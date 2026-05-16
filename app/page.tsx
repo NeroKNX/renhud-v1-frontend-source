@@ -49,7 +49,7 @@ export default function LandingPage() {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="text-sm ren-text-secondary mb-1"
           >
-            No soy un asistente. <span className="ren-text-primary">Soy otra cosa.</span>
+            Una inteligencia que piensa distinto.
           </motion.p>
 
           <motion.p
@@ -58,8 +58,8 @@ export default function LandingPage() {
             transition={{ duration: 0.4, delay: 0.4 }}
             className="text-[13px] ren-text-tertiary max-w-[360px] mx-auto mb-6 leading-relaxed"
           >
-            Una presencia que aprende contigo.   
-            Documentos, ideas, decisiones — procesa lo que le tires y devuelve criterio.
+            Una entidad en construcción — procesa documentos, analiza decisiones,
+            estructura información compleja y devuelve criterio.
           </motion.p>
 
           {/* Botones */}
@@ -91,11 +91,11 @@ export default function LandingPage() {
             className="flex flex-wrap gap-2 justify-center mb-7"
           >
             {[
-              { icon: '🧠', label: 'Piensa contigo' },
-              { icon: '📋', label: 'Documentos' },
-              { icon: '🩺', label: 'Clínico' },
-              { icon: '💾', label: 'Memoria' },
-              { icon: '🔗', label: 'Se conecta' },
+              { icon: '🧠', label: 'Razonamiento' },
+              { icon: '📋', label: 'Documentación' },
+              { icon: '🩺', label: 'Entorno clínico' },
+              { icon: '💾', label: 'Memoria persistente' },
+              { icon: '🔗', label: 'Integración' },
             ].map((pill) => (
               <span key={pill.label} className="ren-pill">
                 <span className="text-[13px]">{pill.icon}</span>
