@@ -49,7 +49,7 @@ export default function LandingPage() {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="text-sm ren-text-secondary mb-1"
           >
-            Una inteligencia que piensa distinto.
+            Procesamiento de información con criterio clínico y estructural.
           </motion.p>
 
           <motion.p
@@ -58,8 +58,9 @@ export default function LandingPage() {
             transition={{ duration: 0.4, delay: 0.4 }}
             className="text-[13px] ren-text-tertiary max-w-[360px] mx-auto mb-6 leading-relaxed"
           >
-            Una entidad en construcción — procesa documentos, analiza decisiones,
-            estructura información compleja y devuelve criterio.
+            REN analiza documentos complejos, estructura historias clínicas,
+            administra conocimiento y mantiene contexto a través del tiempo.
+            Diseñado para entornos donde la información densa necesita orden.
           </motion.p>
 
           {/* Botones */}
@@ -91,11 +92,11 @@ export default function LandingPage() {
             className="flex flex-wrap gap-2 justify-center mb-7"
           >
             {[
-              { icon: '🧠', label: 'Razonamiento' },
-              { icon: '📋', label: 'Documentación' },
-              { icon: '🩺', label: 'Entorno clínico' },
-              { icon: '💾', label: 'Memoria persistente' },
-              { icon: '🔗', label: 'Integración' },
+              { icon: '🧠', label: 'Razonamiento estructural' },
+              { icon: '📋', label: 'Documentación clínica' },
+              { icon: '💾', label: 'Memoria contextual' },
+              { icon: '🔗', label: 'Integración de datos' },
+              { icon: '🔍', label: 'Análisis crítico' },
             ].map((pill) => (
               <span key={pill.label} className="ren-pill">
                 <span className="text-[13px]">{pill.icon}</span>
