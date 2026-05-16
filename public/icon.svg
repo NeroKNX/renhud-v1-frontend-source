@@ -1,0 +1,24 @@
+<svg width="180" height="180" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @media (prefers-color-scheme: light) {
+      .bg { fill: #0a0a0c; }
+      .stroke1 { stroke: #818cf8; }
+      .stroke2 { stroke: #a78bfa; }
+      .stroke3 { stroke: #6366f1; }
+      .fill1 { fill: #a78bfa; }
+    }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0a0a0c; }
+      .stroke1 { stroke: #818cf8; }
+      .stroke2 { stroke: #a78bfa; }
+      .stroke3 { stroke: #6366f1; }
+      .fill1 { fill: #a78bfa; }
+    }
+  </style>
+  <rect class="bg" width="48" height="48" rx="10" />
+  <path class="stroke1" d="M12 36L8 42H18L14 36" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path class="stroke2" d="M14 34C14 34 16 28 20 26C24 24 28 20 30 16C32 12 36 10 38 10C38 10 36 14 34 18C32 22 30 28 28 30C26 32 22 34 20 34H14Z" stroke-width="1.2" stroke-linejoin="round"/>
+  <path class="stroke1" d="M30 16C30 16 32 12 36 10C38 10 40 10 40 12" stroke-width="1.2" stroke-linecap="round"/>
+  <path class="stroke3" d="M34 20L28 24" stroke-width="1" stroke-linecap="round"/>
+  <circle class="fill1" cx="21" cy="18" r="1.5" opacity="0.6"/>
+</svg>
