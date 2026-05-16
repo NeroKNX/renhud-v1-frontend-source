@@ -10,7 +10,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'REN',
-  description: 'Procesamiento de documentos clínicos con IA. Laboratorios, gases, evoluciones — entra desordenado, sale estructurado.',
+  description: 'Una presencia que aprende contigo. Documentos, ideas, decisiones — procesa lo que le tires y devuelve criterio.',
   generator: 'Renhud',
   icons: {
     icon: '/icon.svg',

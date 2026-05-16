@@ -9,14 +9,7 @@ export default function LandingPage() {
   const router = useRouter();
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden ren-bg-primary" style={{
-      background: 'radial-gradient(ellipse at 30% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%) var(--ren-bg-primary)'
-    }}>
-      {/* Background glow */}
-      <div className="fixed inset-0 pointer-events-none" style={{
-        background: 'radial-gradient(ellipse at 30% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%)',
-      }} />
-
+    <div className="h-dvh flex flex-col overflow-hidden ren-bg-primary">
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
@@ -27,19 +20,19 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-[480px] w-full"
+          className="text-center max-w-[460px] w-full"
         >
-          {/* Cuervo SVG */}
+          {/* Cuervo */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex justify-center mb-4"
+            className="flex justify-center mb-5"
           >
             <CrowIcon size="lg" animate />
           </motion.div>
 
-          {/* Título con gradiente animado */}
+          {/* Título */}
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -56,17 +49,17 @@ export default function LandingPage() {
             transition={{ duration: 0.4, delay: 0.3 }}
             className="text-sm ren-text-secondary mb-1"
           >
-            No soy un asistente genérico. <span className="ren-text-primary">Soy REN.</span>
+            No soy un asistente. <span className="ren-text-primary">Soy otra cosa.</span>
           </motion.p>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.4 }}
-            className="text-[13px] ren-text-tertiary max-w-[360px] mx-auto mb-6"
+            className="text-[13px] ren-text-tertiary max-w-[360px] mx-auto mb-6 leading-relaxed"
           >
-            Procesamiento de documentos clínicos con IA.
-            Laboratorios, gases, evoluciones — entra desordenado, sale estructurado.
+            Una presencia que aprende contigo.   
+            Documentos, ideas, decisiones — procesa lo que le tires y devuelve criterio.
           </motion.p>
 
           {/* Botones */}
@@ -90,7 +83,7 @@ export default function LandingPage() {
             </button>
           </motion.div>
 
-          {/* Pills */}
+          {/* Pills — capacidades variadas */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -98,10 +91,11 @@ export default function LandingPage() {
             className="flex flex-wrap gap-2 justify-center mb-7"
           >
             {[
-              { icon: '📋', label: 'Laboratorios' },
-              { icon: '🩺', label: 'Gases arteriales' },
-              { icon: '📄', label: 'Documentación UCI' },
-              { icon: '🧠', label: 'Memoria persistente' },
+              { icon: '🧠', label: 'Piensa contigo' },
+              { icon: '📋', label: 'Documentos' },
+              { icon: '🩺', label: 'Clínico' },
+              { icon: '💾', label: 'Memoria' },
+              { icon: '🔗', label: 'Se conecta' },
             ].map((pill) => (
               <span key={pill.label} className="ren-pill">
                 <span className="text-[13px]">{pill.icon}</span>
@@ -115,9 +109,11 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.7 }}
-            className="text-[11px] ren-text-tertiary"
+            className="text-[11px] ren-text-tertiary space-x-3"
           >
-            <span className="opacity-50">🜁</span> REN · alpha · <a href="/chat" className="hover:text-[var(--accent-hover)] transition-colors">chat</a>
+            <span className="opacity-50">🜁</span>
+            <span>REN · alpha</span>
+            <a href="/chat" className="hover:text-[var(--accent-hover)] transition-colors">chat</a>
           </motion.footer>
         </motion.div>
       </main>
