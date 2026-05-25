@@ -66,7 +66,7 @@ export function KeyboardShortcutsHelp() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+              className="fixed inset-0 z-50" style={{ background: 'var(--ren-overlay)', backdropFilter: 'blur(4px)' }}
             />
 
             <motion.div

@@ -6,7 +6,7 @@ export interface UserPreferences {
   theme: ThemeMode;
   soundEnabled: boolean;
   drafts: Record<string, string>;
-  skillNewChat: boolean;
+  trickNewChat: boolean;
 }
 
 const PREFERENCES_KEY = 'ren_preferences';
@@ -16,7 +16,7 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   theme: 'dark',
   soundEnabled: false,
   drafts: {},
-  skillNewChat: true,
+  trickNewChat: true,
 };
 
 export const fontSizes = {
@@ -74,8 +74,8 @@ export class PreferencesManager {
     this.updatePreferences({ soundEnabled: enabled });
   }
 
-  static setSkillNewChat(enabled: boolean): void {
-    this.updatePreferences({ skillNewChat: enabled });
+  static setTrickNewChat(enabled: boolean): void {
+    this.updatePreferences({ trickNewChat: enabled });
   }
 
   static saveDraft(sessionId: string, text: string): void {
@@ -99,7 +99,7 @@ export class PreferencesManager {
     if (typeof window === 'undefined') return;
     try {
       sessionStorage.removeItem(PREFERENCES_KEY);
-      sessionStorage.removeItem('ren_user');
+      sessionStorage.removeItem('ren_guest');
     } catch {}
   }
 

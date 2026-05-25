@@ -58,7 +58,7 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
 
   const filteredSessions = sessions
     .filter(session => {
-      const titleMatch = session.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const titleMatch = (session.title || '').toLowerCase().includes(searchQuery.toLowerCase());
       return titleMatch && session.id !== pendingDeleteId;
     })
     .sort((a, b) => {
@@ -227,7 +227,7 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+            className="fixed inset-0 z-40" style={{ background: 'var(--ren-overlay)', backdropFilter: 'blur(4px)' }}
           />
 
           <motion.div
@@ -235,7 +235,7 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed left-0 top-0 bottom-0 w-80 md:w-96 bg-[var(--ren-bg-secondary)] border-r border-[var(--ren-border)] z-50 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+            className="fixed left-0 top-0 bottom-0 w-80 md:w-96 bg-[var(--ren-bg-secondary)] border-r border-[var(--ren-border)] z-50 flex flex-col" style={{ boxShadow: 'var(--ren-shadow-sidebar)' }}
           >
             {/* Header */}
             <div className="px-5 py-6 border-b border-[var(--ren-border)]">
@@ -363,9 +363,6 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                             ? 'bg-[var(--ren-bg-tertiary)] border-[var(--accent-color)]/50'
                             : 'ren-bg-primary border-[var(--ren-border)] hover:border-[var(--accent-color)]/30 hover:bg-[var(--ren-bg-tertiary)]'
                     }`}
-                    onClick={() => selectionMode
-                      ? toggleSelection(session.id, { stopPropagation: () => {} } as React.MouseEvent)
-                      : handleSelectSession(session.id)}
                     onTouchStart={(e) => handleTouchStart(session.id, e)}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={() => handleTouchEnd(session.id, session)}
@@ -374,8 +371,24 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                       transition: swipingId === session.id ? 'none' : undefined,
                     }}
                   >
+                    <a
+                      href={`/chat?session=${session.id}`}
+                      onClick={(e) => {
+                        if (selectionMode) {
+                          e.preventDefault();
+                          toggleSelection(session.id, e);
+                          return;
+                        }
+                        // Ctrl+Click / Cmd+Click / middle-click → new tab
+                        if (e.ctrlKey || e.metaKey || e.button === 1) return;
+                        e.preventDefault();
+                        handleSelectSession(session.id);
+                      }}
+                      className="block w-full"
+                      style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
                     {editingId === session.id && !selectionMode ? (
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}>
                         <input
                           type="text"
                           value={editTitle}
@@ -420,14 +433,14 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                           {!selectionMode && (
                             <div className="flex items-center gap-1 flex-shrink-0">
                               <button
-                                onClick={(e) => handleStartEdit(session, e)}
+                                onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleStartEdit(session, e); }}
                                 className="p-1.5 hover:bg-[var(--ren-bg-tertiary)] rounded-lg transition-colors opacity-60 hover:opacity-100"
                                 title="Renombrar"
                               >
                                 <Edit2 size={13} className="text-[var(--ren-text-tertiary)]" />
                               </button>
                               <button
-                                onClick={(e) => handleDeleteClick(session.id, session, e)}
+                                onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleDeleteClick(session.id, session, e); }}
                                 className="p-1.5 hover:bg-red-500/15 rounded-lg transition-colors opacity-60 hover:opacity-100 hover:text-red-400"
                                 title="Eliminar"
                               >
@@ -464,6 +477,7 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                         )}
                       </>
                     )}
+                    </a>
                   </motion.div>
                 ))}
                 </>

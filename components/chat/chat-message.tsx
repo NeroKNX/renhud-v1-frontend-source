@@ -1,10 +1,11 @@
 'use client';
 
 import { motion } from 'motion/react';
-import { User, Copy, Check, Pencil, Brain, FileText } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { User, Copy, Check, Pencil, Brain, FileText, ChevronDown, ChevronUp, Bookmark } from 'lucide-react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { marked } from 'marked';
 import { copyToClipboard, type ModelType } from '@/lib/model-config';
+import type { TrickInfo } from '@/lib/session-manager';
 
 interface AttachedFile {
   name: string;
@@ -18,8 +19,10 @@ interface ChatMessageProps {
   timestamp?: string;
   model?: ModelType;
   isDeep?: boolean;
+  activeTrick?: TrickInfo;
   files?: AttachedFile[];
   onEdit?: (newMessage: string) => void;
+  isStreaming?: boolean;
 }
 
 marked.setOptions({
@@ -29,11 +32,47 @@ marked.setOptions({
 
 import { CrowIcon } from '@/components/ui/crow-icon';
 
-export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit }: ChatMessageProps) {
+export function ChatMessage({ message, isUser, timestamp, isDeep, activeTrick, files, onEdit, isStreaming }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
+  const [copyBlockCopied, setCopyBlockCopied] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [guardarOpen, setGuardarOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
+
+  // ── Parsear bloque SALIDA COPIABLE ──
+  let mainMessage = message;
+  let copyBlockContent: string | null = null;
+  let guardarContent: string | null = null;
+  if (message) {
+    const delimiters = ['\n--- SALIDA COPIABLE ---\n', '\n-- SALIDA COPIABLE --\n'];
+    let bestIdx = -1;
+    let bestDelim = '';
+    for (const delim of delimiters) {
+      const idx = message.lastIndexOf(delim);
+      if (idx > bestIdx) {
+        bestIdx = idx;
+        bestDelim = delim;
+      }
+    }
+    if (bestIdx !== -1) {
+      const after = message.slice(bestIdx + bestDelim.length);
+      const finIdx = after.lastIndexOf('\n---');
+      copyBlockContent = finIdx !== -1 ? after.slice(0, finIdx).trim() : after.trim();
+      mainMessage = message.slice(0, bestIdx).trim();
+    }
+
+    // ── Parsear línea GUARDAR (opción B — render colapsable) ──
+    const guardarLines = mainMessage.split('\n').filter(line => /^(?:\s*)?(?:📝\s*)?GUARDAR:\s*(.+)$/i.test(line.trim()));
+    if (guardarLines.length > 0) {
+      const lastLine = guardarLines[guardarLines.length - 1];
+      const match = lastLine.match(/GUARDAR:\s*(.+)$/i);
+      if (match) {
+        guardarContent = match[1].trim();
+        mainMessage = mainMessage.split('\n').filter(line => !/^(?:\s*)?(?:📝\s*)?GUARDAR:/i.test(line.trim())).join('\n').trim();
+      }
+    }
+  }
 
   const handleBubbleTap = () => {
     setShowActions(prev => !prev);
@@ -51,7 +90,7 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit 
   }, [showActions]);
 
   const handleCopy = async () => {
-    const success = await copyToClipboard(message);
+    const success = await copyToClipboard(mainMessage);
     if (success) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -119,9 +158,36 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit 
     return `${d} ${t}`;
   };
 
-  const htmlContent = renderMarkdown(message);
+  const htmlContent = renderMarkdown(mainMessage);
+  const finalHtml = isStreaming
+    ? htmlContent + '<span class="ren-streaming-cursor">▊</span>'
+    : htmlContent;
+
+  // ── Burbuja pensando (streaming, texto vacío) ──
+  if (!message && !isUser) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+        className="flex gap-1.5 sm:gap-2 justify-start mb-2 sm:mb-2.5 group"
+      >
+        <CrowIcon size="md" animate />
+        <div className="relative flex flex-col max-w-[88%] sm:max-w-[82%] md:max-w-[68%] min-w-0 items-start">
+          <div className="bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] rounded-2xl rounded-bl-sm px-4 sm:px-4 py-3 sm:py-3.5">
+            <div className="flex items-center gap-1.5 h-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
+    <>
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
@@ -136,14 +202,34 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit 
         <div 
           ref={bubbleRef} 
           onClick={handleBubbleTap}
-          className={`relative px-3 sm:px-3.5 py-1.5 sm:py-2 transition-all min-w-0 cursor-pointer active:scale-[0.98] hover:brightness-110 ${
-            isUser
-              ? 'bg-[var(--ren-bg-message-user)] text-[var(--ren-text-primary)] rounded-2xl rounded-br-sm ring-1 ring-[var(--accent-color)]/20'
-              : isDeep
-                ? 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border-2 border-[var(--accent-color)]/40'
-                : 'bg-[var(--ren-bg-secondary)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border border-[var(--ren-border)]'
+          className={`relative px-3 sm:px-3.5 py-1.5 sm:py-2 transition-all min-w-0 ${
+            isUser && activeTrick
+              ? 'bg-[var(--ren-bg-message-user)] text-[var(--ren-text-primary)] rounded-2xl rounded-br-sm border-2'
+              : isUser
+                ? 'bg-[var(--ren-bg-message-user)] text-[var(--ren-text-primary)] rounded-2xl rounded-br-sm ring-1 ring-[var(--accent-color)]/20'
+                : activeTrick
+                  ? 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border-2'
+                  : isDeep
+                    ? 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border-2 border-[var(--accent-color)]/40'
+                    : 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border border-[var(--ren-border)]'
           }`}
+          style={activeTrick && !isUser ? { borderColor: activeTrick.color + '66' } : isUser && activeTrick ? { borderColor: activeTrick.color + '66' } : undefined}
         >
+          {/* Trick badge */}
+          {activeTrick && (
+            <div className="flex items-center gap-1 mb-1.5 sm:mb-2">
+              <span 
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono"
+                style={{ 
+                  backgroundColor: activeTrick.color + '18',
+                  border: `1px solid ${activeTrick.color}40`,
+                  color: activeTrick.color
+                }}
+              >
+                {activeTrick.emoji} {activeTrick.name}
+              </span>
+            </div>
+          )}
           {files && files.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2.5">
               {files.map((file, i) => (
@@ -164,11 +250,81 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit 
 
           <div
             ref={contentRef}
-            className="ren-markdown leading-[1.5] tracking-[0.01em] text-sm md:text-base text-[var(--ren-text-primary)]"
-            dangerouslySetInnerHTML={{ __html: htmlContent }}
+            className="ren-markdown leading-[1.5] tracking-[0.01em] text-sm md:text-base text-[var(--ren-text-primary)] select-text"
+            style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+            dangerouslySetInnerHTML={{ __html: finalHtml }}
           />
 
-          <div className="flex items-end justify-between mt-1 sm:mt-1.5">
+          {/* ── Guardar colapsable (opción B) ── */}
+          {guardarContent && !isUser && (
+            <div className="mt-2.5">
+              <button
+                onClick={() => setGuardarOpen(prev => !prev)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-mono transition-all w-full border border-dashed"
+                style={{
+                  backgroundColor: guardarOpen ? 'var(--accent-color)' + '0c' : 'transparent',
+                  borderColor: guardarOpen ? 'var(--accent-color)' + '30' : 'var(--ren-border)' + '30',
+                  color: 'var(--ren-text-tertiary)',
+                }}
+              >
+                <Bookmark size={10} className="text-[var(--accent-color)]/70 flex-shrink-0" />
+                <span className="truncate flex-1 text-left">
+                  {guardarOpen ? 'Guardado en memoria' : '📌 Guardado'}
+                </span>
+                {guardarOpen ? <ChevronUp size={10} className="flex-shrink-0" /> : <ChevronDown size={10} className="flex-shrink-0" />}
+              </button>
+              {guardarOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  transition={{ duration: 0.2, ease: 'easeOut' }}
+                  className="mt-1 px-2.5 py-2 rounded-lg text-[11px] sm:text-xs leading-relaxed"
+                  style={{
+                    backgroundColor: 'var(--accent-color)' + '06',
+                    border: '1px solid var(--accent-color)' + '15',
+                    color: 'var(--ren-text-secondary)',
+                  }}
+                >
+                  <span className="font-mono whitespace-pre-wrap break-words select-text" style={{ userSelect: 'text', WebkitUserSelect: 'text' }}>
+                    {guardarContent}
+                  </span>
+                </motion.div>
+              )}
+            </div>
+          )}
+
+          {/* ── Bloque Salida Copiable (estilo Claude Código) ── */}
+          {copyBlockContent && !isUser && (
+            <div className="mt-3 pt-3 border-t border-[var(--ren-border)]/40">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-semibold tracking-wider uppercase text-[var(--ren-text-tertiary)]">
+                  📋 Salida Copiable
+                </span>
+                <button
+                  onClick={() => {
+                    copyToClipboard(copyBlockContent!);
+                    setCopyBlockCopied(true);
+                    setTimeout(() => setCopyBlockCopied(false), 2000);
+                  }}
+                  className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium rounded-md border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] hover:bg-[var(--ren-bg-secondary)] text-[var(--ren-text-secondary)] hover:text-[var(--ren-text-primary)] transition-all active:scale-95"
+                >
+                  {copyBlockCopied ? (
+                    <><Check size={10} className="text-emerald-400" /> Copiado</>
+                  ) : (
+                    <><Copy size={10} /> Copiar</>
+                  )}
+                </button>
+              </div>
+              <pre
+                className="whitespace-pre-wrap font-mono text-[11px] sm:text-xs leading-relaxed text-[var(--ren-text-secondary)] bg-[var(--ren-bg-tertiary)]/50 border border-[var(--ren-border)]/30 rounded-lg px-3 py-2.5 select-text overflow-x-auto"
+                style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
+              >
+                {copyBlockContent}
+                </pre>
+            </div>
+          )}
+
+          <div className="flex items-end justify-between mt-2 sm:mt-2.5">
             <div className="leading-none">
               {timestamp && (
                 <span className="text-[9px] sm:text-[10px] text-[var(--ren-text-tertiary)]/40">{formatTime(timestamp)}</span>
@@ -206,10 +362,27 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, files, onEdit 
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0 self-end w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[#1e1e24] to-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]/50 flex items-center justify-center shadow-sm">
+        <div className="flex-shrink-0 self-end w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full bg-gradient-to-br from-[var(--ren-bg-tertiary)] to-[var(--ren-bg-secondary)] border border-[var(--ren-border)]/50 flex items-center justify-center shadow-sm">
           <User size={11} className="sm:w-[13px] sm:h-[13px] md:w-[15px] md:h-[15px] text-[var(--ren-text-tertiary)]" />
         </div>
       )}
     </motion.div>
+
+    {isStreaming && (
+      <style>{`
+        @keyframes renCursorBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+        .ren-streaming-cursor {
+          display: inline-block;
+          animation: renCursorBlink 1s step-end infinite;
+          color: var(--accent-color);
+          font-size: 0.9em;
+          margin-left: 1px;
+        }
+      `}</style>
+    )}
+    </>
   );
 }

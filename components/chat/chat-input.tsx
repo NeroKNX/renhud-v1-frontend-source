@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { PreferencesManager } from '@/lib/preferences-manager';
 
-export interface QuickSkill {
+export interface QuickTrick {
   id: string;
   name: string;
   enabled: boolean;
@@ -17,11 +17,11 @@ interface ChatInputProps {
   onSendMessage: (message: string, isDeep?: boolean, files?: File[]) => void;
   disabled?: boolean;
   sessionId?: string;
-  quickSkills?: QuickSkill[];
-  onToggleSkill?: (skillId: string) => void;
+  quickTricks?: QuickTrick[];
+  onToggleTrick?: (trickId: string) => void;
 }
 
-export function ChatInput({ onSendMessage, disabled, sessionId, quickSkills, onToggleSkill }: ChatInputProps) {
+export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onToggleTrick }: ChatInputProps) {
   const [message, setMessage] = useState('');
   const [isAdvancedMode, setIsAdvancedMode] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -111,7 +111,12 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickSkills, onT
   };
 
   return (
-    <div className="border-t border-[var(--ren-border)] ren-bg-primary px-2 sm:px-4 py-3 sm:py-4">
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+      className="border-t border-[var(--ren-border)] ren-bg-primary px-2 sm:px-4 py-3 sm:py-4"
+    >
       {attachedFiles.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
           {attachedFiles.map((file, index) => (
@@ -148,50 +153,57 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickSkills, onT
       <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3">
         <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-1.5 sm:gap-2 group relative flex-shrink-0">
-            <input
-              type="checkbox"
-              checked={isAdvancedMode}
-              onChange={(e) => setIsAdvancedMode(e.target.checked)}
+            <motion.button
+              type="button"
               disabled={disabled}
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded accent-[#6366f1] cursor-pointer hover:border-[var(--accent-color)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            />
-            <Brain size={12} className={`sm:w-[14px] sm:h-[14px] transition-colors flex-shrink-0 ${isAdvancedMode ? 'text-[var(--accent-color)]' : 'text-[var(--ren-text-tertiary)]'}`} />
-            <span className={`text-xs sm:text-sm font-mono transition-colors flex-shrink-0 ${isAdvancedMode ? 'text-[var(--accent-color)]' : 'text-[var(--ren-text-tertiary)]'}`}>
-              Deep
-            </span>
+              onClick={() => setIsAdvancedMode(!isAdvancedMode)}
+              whileTap={{ scale: 0.92 }}
+              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                isAdvancedMode
+                  ? 'bg-[var(--accent-color)]/12 border-[var(--accent-color)]/40 text-[var(--accent-hover)]'
+                  : 'border-transparent text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)] hover:bg-[var(--ren-bg-tertiary)]'
+              }`}
+              title="Alternar modo profundo"
+            >
+              <Brain size={12} className={`sm:w-[14px] sm:h-[14px] transition-colors flex-shrink-0 ${
+                isAdvancedMode ? 'text-[var(--accent-color)]' : 'text-[var(--ren-text-tertiary)]'
+              }`} />
+              <span className={`text-xs sm:text-sm font-mono transition-colors flex-shrink-0 ${
+                isAdvancedMode ? 'text-[var(--accent-hover)]' : ''
+              }`}>
+                Deep
+              </span>
+              {isAdvancedMode && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="w-1.5 h-1.5 rounded-full bg-[var(--accent-color)]"
+                />
+              )}
+            </motion.button>
             <div className="absolute bottom-full left-0 mb-1.5 hidden group-hover:block z-50">
               <div className="bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded-lg px-2.5 py-1.5 text-xs text-[var(--ren-text-primary)] font-mono whitespace-nowrap shadow-lg">
                 Usa el modelo avanzado (Pro) para preguntas complejas
               </div>
             </div>
-            <motion.div
-              className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full flex-shrink-0 ${isAdvancedMode ? 'bg-[var(--accent-color)]' : 'bg-gray-700'}`}
-              animate={{ scale: isAdvancedMode ? [1, 1.3, 1] : 1 }}
-              transition={{ duration: 0.3 }}
-            />
           </div>
 
-          {quickSkills?.filter(s => s.quickAccess).length > 0 && (
-            <div className="flex items-center gap-1.5 sm:gap-2 pl-2 sm:pl-3 border-l border-[var(--ren-border)]">
-              {quickSkills?.filter(s => s.quickAccess).map(skill => (
-                <label
-                  key={skill.id}
-                  className="flex items-center gap-1 sm:gap-1.5 cursor-pointer flex-shrink-0 group/skill"
+          {quickTricks?.filter(s => s.quickAccess).length > 0 && (
+            <div className="flex items-center gap-1 sm:gap-1.5 pl-2 sm:pl-3 border-l border-[var(--ren-border)]">
+              {quickTricks?.filter(s => s.quickAccess).map(trick => (
+                <motion.button
+                  key={trick.id}
+                  type="button"
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onToggleTrick?.(trick.id)}
+                  className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-full border text-[10px] sm:text-[11px] font-mono transition-all cursor-pointer ${
+                    trick.enabled
+                      ? 'bg-[var(--accent-color)]/12 border-[var(--accent-color)]/35 text-[var(--accent-hover)]'
+                      : 'border-[var(--ren-border)] text-[var(--ren-text-tertiary)] hover:border-[var(--accent-color)]/30 hover:text-[var(--ren-text-secondary)]'
+                  }`}
                 >
-                  <input
-                    type="checkbox"
-                    checked={skill.enabled}
-                    onChange={() => onToggleSkill?.(skill.id)}
-                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded accent-[#6366f1] cursor-pointer hover:border-[var(--accent-color)] transition-colors"
-                  />
-                  <span className={`text-[10px] sm:text-[11px] font-mono transition-colors ${
-                    skill.enabled
-                      ? 'text-[var(--accent-hover)]'
-                      : 'text-[var(--ren-text-tertiary)] group-hover/skill:text-[var(--ren-text-tertiary)]'
-                  }`}>
-                    {skill.emoji || '⚡'} {skill.name}
-                  </span>
-                </label>
+                  {trick.emoji || '⚡'} {trick.name}
+                </motion.button>
               ))}
             </div>
           )}
@@ -251,6 +263,6 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickSkills, onT
           <span className="sm:hidden">Enter: enviar | Shift+Enter: nueva linea</span>
         </p>
       )}
-    </div>
+    </motion.div>
   );
 }

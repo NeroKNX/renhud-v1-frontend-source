@@ -1,5 +1,12 @@
 import type { ModelType } from './model-config';
 
+export interface TrickInfo {
+  id: string;
+  name: string;
+  emoji: string;
+  color: string;
+}
+
 export interface Message {
   id: string;
   text: string;
@@ -7,6 +14,8 @@ export interface Message {
   timestamp: string;
   model?: ModelType;
   isDeep?: boolean;
+  isError?: boolean;
+  activeTrick?: TrickInfo;
   files?: { name: string; type: string; data: string }[];
 }
 
@@ -140,12 +149,12 @@ export class SessionManager {
     }
   }
 
-  /** Logout — limpia TODO (incluyendo ren_user) */
+  /** Logout — limpia TODO */
   static logout(): void {
     SessionManager.clearAllLocal();
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem('ren_current_session');
-      sessionStorage.removeItem('ren_user');
+      sessionStorage.removeItem('ren_guest');
     }
   }
 }

@@ -11,6 +11,7 @@ const sizeMap = {
   md: 'w-9 h-9',
   lg: 'w-11 h-11',
   xl: 'w-14 h-14',
+  '2xl': 'w-16 h-16',
 };
 
 export function CrowIcon({ className = '', animate = false, size = 'md' }: CrowIconProps) {

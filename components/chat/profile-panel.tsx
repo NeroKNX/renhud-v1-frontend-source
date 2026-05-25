@@ -102,7 +102,7 @@ export function ProfilePanel({ isOpen, onClose, isGuest, userId, userName }: Pro
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 z-40" style={{ background: 'var(--ren-overlay)', backdropFilter: 'blur(4px)' }}
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 10 }}

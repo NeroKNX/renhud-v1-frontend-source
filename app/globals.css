@@ -18,9 +18,11 @@ html {
   --ren-bg-primary: #0a0a0c;
   --ren-bg-secondary: #131316;
   --ren-bg-tertiary: #18181b;
+  --ren-overlay: rgba(0,0,0,0.55);
+  --ren-shadow-sidebar: 0 0 50px rgba(0,0,0,0.5);
   --ren-bg-header: #0a0a0c;
-  --ren-bg-message-user: #18181b;
-  --ren-bg-message-ai: #131316;
+  --ren-bg-message-user: #2e2e40;
+  --ren-bg-message-ai: #1e1e2a;
   --ren-text-primary: #e4e4e7;
   --ren-text-secondary: #a1a1aa;
   --ren-text-tertiary: #71717a;
@@ -60,9 +62,11 @@ html {
   --ren-bg-primary: #f8fafc;
   --ren-bg-secondary: #ffffff;
   --ren-bg-tertiary: #f1f5f9;
+  --ren-overlay: rgba(0,0,0,0.15);
+  --ren-shadow-sidebar: 0 0 40px rgba(0,0,0,0.12);
   --ren-bg-header: #ffffff;
-  --ren-bg-message-user: #e0e7ff;
-  --ren-bg-message-ai: #f1f5f9;
+  --ren-bg-message-user: #dde4ff;
+  --ren-bg-message-ai: #ffffff;
   --ren-text-primary: #1e293b;
   --ren-text-secondary: #475569;
   --ren-text-tertiary: #94a3b8;
@@ -180,7 +184,7 @@ html {
   }
   body {
     @apply text-foreground;
-    background: transparent;
+    background: var(--background);
     font-size: var(--base-font-size);
   }
 }
@@ -274,6 +278,18 @@ html {
 
 /* Theme-aware border utility */
 .ren-border-color { border-color: var(--ren-border); }
+
+/* Hide number input spinners throughout the app */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
 
 /* Theme-aware placeholder */
 .ren-placeholder::placeholder { color: var(--ren-text-tertiary); opacity: 0.6; }
@@ -412,18 +428,69 @@ html::before {
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.10) 1.5px, transparent 1.5px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 75% 55% at 50% 45%, black 30%, transparent 72%);
-  -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 45%, black 30%, transparent 72%);
+    radial-gradient(circle, rgba(255,255,255,0.18) 2px, transparent 2px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 45%, black 30%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 45%, black 30%, transparent 72%);
+  animation: renDotPulse 8s ease-in-out infinite;
 }
 
+/* Desktop: dots más grandes, más densos, máscara más generosa */
+@media (min-width: 1024px) {
+  html::before {
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,0.22) 2.5px, transparent 2.5px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse 85% 60% at 50% 45%, black 35%, transparent 68%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 45%, black 35%, transparent 68%);
+  }
+}
+
+/* Light mode: fondo limpio, sin patrones, sin dots, sin máscaras */
 [data-theme="light"] html {
   background: #f8fafc;
 }
 [data-theme="light"] html::before {
-  background-image:
-    radial-gradient(circle, rgba(0,0,0,0.10) 1.5px, transparent 1.5px);
+  display: none;
+}
+
+/* Ren vignette overlay — sits between dots and content */
+html::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse 75% 55% at 50% 45%, transparent 30%, rgba(0,0,0,0.35) 100%);
+  animation: renVignette 10s ease-in-out infinite;
+}
+
+[data-theme="light"] html::after {
+  display: none;
+}
+
+
+
+@keyframes renVignette {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+@keyframes renDotPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Button glow effect */
+.ren-btn-glow {
+  transition: all 0.2s ease;
+}
+.ren-btn-glow:hover {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+}
+
+[data-theme="light"] .ren-btn-glow:hover {
+  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
 }
 
 /* Animations */

@@ -4,16 +4,17 @@ import { X, Volume2, VolumeX, Type, Copy, Check, Sun, Moon } from 'lucide-react'
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PreferencesManager, type FontSize, type ThemeMode, fontSizes } from '@/lib/preferences-manager';
-import { SessionManager } from '@/lib/session-manager';
 import { copyToClipboard } from '@/lib/model-config';
+
+import type { Message } from '@/lib/session-manager';
 
 interface SettingsPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  currentSessionId: string;
+  messages: Message[];
 }
 
-export function SettingsPanel({ isOpen, onClose, currentSessionId }: SettingsPanelProps) {
+export function SettingsPanel({ isOpen, onClose, messages }: SettingsPanelProps) {
   const [fontSize, setFontSize] = useState<FontSize>('medium');
   const [theme, setTheme] = useState<ThemeMode>('dark');
   const [soundEnabled, setSoundEnabled] = useState(false);
@@ -48,10 +49,9 @@ export function SettingsPanel({ isOpen, onClose, currentSessionId }: SettingsPan
   };
 
   const handleCopyConversation = async () => {
-    const session = SessionManager.getSession(currentSessionId);
-    if (!session) return;
+    if (!messages.length) return;
 
-    const content = `Conversación con Ren - ${session.title}\n${session.messages.map(msg => {
+    const content = `Conversación con Ren\n${messages.map(msg => {
       const role = msg.isUser ? 'Usuario' : 'Ren';
       return `${role}: ${msg.text}`;
     }).join('\n\n')}`;
@@ -72,7 +72,7 @@ export function SettingsPanel({ isOpen, onClose, currentSessionId }: SettingsPan
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="fixed inset-0 z-40" style={{ background: 'var(--ren-overlay)', backdropFilter: 'blur(4px)' }}
           />
 
           <motion.div
@@ -152,7 +152,7 @@ export function SettingsPanel({ isOpen, onClose, currentSessionId }: SettingsPan
               <div className="space-y-2">
                 <button
                   onClick={handleCopyConversation}
-                  disabled={!currentSessionId}
+                  disabled={!messages.length}
                   className="w-full px-4 py-2.5 rounded-lg border border-[var(--ren-border)] ren-bg-primary text-[var(--ren-text-primary)] hover:bg-[var(--ren-bg-tertiary)] hover:border-[var(--accent-color)]/50 font-mono text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {copied ? (

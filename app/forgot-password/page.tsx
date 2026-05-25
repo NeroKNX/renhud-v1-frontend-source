@@ -7,6 +7,16 @@ import { User, Key, Lock, ArrowLeft, Eye, EyeOff, CheckCircle } from 'lucide-rea
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 
+const stagger = {
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  hidden: {},
+};
+
+const fadeSlide = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } },
+};
+
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -54,7 +64,34 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-dvh flex flex-col justify-center px-4 py-6 sm:py-12 overflow-y-auto ren-bg-primary">
+    <div className="min-h-dvh flex flex-col justify-center px-4 py-6 sm:py-12 overflow-y-auto relative">
+      {/* Ambient particles — desktop only */}
+      <div className="hidden lg:block absolute inset-0 pointer-events-none z-0 overflow-hidden">
+        {[...Array(8)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full bg-[var(--accent-color)]"
+            style={{
+              width: Math.random() * 2 + 1,
+              height: Math.random() * 2 + 1,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              opacity: 0.12,
+            }}
+            animate={{
+              y: [0, -(Math.random() * 30 + 10), 0],
+              opacity: [0.06, 0.2, 0.06],
+            }}
+            transition={{
+              duration: Math.random() * 6 + 4,
+              repeat: Infinity,
+              ease: 'easeInOut',
+              delay: Math.random() * 3,
+            }}
+          />
+        ))}
+      </div>
+
       {/* Theme Toggle */}
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
@@ -64,7 +101,7 @@ export default function ForgotPasswordPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md mx-auto"
+        className="w-full max-w-md lg:max-w-lg mx-auto relative z-10"
       >
         <button
           onClick={() => router.push('/login')}
@@ -74,7 +111,24 @@ export default function ForgotPasswordPage() {
           Volver a inicio de sesión
         </button>
 
-        <div className="ren-bg-secondary border border-[var(--ren-border)] rounded-2xl p-8 shadow-[0_0_50px_var(--ren-shadow)]">
+        <div className="relative">
+          {/* Ambient glow behind card — more intense on desktop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+            className="absolute -inset-20 lg:-inset-32 rounded-full pointer-events-none"
+            style={{
+              background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
+              filter: 'blur(40px)',
+            }}
+          />
+          <motion.div
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
+          className="bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)] rounded-2xl p-8 shadow-[0_0_50px_var(--ren-shadow)] hover:shadow-[0_0_60px_var(--ren-shadow-accent)] transition-shadow duration-700 relative"
+        >
           {step === 'success' ? (
             <>
               <motion.div
@@ -88,12 +142,20 @@ export default function ForgotPasswordPage() {
                 </div>
               </motion.div>
 
-              <div className="text-center mb-8">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
+                className="text-center mb-8"
+              >
                 <h1 className="text-2xl font-bold mb-1 ren-gradient-text">Contraseña actualizada</h1>
                 <p className="text-sm ren-text-secondary">Ya puedes iniciar sesión con tu nueva contraseña</p>
-              </div>
+              </motion.div>
 
               <motion.button
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.2 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push('/login')}
@@ -104,23 +166,42 @@ export default function ForgotPasswordPage() {
             </>
           ) : (
             <>
-              {/* Cuervo */}
+              {/* Cuervo con aura */}
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.4 }}
-                className="flex justify-center mb-5"
+                className="flex justify-center mb-5 relative"
               >
-                <CrowIcon size="xl" animate />
+                {/* Aura que respira */}
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)',
+                    filter: 'blur(20px)',
+                    transform: 'scale(1.5)',
+                  }}
+                  animate={{ scale: [1.3, 1.7, 1.3], opacity: [0.35, 0.75, 0.35] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <div className="lg:scale-125 origin-center relative z-10">
+                  <CrowIcon size="xl" animate />
+                </div>
               </motion.div>
 
               <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold mb-1 ren-gradient-text">Recuperar contraseña</h1>
+                <h1 className="text-2xl lg:text-3xl font-bold mb-1 ren-gradient-text">Recuperar contraseña</h1>
                 <p className="text-sm ren-text-secondary">Ingresa tu usuario y el código de recuperación que recibiste al registrarte</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
+              <motion.form
+                onSubmit={handleSubmit}
+                className="space-y-5"
+                variants={stagger}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.div variants={fadeSlide} className="space-y-2">
                   <label className="text-xs ren-text-secondary uppercase tracking-wider">
                     Usuario
                   </label>
@@ -135,9 +216,9 @@ export default function ForgotPasswordPage() {
                       className="w-full ren-bg-primary border border-[var(--ren-border)] rounded-lg px-12 py-3 ren-text-primary text-sm focus:outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/20 transition-all placeholder:text-[var(--ren-text-tertiary)]"
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="space-y-2">
+                <motion.div variants={fadeSlide} className="space-y-2">
                   <label className="text-xs ren-text-secondary uppercase tracking-wider">
                     Código de recuperación
                   </label>
@@ -153,9 +234,9 @@ export default function ForgotPasswordPage() {
                       className="w-full ren-bg-primary border border-[var(--ren-border)] rounded-lg px-12 py-3 ren-text-primary text-sm focus:outline-none focus:border-[var(--accent-color)] focus:ring-2 focus:ring-[var(--accent-color)]/20 transition-all placeholder:text-[var(--ren-text-tertiary)] font-mono tracking-widest text-center"
                     />
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="space-y-2">
+                <motion.div variants={fadeSlide} className="space-y-2">
                   <label className="text-xs ren-text-secondary uppercase tracking-wider">
                     Nueva contraseña
                   </label>
@@ -179,13 +260,20 @@ export default function ForgotPasswordPage() {
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
-                </div>
+                </motion.div>
 
                 {error && (
-                  <p className="text-sm text-red-400 text-center">{error}</p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-sm text-red-400 text-center"
+                  >
+                    {error}
+                  </motion.p>
                 )}
 
                 <motion.button
+                  variants={fadeSlide}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
@@ -194,9 +282,10 @@ export default function ForgotPasswordPage() {
                 >
                   {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}
                 </motion.button>
-              </form>
+              </motion.form>
             </>
           )}
+        </motion.div>
         </div>
       </motion.div>
     </div>

@@ -1,23 +1,25 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { Settings, Star, History, Plus, User, Download, ArrowLeft, Brain, StickyNote, Zap } from 'lucide-react';
+import { Settings, Star, History, Plus, User, Download, ArrowLeft, Brain, StickyNote, Zap, MoreHorizontal } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { ChatMessage } from '@/components/chat/chat-message';
 import { TypingIndicator } from '@/components/chat/typing-indicator';
 import { ChatInput } from '@/components/chat/chat-input';
-import { EmptyState } from '@/components/chat/empty-state';
+import { WelcomeLanding } from '@/components/chat/welcome-landing';
+
 import { HistorySidebar } from '@/components/chat/history-sidebar';
 import { SettingsPanel } from '@/components/chat/settings-panel';
-import { SkillsPanel, type SkillPrompt } from '@/components/chat/skills-panel';
+import { TricksPanel, type TrickPrompt } from '@/components/chat/tricks-panel';
 import { ProfilePanel } from '@/components/chat/profile-panel';
 import { KeyboardShortcutsHelp } from '@/components/chat/keyboard-shortcuts-help';
-import { SkeletonLoader } from '@/components/chat/skeleton-loader';
-import { SessionManager, type Message, type ChatSession } from '@/lib/session-manager';
+import { useAuth } from '@/lib/auth-context';
+import { EmptyState } from '@/components/chat/empty-state';
+import { SessionManager, type Message, type ChatSession, type TrickInfo } from '@/lib/session-manager';
 import { PreferencesManager, fontSizes } from '@/lib/preferences-manager';
 import type { ModelType } from '@/lib/model-config';
-import { sendMessage } from '@/lib/api';
 import * as api from '@/lib/api';
 
 export default function ChatPage() {
@@ -26,29 +28,52 @@ export default function ChatPage() {
   const [isTyping, setIsTyping] = useState(false);
   const [streamingMsg, setStreamingMsg] = useState<Message | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string>('');
-  const sessionMsgs = useRef<Record<string, Message[]>>({}); // messages per active_skill
+  const sessionMsgs = useRef<Record<string, Message[]>>(
+    (() => {
+      try {
+        if (typeof window !== 'undefined') {
+          const raw = sessionStorage.getItem('ren_trick_sessions');
+          if (raw) return JSON.parse(raw);
+        }
+      } catch {}
+      return {};
+    })()
+  ); // messages per active_trick (persisted to sessionStorage)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [userName, setUserName] = useState('');
-  const [isGuest, setIsGuest] = useState(false);
-  const [userId, setUserId] = useState('');
+  const { user, isGuest, isLoading: authLoading, logout: authLogout } = useAuth();
+  const userName = user?.name || user?.username || '';
+  const userId = user?.user_id || '';
   const [showSessionWarning, setShowSessionWarning] = useState(false);
   const [historyRefreshTrigger, setHistoryRefreshTrigger] = useState(0);
   const [hasGeneratedWelcome, setHasGeneratedWelcome] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isSkillsOpen, setIsSkillsOpen] = useState(false);
+  const [isTricksOpen, setIsTricksOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
 
   const [showOnboarding, setShowOnboarding] = useState(false);
 
+  // Tab ID único por pestaña — previene mezcla de sesiones entre tabs
+  const tabIdRef = useRef<string>(
+    typeof window !== 'undefined'
+      ? (sessionStorage.getItem('ren_tab_id') || (() => {
+          const id = crypto.randomUUID?.()?.slice(0,8) || Math.random().toString(36).slice(2,10);
+          sessionStorage.setItem('ren_tab_id', id);
+          return id;
+        })())
+      : 'server'
+  );
+
   // Mobile menu dropdown state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  const [skills, setSkills] = useState<SkillPrompt[]>([]);
+  const [tricks, setTricks] = useState<TrickPrompt[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false);
+  const serverFirstLoadRef = useRef(false);
 
   // ──────────────────────────────────────────────
   // Estado de sesiones: siempre se llena desde API
@@ -65,18 +90,23 @@ export default function ChatPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Load skills + restore enabled states from server
+  // Load tricks + restore enabled states from server
   useEffect(() => {
     if (isGuest || !userId) return;
     Promise.all([
-      import('@/lib/api').then(m => m.loadSkills(userId)),
-      (() => { const t = (() => { try { const u = JSON.parse(sessionStorage.getItem('ren_user') || '{}'); return u.jwt || ''; } catch { return ''; } })(); return fetch(`/api/skills/enabled?user_id=${userId}`, { headers: t ? { 'x-ren-token': t } : {} }).then(r => r.json()).then(d => d.enabled || []).catch(() => []); })(),
-    ]).then(([loadedSkills, enabledIds]) => {
-      if (loadedSkills.length) {
-        loadedSkills.forEach(skill => {
-          if (enabledIds.includes(skill.id)) skill.enabled = true;
-        });
-        setSkills(loadedSkills);
+      import('@/lib/api').then(m => m.loadTricks(userId)),
+      fetch(`/api/tricks/enabled?user_id=${userId}`, { credentials: 'include' }).then(r => r.json()).then(d => d.enabled || []).catch(() => []),
+    ]).then(([loadedTricks, enabledIds]) => {
+      if (loadedTricks.length) {
+        // Restaurar estado enabled desde el servidor (persiste entre recargas)
+        if (enabledIds.length > 0) {
+          loadedTricks.forEach(trick => {
+            trick.enabled = enabledIds.includes(trick.id);
+          });
+        } else {
+          loadedTricks.forEach(trick => { trick.enabled = false; });
+        }
+        setTricks(loadedTricks);
       }
     }).catch(() => {});
   }, [isGuest, userId]);
@@ -88,18 +118,16 @@ export default function ChatPage() {
     PreferencesManager.applyTheme(prefs.theme);
   }, []);
 
-  // Check authentication
+  // Redirigir si no hay sesión
   useEffect(() => {
-    const userStr = sessionStorage.getItem('ren_user');
-    if (!userStr) {
-      router.push('/login');
-      return;
+    if (authLoading) return;
+    if (!user) {
+      // Sin sesión y sin guest → login
+      if (!sessionStorage.getItem('ren_guest')) {
+        router.push('/login');
+      }
     }
-    const user = JSON.parse(userStr);
-    setUserName(user.name || user.email?.split('@')[0] || 'Usuario');
-    setIsGuest(user.isGuest || false);
-    setUserId(user.user_id || '');
-  }, [router]);
+  }, [user, authLoading, router]);
 
   // ────────────────────────────────────────────────────────────────────
   // Cargar sesiones — SIEMPRE del servidor, NUNCA de cache local
@@ -112,26 +140,38 @@ export default function ChatPage() {
         id: s.id,
         title: s.title || 'Chat',
         messages: (s.messages || []).map((m: any) => {
+          // 🐛 Fix: extraer trick metadata de respuesta del servidor
+          let msgTrick = m.activeTrick;
+          if (!msgTrick && m.metadata?.trick) {
+            msgTrick = m.metadata.trick;
+          }
           if (m.role && m.content) {
+            const isErr1 = typeof m.content === 'string' && m.content.startsWith('⚠️');
             return {
               id: crypto.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
-              text: m.content,
+              text: isErr1 ? '⚠️ Error de conexión.' : m.content,
               isUser: m.role === 'user',
-              timestamp: m.timestamp || new Date().toISOString(),
+              timestamp: m.timestamp || m.createdAt || new Date().toISOString(),
               model: 'flash',
+              isError: isErr1,
+              activeTrick: msgTrick,
             };
           }
+          const isErr2 = m.isError || (typeof m.text === 'string' && m.text.startsWith('⚠️'));
           return {
             id: m.id || Date.now().toString(),
-            text: m.text || '',
+            text: isErr2 ? '⚠️ Error de conexión.' : (m.text || ''),
             isUser: m.isUser ?? false,
-            timestamp: m.timestamp || new Date().toISOString(),
+            timestamp: m.timestamp || m.createdAt || new Date().toISOString(),
             model: m.model || 'flash',
             isDeep: m.isDeep || false,
+            isError: isErr2,
+            activeTrick: msgTrick,
           };
         }),
         createdAt: s.createdAt || new Date().toISOString(),
         updatedAt: s.updatedAt || new Date().toISOString(),
+        isFavorite: s.isFavorite || false,
       }));
       mapped.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 
@@ -152,7 +192,10 @@ export default function ChatPage() {
   useEffect(() => {
     if (isGuest) {
       SessionManager.clearAllLocal();
-      createNewSession();
+      setMessages([]);
+      setCurrentSessionId('');
+      setHasGeneratedWelcome(false);
+      setIsInitialLoadDone(true);
       return;
     }
     if (!userId) return;
@@ -167,36 +210,69 @@ export default function ChatPage() {
     const cached = SessionManager.getAllSessions();
     if (cached.length > 0) {
       setServerSessions(cached);
-      const mostRecent = cached[0];
-      setMessages(mostRecent.messages);
-      setCurrentSessionId(mostRecent.id);
-      SessionManager.setCurrentSessionId(mostRecent.id);
-      setHasGeneratedWelcome(mostRecent.messages.length > 0);
-      setIsFavorite(mostRecent?.isFavorite || false);
+      // Restaurar sesión guardada (sessionStorage) o de la URL, NO cached[0]
+      const savedSessionId = SessionManager.getCurrentSessionId();
+      const urlSession = new URLSearchParams(window.location.search).get('session');
+      const targetId = urlSession || savedSessionId || cached[0].id;
+      const targetSession = cached.find(s => s.id === targetId) || cached[0];
+      setMessages(targetSession.messages);
+      setCurrentSessionId(targetSession.id);
+      SessionManager.setCurrentSessionId(targetSession.id);
+      setHasGeneratedWelcome(targetSession.messages.length > 0);
+      setIsFavorite(targetSession?.isFavorite || false);
     }
 
     // Siempre refrescar desde servidor
     loadSessionsFromServer(uid).then(mapped => {
+      serverFirstLoadRef.current = true;
+      setIsInitialLoadDone(true);
       if (mapped && mapped.length > 0) {
         // Reemplazar con datos del servidor
         setServerSessions(mapped);
-        // Si no teníamos cache o el usuario sigue en sesión inicial, mostrar la más reciente
+        // Si no teníamos cache → posiblemente es una pestaña nueva
         if (cached.length === 0) {
-          const mostRecent = mapped[0];
-          setMessages(mostRecent.messages);
-          setCurrentSessionId(mostRecent.id);
-          SessionManager.setCurrentSessionId(mostRecent.id);
-          setHasGeneratedWelcome(mostRecent.messages.length > 0);
-          setIsFavorite(mostRecent?.isFavorite || false);
+          const params = new URLSearchParams(window.location.search);
+          const sessionParam = params.get('session');
+          const savedSessionId = SessionManager.getCurrentSessionId();
+          if (sessionParam || savedSessionId) {
+            // URL param o sesión guardada (mismo tab recargado)
+            const targetId = sessionParam || savedSessionId!;
+            const targetSession = mapped.find(s => s.id === targetId) || mapped[0];
+            setMessages(targetSession.messages);
+            setCurrentSessionId(targetSession.id);
+            SessionManager.setCurrentSessionId(targetSession.id);
+            setHasGeneratedWelcome(targetSession.messages.length > 0);
+            setIsFavorite(targetSession?.isFavorite || false);
+          } else {
+            // Pestaña nueva sin sesión guardada → mostrar área vacía
+            setMessages([]);
+            setCurrentSessionId('');
+            SessionManager.setCurrentSessionId('');
+            setHasGeneratedWelcome(false);
+            setIsInitialLoadDone(true);
+          }
         }
-      } else if (cached.length === 0) {
-        // No hay sesiones en ninguna parte — crear
-        createNewSession();
+      } else {
+        // Sin sesiones en el servidor — mostrar área vacía
+        setIsInitialLoadDone(true);
+        if (cached.length === 0) {
+          setMessages([]);
+          setCurrentSessionId('');
+          setHasGeneratedWelcome(false);
+        }
       }
     }).catch(() => {
-      if (cached.length === 0) createNewSession();
+      serverFirstLoadRef.current = true;
+      setIsInitialLoadDone(true);
+      if (cached.length === 0) {
+        setMessages([]);
+        setCurrentSessionId('');
+        setHasGeneratedWelcome(false);
+      }
     });
   }, [isGuest, userId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // WebSocket no se throttle al cambiar pestaña — no necesitamos visibilitychange handler
 
   // ────────────────────────────────────────────────────────────────────
   // Crear nueva sesión — siempre via API
@@ -205,13 +281,14 @@ export default function ChatPage() {
     const uid = userId;
     if (!uid) return;
 
-    // Pedir ID al servidor
-    let sessionId: string;
-    if (!isGuest) {
-      sessionId = await api.newSession(uid);
-    } else {
-      sessionId = crypto.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    // Abortar stream activo
+    if (streamAbortRef.current) {
+      streamAbortRef.current.abort();
+      streamAbortRef.current = null;
     }
+
+    // Crear ID local SOLAMENTE (no se guarda en DB hasta el primer mensaje del usuario)
+    const sessionId = crypto.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 
     const newSession: ChatSession = {
       id: sessionId,
@@ -226,6 +303,7 @@ export default function ChatPage() {
     setMessages([]);
     setCurrentSessionId(sessionId);
     SessionManager.setCurrentSessionId(sessionId);
+    window.history.replaceState(null, '', `/chat?session=${sessionId}`);
     SessionManager.addSessionToCache(newSession);
     setServerSessions(prev => {
       const filtered = prev.filter(s => s.id !== sessionId);
@@ -236,6 +314,8 @@ export default function ChatPage() {
     setIsTyping(true);
     setIsFavorite(false);
     setHistoryRefreshTrigger(prev => prev + 1);
+    // Desactivar tricks al crear nueva sesión
+    setTricks(prev => prev.map(s => ({ ...s, enabled: false })));
   }, [isGuest, userId]);
 
   // Cerrar menú móvil al hacer click fuera o presionar Escape
@@ -281,57 +361,18 @@ export default function ChatPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isHistoryOpen, currentSessionId, messages, createNewSession]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Streaming con requestAnimationFrame — suave, sin crasheos
-  function streamTextIn(fullText: string, model?: string, isDeep?: boolean) {
-    const total = fullText.length;
-    if (total === 0) { setIsTyping(false); return; }
-
-    const msgId = Date.now().toString();
-    // Crear ChatMessage desde el inicio — se actualiza in-place
-    setStreamingMsg({
-      id: msgId,
-      text: '',
-      isUser: false,
-      timestamp: new Date().toISOString(),
-      model: model || 'flash',
-      isDeep: isDeep || false,
-    });
-
-    let pos = 0;
-    let frameCount = 0;
-    const chunkSize = total > 500 ? 8 : total > 200 ? 5 : total > 80 ? 3 : 2;
-    const UPDATE_EVERY = 1;
-
-    function frame() {
-      frameCount++;
-      if (frameCount % UPDATE_EVERY !== 0) {
-        requestAnimationFrame(frame);
-        return;
+  // Limpiar stream al desmontar
+  useEffect(() => {
+    return () => {
+      if (streamAbortRef.current) {
+        streamAbortRef.current.abort();
+        streamAbortRef.current = null;
       }
-      pos += chunkSize;
-      if (pos >= total) {
-        const msg: Message = {
-          id: msgId,
-          text: fullText,
-          isUser: false,
-          timestamp: new Date().toISOString(),
-          model: model || 'flash',
-          isDeep: isDeep || false,
-        };
-        // setTimeout para que React 18 bachee los 3 state updates juntos
-        // RAF no tiene automatic batching en React 18
-        setTimeout(() => {
-          setMessages(prev => prev.some(m => m.id === msgId) ? prev : [...prev, msg]);
-          setStreamingMsg(null);
-          setIsTyping(false);
-        }, 0);
-        return;
-      }
-      setStreamingMsg(prev => prev ? { ...prev, text: fullText.slice(0, pos) } : null);
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-  }
+    };
+  }, []);
+
+  // Ref para abortar stream SSE actual
+  const streamAbortRef = useRef<{ abort: () => void } | null>(null);
 
   // Check session limit for guests
   useEffect(() => {
@@ -354,15 +395,19 @@ export default function ChatPage() {
       // Actualizar serverSessions state (para el sidebar)
       setServerSessions(prev => prev.map(s =>
         s.id === currentSessionId
-          ? { ...s, messages, updatedAt: new Date().toISOString(), title: s.title === 'Nueva conversación' && messages.find(m => m.isUser) ? messages.find(m => m.isUser)!.text.slice(0, 50) + (messages.find(m => m.isUser)!.text.length > 50 ? '...' : '') : s.title }
+          ? { ...s, messages, updatedAt: new Date().toISOString(), title: (() => { try { const firstUserMsg = messages.find(m => m.isUser); return s.title === 'Nueva conversación' && firstUserMsg ? firstUserMsg.text.slice(0, 50) + (firstUserMsg.text.length > 50 ? '...' : '') : s.title; } catch { return s.title; } })() }
           : s
       ));
+
+      // Filtrar mensajes de error antes de guardar
+      const cleanMessages = messages.filter(m => !m.isError);
+      if (cleanMessages.length === 0) return;
 
       // Debounce: guardar en servidor 1s después del último cambio
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
       saveTimerRef.current = setTimeout(() => {
-        const title = messages.find(m => m.isUser)?.text?.slice(0, 50) || 'Chat';
-        api.saveSession(userId, currentSessionId, title, messages).catch(() => {});
+        const title = cleanMessages.find(m => m.isUser)?.text?.slice(0, 50) || 'Chat';
+        api.saveSession(userId, currentSessionId, title, cleanMessages).catch(() => {});
       }, 1000);
     }
 
@@ -376,47 +421,132 @@ export default function ChatPage() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+  // Track cuántos mensajes había para detectar nuevos envíos
+  const prevMsgCountRef = useRef(0);
 
-  // Generate welcome message
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    const currentCount = messages.length;
+
+    // Si se ACABA de enviar un mensaje del usuario (new user msg added), forzar scroll
+    if (currentCount > prevMsgCountRef.current && currentCount > 0) {
+      const lastIdx = currentCount - 1;
+      const lastMsg = messages[lastIdx];
+      if (lastMsg.isUser) {
+        scrollToBottom();
+        prevMsgCountRef.current = currentCount;
+        return;
+      }
+    }
+    prevMsgCountRef.current = currentCount;
+
+    // Para streaming del asistente: solo scrollear si el usuario está cerca del final
+    if (container) {
+      const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 250;
+      if (isNearBottom) {
+        scrollToBottom();
+      }
+    } else {
+      scrollToBottom();
+    }
+  }, [messages, streamingMsg?.text, isTyping]);
+
+  // Generate welcome message (solo después de confirmar que el servidor no tiene sesiones)
   const initCalledRef = useRef(false);
   useEffect(() => {
     if (initCalledRef.current) return;
+    if (!serverFirstLoadRef.current) return; // Esperar a que el servidor responda primero
     if (currentSessionId && messages.length === 0 && !hasGeneratedWelcome) {
       initCalledRef.current = true;
       setHasGeneratedWelcome(true);
       setIsTyping(true);
 
-      const fallback = '';
+      const activeTrick = tricks.find(s => s.enabled)?.id || '__NONE__';
+      const initTrickData = tricks.find(s => s.enabled);
+      const initTrickInfo: TrickInfo | undefined = initTrickData
+        ? { id: initTrickData.id, name: initTrickData.name, emoji: initTrickData.emoji || '⚡', color: initTrickData.color || '#8b5cf6' }
+        : undefined;
+      const msgId = crypto.randomUUID?.() || `${Date.now()}_init`;
+      setStreamingMsg({
+        id: `streaming_${msgId}`,
+        text: '',
+        isUser: false,
+        timestamp: new Date().toISOString(),
+        model: 'flash',
+        activeTrick: initTrickInfo,
+      });
 
-      const activeSkill = skills.find(s => s.enabled)?.id || '__NONE__';
-      sendMessage({ message: '__INIT__', user_id: userId, active_skill: activeSkill })
-        .then(res => {
-          if (res.text) {
-            streamTextIn(res.text, 'flash');
-          } else {
+      // Init ahora stremea como cualquier otro mensaje (via WS con fallback SSE)
+      api.chatStream(
+        { message: '__INIT__', user_id: userId, active_trick: activeTrick, tab_id: tabIdRef.current },
+        {
+          onMeta: (meta) => {
+            if (meta.session_id && meta.session_id !== currentSessionId) {
+              setCurrentSessionId(meta.session_id);
+            }
+          },
+          onChunk: (text) => {
+            setStreamingMsg(prev => prev ? { ...prev, text: prev.text + text } : null);
+          },
+          onDone: (fullText) => {
+            if (fullText) {
+              setMessages(prev => prev.some(m => m.id === msgId) ? prev : [...prev, {
+                id: msgId,
+                text: fullText,
+                isUser: false,
+                timestamp: new Date().toISOString(),
+                model: 'flash',
+                activeTrick: initTrickInfo,
+              }]);
+            }
+            setStreamingMsg(null);
             setIsTyping(false);
-          }
-        })
-        .catch(() => {
-          setIsTyping(false);
-          setMessages(prev => [...prev, {
-            id: crypto.randomUUID?.() || `${Date.now()}_err`,
-            text: '⚠️ No pude conectar con el servidor. Verifica tu conexión e intenta de nuevo.',
-            isUser: false,
-            timestamp: new Date().toISOString(),
-            model: 'flash',
-          }]);
-        });
+          },
+          onError: () => {
+            setIsTyping(false);
+            // Error temporal — no se persiste a messages ni al servidor
+            setStreamingMsg({
+              id: crypto.randomUUID?.() || `${Date.now()}_err`,
+              text: '⚠️ No pude conectar con el servidor.',
+              isUser: false,
+              timestamp: new Date().toISOString(),
+              model: 'flash',
+              activeTrick: initTrickInfo,
+              isError: true,
+            });
+            setTimeout(() => {
+              setStreamingMsg(prev => prev?.isError ? null : prev);
+            }, 5000);
+          },
+        }
+      );
     }
   }, [currentSessionId, messages.length, hasGeneratedWelcome]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Guardar/cambiar sesión paralela por skill
-  const getCurrentSkill = () => skills.find(s => s.enabled)?.id || '__NONE__';
+  // Guardar/cambiar sesión paralela por trick
+  const getCurrentTrick = () => tricks.find(s => s.enabled)?.id || '__NONE__';
 
   const handleSendMessage = async (text: string, isDeep?: boolean, files?: File[]) => {
+    // Si es primer mensaje y la sesión es local (no creada en servidor), crearla
+    let effectiveSessionId = currentSessionId;
+    if (!isGuest && userId && currentSessionId && !serverSessions.some(s => s.id === currentSessionId)) {
+      try {
+        const serverId = await api.newSession(userId, tabIdRef.current);
+        effectiveSessionId = serverId;
+        setCurrentSessionId(serverId);
+        SessionManager.setCurrentSessionId(serverId);
+        SessionManager.updateSessionInCache(serverId, messages);
+        window.history.replaceState(null, '', `/chat?session=${serverId}`);
+        // Actualizar serverSessions: reemplazar la sesión local por la del servidor
+        setServerSessions(prev => {
+          const filtered = prev.filter(s => s.id !== currentSessionId);
+          return [{ ...prev.find(s => s.id === currentSessionId), id: serverId } as ChatSession, ...filtered].filter(Boolean);
+        });
+      } catch (e) {
+        console.error('[handleSendMessage] newSession:', e);
+      }
+    }
+
     const filesBase64 = files ? await Promise.all(
       files.map(file => new Promise<{name: string, type: string, data: string}>((resolve, reject) => {
         const reader = new FileReader();
@@ -429,10 +559,33 @@ export default function ChatPage() {
       }))
     ) : undefined;
 
-    const activeSkill = getCurrentSkill();
+    const activeTrick = getCurrentTrick();
+    // Trick info para badge visual
+    const activeTrickData = tricks.find(s => s.enabled);
+    const trickInfo: TrickInfo | undefined = activeTrickData
+      ? { id: activeTrickData.id, name: activeTrickData.name, emoji: activeTrickData.emoji || '⚡', color: activeTrickData.color || '#8b5cf6' }
+      : undefined;
+
     // Guardar mensajes actuales en la sesión activa antes de enviar
-    const currentKey = sessionMsgs.current[currentSessionId] ? currentSessionId : activeSkill;
+    const currentKey = sessionMsgs.current[effectiveSessionId || currentSessionId] ? (effectiveSessionId || currentSessionId) : activeTrick;
     sessionMsgs.current[currentKey] = messages;
+    try { sessionStorage.setItem('ren_trick_sessions', JSON.stringify(sessionMsgs.current)); } catch {}
+
+    // Save user message to sessionStorage immediately (before streaming resolves)
+    const userMsgSave = () => {
+      const sid = effectiveSessionId || currentSessionId;
+      if (!isGuest && userId && sid && !sid.startsWith('guest_')) {
+        const updated = [...messages, userMessage];
+        const cleaned = updated.filter(m => !m.isError);
+        if (cleaned.length > 0) {
+          const title = text.slice(0, 50) + (text.length > 50 ? '...' : '');
+          api.saveSession(userId, sid, title, cleaned).catch(() => {});
+        }
+      }
+      // Also save to local sessionStorage
+      sessionMsgs.current[currentKey] = [...(sessionMsgs.current[currentKey] || []), userMessage];
+      try { sessionStorage.setItem('ren_trick_sessions', JSON.stringify(sessionMsgs.current)); } catch {}
+    };
 
     const userMessage: Message = {
       id: crypto.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`,
@@ -440,32 +593,103 @@ export default function ChatPage() {
       isUser: true,
       timestamp: new Date().toISOString(),
       files: filesBase64,
+      activeTrick: trickInfo,
     };
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
+    // Save user message immediately to server (no esperar debounce)
+    userMsgSave();
+
+    const msgId = crypto.randomUUID?.() || `${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    setStreamingMsg({
+      id: `streaming_${msgId}`,
+      text: '',
+      isUser: false,
+      timestamp: new Date().toISOString(),
+      model: isDeep ? 'pro' : 'flash',
+      isDeep: isDeep || false,
+      activeTrick: trickInfo,
+    });
+
+    // Cancelar stream anterior si lo hay
+    if (streamAbortRef.current) {
+      streamAbortRef.current.abort();
+      streamAbortRef.current = null;
+    }
+
     // Solo enviar historial de ESTA sesión
     const history = messages.map(m => ({ role: m.isUser ? 'user' as const : 'assistant' as const, content: m.text }));
-    sendMessage({ message: text, deep: isDeep, files: filesBase64, user_id: userId, active_skill: activeSkill, history })
-      .then(res => {
-        const newSessionId = res.session_id || currentSessionId;
-        if (newSessionId && newSessionId !== currentSessionId) {
-          setCurrentSessionId(newSessionId);
-        }
-        const sid = newSessionId;
-        // Merge messages bajo la key correcta
-        if (sid !== currentKey && sessionMsgs.current[currentKey]) {
-          sessionMsgs.current[sid] = [...(sessionMsgs.current[currentKey] || []), userMessage];
-          delete sessionMsgs.current[currentKey];
-        } else {
-          sessionMsgs.current[sid] = [...(sessionMsgs.current[sid] || []), userMessage];
-        }
-        PreferencesManager.playNotificationSound();
-        streamTextIn(res.text, res.model || 'flash', isDeep);
-      })
-      .catch(() => {
-        streamTextIn('Lo siento, no pude conectar con el servidor. Intenta de nuevo.', 'flash');
-      });
+
+    let resolvedSessionId = effectiveSessionId || currentSessionId;
+
+    const streamCtrl = api.chatStream(
+      { message: text, deep: isDeep, files: filesBase64, user_id: userId, active_trick: activeTrick, tab_id: tabIdRef.current, history },
+      {
+        onMeta: (meta) => {
+          if (meta.session_id && meta.session_id !== resolvedSessionId) {
+            resolvedSessionId = meta.session_id;
+            setCurrentSessionId(resolvedSessionId);
+          }
+        },
+        onChunk: (text) => {
+          setStreamingMsg(prev => prev ? { ...prev, text: prev.text + text } : null);
+        },
+        onDone: (fullText, sessionId) => {
+          if (fullText) {
+            const sid = sessionId || resolvedSessionId;
+            // Merge messages bajo la key correcta
+            if (sid !== currentKey && sessionMsgs.current[currentKey]) {
+              sessionMsgs.current[sid] = [...(sessionMsgs.current[currentKey] || []), userMessage];
+              delete sessionMsgs.current[currentKey];
+            } else {
+              sessionMsgs.current[sid] = [...(sessionMsgs.current[sid] || []), userMessage];
+            }
+            try { sessionStorage.setItem('ren_trick_sessions', JSON.stringify(sessionMsgs.current)); } catch {}
+            PreferencesManager.playNotificationSound();
+            setMessages(prev => prev.some(m => m.id === msgId) ? prev : [...prev, {
+              id: msgId,
+              text: fullText,
+              isUser: false,
+              timestamp: new Date().toISOString(),
+              model: isDeep ? 'pro' : 'flash',
+              isDeep: isDeep || false,
+              activeTrick: trickInfo,
+            }]);
+            // Save assistant response immediately
+            if (!isGuest && userId && sid) {
+              const assistantMsg = { id: msgId, text: fullText, isUser: false, timestamp: new Date().toISOString(), model: isDeep ? 'pro' : 'flash', isDeep: isDeep || false, activeTrick: trickInfo };
+              const finalMessages = [...(sessionMsgs.current[sid] || []), userMessage, assistantMsg];
+              const cleanMsgs = finalMessages.filter(m => !m.isError);
+              if (cleanMsgs.length > 0) {
+                const serverTitle = text.slice(0, 50) + (text.length > 50 ? '...' : '');
+                api.saveSession(userId, sid, serverTitle, cleanMsgs).catch(() => {});
+              }
+            }
+          }
+          setStreamingMsg(null);
+          setIsTyping(false);
+        },
+        onError: () => {
+          setIsTyping(false);
+          // Error temporal — no se persiste a messages ni al servidor
+          setStreamingMsg({
+            id: crypto.randomUUID?.() || `${Date.now()}_err`,
+            text: '⚠️ Error de conexión. Intenta de nuevo.',
+            isUser: false,
+            timestamp: new Date().toISOString(),
+            model: 'flash',
+            activeTrick: trickInfo,
+            isError: true,
+          });
+          // Auto-limpiar después de 5s para permitir reintentar
+          setTimeout(() => {
+            setStreamingMsg(prev => prev?.isError ? null : prev);
+          }, 5000);
+        },
+      }
+    );
+    streamAbortRef.current = streamCtrl;
   };
 
   const handleEditMessage = (messageId: string, newText: string) => {
@@ -478,9 +702,45 @@ export default function ChatPage() {
   };
 
   // ──────────────────────────────────────────────
+  // Sincronizar URL con la sesión activa
+  // ──────────────────────────────────────────────
+  useEffect(() => {
+    if (currentSessionId && window.location.search !== `?session=${currentSessionId}`) {
+      window.history.replaceState(null, '', `/chat?session=${currentSessionId}`);
+    }
+  }, [currentSessionId]);
+
+  // ──────────────────────────────────────────────
+  // Cargar sesión desde URL al montar (soporte para nueva pestaña)
+  // ──────────────────────────────────────────────
+  useEffect(() => {
+    if (!isInitialLoadDone || !userId || serverSessions.length === 0) return;
+    if (currentSessionId) return; // ya hay sesión activa, no sobreescribir
+
+    const params = new URLSearchParams(window.location.search);
+    const sessionParam = params.get('session');
+    if (sessionParam) {
+      const session = serverSessions.find(s => s.id === sessionParam);
+      if (session) {
+        setMessages(session.messages);
+        setCurrentSessionId(session.id);
+        SessionManager.setCurrentSessionId(session.id);
+        setHasGeneratedWelcome(session.messages.length > 0);
+        setIsFavorite(session?.isFavorite || false);
+      }
+    }
+  }, [isInitialLoadDone, userId, serverSessions]);
+
+  // ──────────────────────────────────────────────
   // Seleccionar sesión — desde estado de React (API)
   // ──────────────────────────────────────────────
   const handleSelectSession = useCallback(async (sessionId: string) => {
+    // Abortar stream activo
+    if (streamAbortRef.current) {
+      streamAbortRef.current.abort();
+      streamAbortRef.current = null;
+    }
+
     // Buscar en serverSessions (que viene de API)
     let session = serverSessions.find(s => s.id === sessionId);
     
@@ -507,8 +767,11 @@ export default function ChatPage() {
       setMessages(session.messages);
       setCurrentSessionId(session.id);
       SessionManager.setCurrentSessionId(session.id);
+      window.history.replaceState(null, '', `/chat?session=${session.id}`);
       setHasGeneratedWelcome(session.messages.length > 0);
       setIsFavorite(session?.isFavorite || false);
+      // Desactivar tricks al cambiar de sesión
+      setTricks(prev => prev.map(s => ({ ...s, enabled: false })));
     } else {
       console.warn(`[Ren] Sesión no encontrada: ${sessionId}`);
     }
@@ -601,24 +864,37 @@ export default function ChatPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ren-chat-${session.title.toLowerCase().replace(/\s+/g, '-')}.txt`;
+    a.download = `ren-chat-${(session.title || 'chat').toLowerCase().replace(/\s+/g, '-')}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authLogout();
     SessionManager.logout();
     router.push('/');
   };
 
   return (
     <>
-      <div className="min-h-dvh flex flex-col ren-bg-primary overflow-hidden" style={{ overscrollBehaviorX: 'none' }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+        className="min-h-dvh flex flex-col overflow-hidden"
+        style={{ overscrollBehaviorX: 'none' }}
+      >
         <div className="w-full max-w-[860px] mx-auto flex flex-col h-dvh max-h-dvh">
           {/* Header */}
-          <header className="px-2 sm:px-4 md:px-6 py-3 md:py-4 border-b border-[var(--ren-border)] flex items-center justify-between gap-2 sm:gap-4 ren-bg-header" style={{ position: 'relative', zIndex: 10 }}>
+          <motion.header
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
+            className="px-2 sm:px-4 md:px-6 py-3 md:py-4 border-b border-[var(--ren-border)] flex items-center justify-between gap-2 sm:gap-4 ren-bg-header"
+            style={{ position: 'relative', zIndex: 10 }}
+          >
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <CrowIcon size="lg" animate />
 
@@ -653,6 +929,17 @@ export default function ChatPage() {
                 <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
               </button>
 
+              {/* Calculadoras */}
+              <button
+                onClick={() => router.push('/calculators')}
+                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                title="Calculadoras clínicas"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </button>
+
               {/* Siempre visibles: Historial, Nueva sesión, Favorito */}
               <button onClick={() => setIsHistoryOpen(true)}
                 className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors" title="Historial (Ctrl+H)">
@@ -671,20 +958,44 @@ export default function ChatPage() {
               {/* Separador */}
               <div className="hidden sm:block w-px h-5 bg-[var(--ren-border)] mx-0.5" />
 
-              {/* Menú desplegable: Perfil, Skills, Config, Exportar */}
-              <div className="relative" ref={mobileMenuRef}>
-                <button
+              {/* Desktop: botones visibles directamente */}
+              <div className="hidden md:flex items-center gap-0.5">
+                {!isGuest && (
+                  <button onClick={() => setIsProfileOpen(true)}
+                    className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                    title={userId === 'nero' ? 'Pensamientos' : 'Perfil'}>
+                    {userId === 'nero' ? <StickyNote size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" /> : <User size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" />}
+                  </button>
+                )}
+                <button onClick={() => setIsTricksOpen(true)}
+                  className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                  title="Tricks">
+                  <Brain size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" />
+                </button>
+                <button onClick={() => setIsSettingsOpen(true)}
+                  className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                  title="Configuración">
+                  <Settings size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" />
+                </button>
+                <button onClick={() => { exportCurrentSession(); }}
+                  disabled={messages.length === 0}
+                  className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Exportar">
+                  <Download size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" />
+                </button>
+              </div>
+
+              {/* Mobile: menú desplegable con los mismos botones */}
+              <div className="relative md:hidden" ref={mobileMenuRef}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setIsMobileMenuOpen(prev => !prev)}
                   className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
                   title="Más opciones"
                 >
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="sm:w-[18px] sm:h-[18px]"
-                    style={{ color: 'var(--ren-text-tertiary)' }}>
-                    <circle cx="8" cy="3.5" r="1.5" fill="currentColor"/>
-                    <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
-                    <circle cx="8" cy="12.5" r="1.5" fill="currentColor"/>
-                  </svg>
-                </button>
+                  <MoreHorizontal size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)]" />
+                </motion.button>
 
                 {isMobileMenuOpen && (
                   <div
@@ -707,12 +1018,12 @@ export default function ChatPage() {
                       </button>
                     )}
                     <button
-                      onClick={() => { setIsSkillsOpen(true); setIsMobileMenuOpen(false); }}
+                      onClick={() => { setIsTricksOpen(true); setIsMobileMenuOpen(false); }}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm font-mono hover:bg-[var(--ren-bg-tertiary)] transition-colors"
                       style={{ color: 'var(--ren-text-secondary)' }}
                     >
                       <Brain size={15} />
-                      Skills
+                      Tricks
                     </button>
                     <button
                       onClick={() => { setIsSettingsOpen(true); setIsMobileMenuOpen(false); }}
@@ -736,7 +1047,7 @@ export default function ChatPage() {
                 )}
               </div>
             </div>
-          </header>
+          </motion.header>
 
           {isGuest && showSessionWarning && (
             <div className="px-4 md:px-6 py-3 bg-amber-500/5 border-b border-amber-500/20">
@@ -757,7 +1068,7 @@ export default function ChatPage() {
               >
                 <p className="text-sm font-mono text-center" style={{ color: 'var(--accent-hover)' }}>
                   🜁{' '}
-                  <span className="font-semibold">10 mensajes de cortesía</span>
+                  <span className="font-semibold">25 mensajes de cortesía</span>
                   {' '}—{' '}
                   <button
                     onClick={() => router.push('/register')}
@@ -790,23 +1101,49 @@ export default function ChatPage() {
             ref={chatContainerRef}
             className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 scroll-smooth ren-scrollbar"
           >
-            {messages.length === 0 && !isTyping ? (
-              <EmptyState isGuest={isGuest} onSuggestionClick={handleSendMessage} />
-            ) : messages.length === 0 && isTyping ? (
-              <SkeletonLoader />
+            {!isInitialLoadDone ? (
+              <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="w-6 h-6 border-2 border-[var(--accent-color)]/40 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : messages.length === 0 && !hasGeneratedWelcome ? (
+              isGuest ? (
+                <EmptyState isGuest onSuggestionClick={(text) => handleSendMessage(text)} />
+              ) : (
+                <WelcomeLanding
+                  onNewChat={createNewSession}
+                  onOpenTricks={() => setIsTricksOpen(true)}
+                  onOpenHistory={() => setIsHistoryOpen(true)}
+                  onNavigate={(path) => router.push(path)}
+                  sessionCount={serverSessions.length}
+                  trickCount={tricks.length}
+                  messageCount={serverSessions.reduce((sum, s) => sum + s.messages.length, 0)}
+                  userName={userName}
+                />
+              )
             ) : (
               <>
                 {[...messages, ...(streamingMsg ? [streamingMsg] : [])].map((message) => (
                   <div key={message.id}>
-                    <ChatMessage
-                      message={message.text}
-                      isUser={message.isUser}
-                      timestamp={message.timestamp}
-                      model={message.model}
-                      isDeep={message.isDeep}
-                      files={message.files}
-                      onEdit={message.isUser ? (newText) => handleEditMessage(message.id, newText) : undefined}
-                    />
+                    {message.isError ? (
+                      <div className="flex justify-center my-3">
+                        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/8 border border-red-500/20 text-red-400/90 text-xs font-mono text-center">
+                          <span>⚠️</span>
+                          <span>{message.text.replace('⚠️ ','')}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <ChatMessage
+                        message={message.text}
+                        isUser={message.isUser}
+                        timestamp={message.timestamp}
+                        model={message.model}
+                        isDeep={message.isDeep}
+                        activeTrick={message.activeTrick}
+                        files={message.files}
+                        onEdit={message.isUser ? (newText) => handleEditMessage(message.id, newText) : undefined}
+                        isStreaming={streamingMsg?.id === message.id}
+                      />
+                    )}
                   </div>
                 ))}
                 {isTyping && !streamingMsg && <TypingIndicator />}
@@ -815,13 +1152,13 @@ export default function ChatPage() {
             <div ref={chatEndRef} />
           </div>
 
-          {/* Active skills indicator */}
-          {skills.filter(s => s.enabled).length > 0 && (
+          {/* Active tricks indicator */}
+          {tricks.filter(s => s.enabled).length > 0 && (
             <div className="px-4 md:px-6 py-2 bg-[var(--accent-color)]/8 border-t border-[var(--accent-color)]/20">
               <div className="flex items-center gap-2 flex-wrap">
                 <Zap size={14} className="text-[var(--accent-hover)] flex-shrink-0" />
-                <span className="text-[11px] font-mono text-[var(--accent-hover)]">Skills activas:</span>
-                {skills.filter(s => s.enabled).map(s => (
+                <span className="text-[11px] font-mono text-[var(--accent-hover)]">Tricks activos:</span>
+                {tricks.filter(s => s.enabled).map(s => (
                   <span key={s.id} className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-full bg-[var(--accent-color)]/15 border border-[var(--accent-color)]/30 text-[var(--accent-hover)]">
                     {s.emoji || '⚡'} {s.name}
                   </span>
@@ -835,28 +1172,28 @@ export default function ChatPage() {
             onSendMessage={handleSendMessage}
             disabled={isTyping}
             sessionId={currentSessionId}
-            quickSkills={skills}
-            onToggleSkill={(id) => {
-              const updated = skills.map(s =>
+            quickTricks={tricks}
+            onToggleTrick={(id) => {
+              const updated = tricks.map(s =>
                 s.id === id ? { ...s, enabled: !s.enabled } : { ...s, enabled: false }
               );
-              setSkills(updated);
+              setTricks(updated);
               // Persist to server
               const enabledIds = updated.filter(s => s.enabled).map(s => s.id);
-              const token = (() => { try { const u = JSON.parse(sessionStorage.getItem('ren_user') || '{}'); return u.jwt || ''; } catch { return ''; } })();
-              fetch('/api/skills/enabled', {
+              fetch('/api/tricks/enabled', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...(token ? { 'x-ren-token': token } : {}) },
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify({ user_id: userId, enabled: enabledIds }),
               }).catch(() => {});
               import('@/lib/api').then(m => {
-                const skill = updated.find(s => s.id === id);
-                if (skill && !isGuest) m.saveSkillToServer(userId, skill);
+                const trick = updated.find(s => s.id === id);
+                if (trick && !isGuest) m.saveTrickToServer(userId, trick);
               }).catch(() => {});
             }}
           />
         </div>
-      </div>
+      </motion.div>
 
       {/* History Sidebar — recibe sesiones del estado de React (desde API) */}
       <HistorySidebar
@@ -875,16 +1212,16 @@ export default function ChatPage() {
       <SettingsPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        currentSessionId={currentSessionId}
+        messages={messages}
       />
 
-      {/* Skills Panel */}
-      <SkillsPanel
-        isOpen={isSkillsOpen}
-        onClose={() => setIsSkillsOpen(false)}
+      {/* Tricks Panel */}
+      <TricksPanel
+        isOpen={isTricksOpen}
+        onClose={() => setIsTricksOpen(false)}
         isGuest={isGuest}
         userId={userId}
-        onSave={(s) => setSkills(s)}
+        onSave={(s) => setTricks(s)}
       />
 
       {/* Notes Panel */}
