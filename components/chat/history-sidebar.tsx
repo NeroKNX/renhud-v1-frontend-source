@@ -1,8 +1,8 @@
 'use client';
 
 import { motion, AnimatePresence } from 'motion/react';
-import { X, MessageSquare, Trash2, Edit2, Search, Star, UserPlus, CheckSquare, Square, Trash } from 'lucide-react';
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { X, MessageSquare, Trash2, Edit2, Search, Star, UserPlus, CheckSquare, Square, Trash, ChevronDown, ChevronRight } from 'lucide-react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import type { ChatSession } from '@/lib/session-manager';
 import { formatDistanceToNow, isToday, isYesterday, differenceInCalendarDays } from 'date-fns';
@@ -41,40 +41,32 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
-  // ── Toast undo delete ──
-  const [toastDeleteId, setToastDeleteId] = useState<string | null>(null);
-  const deletedSessionsRef = useRef<Map<string, ChatSession>>(new Map());
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // ── Filter tabs ──
   const [filterTab, setFilterTab] = useState<'all' | 'favorites' | 'tricks'>('all');
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    };
-  }, []);
+  // ── Parent expand/collapse ──
+  const [expandedParents, setExpandedParents] = useState<Set<string>>(new Set());
 
-  // Salir de selección al cerrar; limpiar toast pendiente
+  const toggleExpand = (parentId: string) => {
+    setExpandedParents(prev => {
+      const next = new Set(prev);
+      if (next.has(parentId)) next.delete(parentId);
+      else next.add(parentId);
+      return next;
+    });
+  };
+
+  // Salir de selección al cerrar
   useEffect(() => {
     if (!isOpen) {
       setSelectionMode(false);
       setSelectedIds(new Set());
-      if (toastTimerRef.current) {
-        clearTimeout(toastTimerRef.current);
-        toastTimerRef.current = null;
-      }
-      deletedSessionsRef.current.clear();
-      setToastDeleteId(null);
     }
   }, [isOpen]);
 
+  // Separar padres e hijos
   const filteredSessions = sessions
     .filter(s => {
-      // Excluir sesión en estado de eliminación (optimistic UI)
-      if (s.id === toastDeleteId) return false;
-
       // Filtro por pestaña
       if (filterTab === 'favorites' && !s.isFavorite) return false;
       if (filterTab === 'tricks') {
@@ -93,10 +85,22 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
 
-  // Agrupar por fecha
+  // Separar parents (sin parentId) y children (con parentId)
+  const parentSessions = filteredSessions.filter(s => !s.parentId);
+  const childSessions = filteredSessions.filter(s => s.parentId);
+
+  // Build children lookup: parentId → child sessions
+  const childrenByParent: Record<string, ChatSession[]> = {};
+  for (const child of childSessions) {
+    const pid = child.parentId!;
+    if (!childrenByParent[pid]) childrenByParent[pid] = [];
+    childrenByParent[pid].push(child);
+  }
+
+  // Agrupar PADRES por fecha (los hijos se renderizan anidados debajo de su padre)
   const groupOrder = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Más antiguo'];
   const groupedSessions: Record<string, ChatSession[]> = {};
-  for (const session of filteredSessions) {
+  for (const session of parentSessions) {
     const group = getDateGroup(session.updatedAt);
     if (!groupedSessions[group]) groupedSessions[group] = [];
     groupedSessions[group].push(session);
@@ -120,45 +124,15 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
     setSelectedIds(newSet);
   };
 
-  // ── Delete individual con deshacer vía toast ──
-  const handleDeleteClick = (sessionId: string, session: ChatSession, e: React.MouseEvent) => {
+  // ── Delete individual ──
+  const handleDeleteClick = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
     if (selectionMode) {
       toggleSelection(sessionId, e);
       return;
     }
-
-    // Limpiar timer y ref de toast anterior si existe
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    if (toastDeleteId) {
-      deletedSessionsRef.current.delete(toastDeleteId);
-    }
-
-    // Guardar sesión en ref por si se deshace
-    deletedSessionsRef.current.set(sessionId, session);
-
-    // Optimistic UI: ocultar card inmediatamente + mostrar toast
-    setToastDeleteId(sessionId);
-
-    // Timer de 5s para eliminación real
-    toastTimerRef.current = setTimeout(() => {
-      onDeleteSession(sessionId);
-      deletedSessionsRef.current.delete(sessionId);
-      setToastDeleteId(prev => prev === sessionId ? null : prev);
-      toastTimerRef.current = null;
-    }, 5000);
-  };
-
-  const handleUndoDelete = () => {
-    const sessionId = toastDeleteId;
-    if (!sessionId) return;
-    if (toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current);
-      toastTimerRef.current = null;
-    }
-    deletedSessionsRef.current.delete(sessionId);
-    setToastDeleteId(null);
+    onDeleteSession(sessionId);
   };
 
   // ── Renombrar ──
@@ -299,124 +273,231 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                         {group}
                       </div>
                       {groupSessions.map(session => {
+                        const isParent = childrenByParent[session.id] !== undefined;
+                        const hasChildren = isParent && childrenByParent[session.id].length > 0;
+                        const isExpanded = expandedParents.has(session.id);
+                        const children = hasChildren ? childrenByParent[session.id] : [];
                         const lastMessage = session.messages[session.messages.length - 1];
                         const trickEmoji = lastMessage?.activeTrick?.emoji;
 
                         return (
-                          <motion.div
-                            key={session.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            layout
-                            className={`group relative p-3 rounded-lg border transition-all cursor-pointer ${
-                              selectedIds.has(session.id)
-                                ? 'bg-[var(--accent-color)]/15 border-[var(--accent-color)]/60 shadow-[0_0_10px_rgba(99,102,241,0.2)]'
-                                : session.isFavorite
-                                  ? currentSessionId === session.id
-                                    ? 'bg-gradient-to-br from-yellow-500/10 to-[var(--ren-bg-tertiary)] border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
-                                    : 'bg-gradient-to-br from-yellow-500/5 to-[var(--ren-bg-primary)] border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 shadow-[0_0_10px_rgba(234,179,8,0.1)]'
-                                  : currentSessionId === session.id
-                                    ? 'bg-[var(--ren-bg-tertiary)] border-[var(--accent-color)]/50'
-                                    : 'ren-bg-primary border-[var(--ren-border)] hover:border-[var(--accent-color)]/30 hover:bg-[var(--ren-bg-tertiary)]'
-                            }`}
-                          >
-                            <a
-                              href={`/chat?session=${session.id}`}
-                              onClick={(e) => {
-                                if (selectionMode) {
-                                  e.preventDefault();
-                                  toggleSelection(session.id, e);
-                                  return;
-                                }
-                                // Ctrl+Click / Cmd+Click / middle-click → new tab
-                                if (e.ctrlKey || e.metaKey || e.button === 1) return;
-                                e.preventDefault();
-                                handleSelectSession(session.id);
-                              }}
-                              className="block w-full"
-                              style={{ textDecoration: 'none', color: 'inherit' }}
+                          <div key={session.id} className="space-y-1">
+                            <motion.div
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              layout
+                              className={`group relative p-3 rounded-lg border transition-all cursor-pointer ${
+                                selectedIds.has(session.id)
+                                  ? 'bg-[var(--accent-color)]/15 border-[var(--accent-color)]/60 shadow-[0_0_10px_rgba(99,102,241,0.2)]'
+                                  : session.isFavorite
+                                    ? currentSessionId === session.id
+                                      ? 'bg-gradient-to-br from-yellow-500/10 to-[var(--ren-bg-tertiary)] border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
+                                      : 'bg-gradient-to-br from-yellow-500/5 to-[var(--ren-bg-primary)] border-yellow-500/30 hover:border-yellow-500/50 hover:bg-yellow-500/10 shadow-[0_0_10px_rgba(234,179,8,0.1)]'
+                                    : currentSessionId === session.id
+                                      ? 'bg-[var(--ren-bg-tertiary)] border-[var(--accent-color)]/50'
+                                      : 'ren-bg-primary border-[var(--ren-border)] hover:border-[var(--accent-color)]/30 hover:bg-[var(--ren-bg-tertiary)]'
+                              }`}
                             >
-                            {editingId === session.id && !selectionMode ? (
-                              <div onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}>
-                                <input
-                                  type="text"
-                                  value={editTitle}
-                                  onChange={(e) => setEditTitle(e.target.value)}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveEdit(session.id);
-                                    if (e.key === 'Escape') handleCancelEdit();
-                                  }}
-                                  onBlur={() => handleSaveEdit(session.id)}
-                                  autoFocus
-                                  className="w-full bg-[var(--ren-bg-secondary)] border border-[var(--accent-color)] rounded px-2 py-1 text-sm text-[var(--ren-text-primary)] font-mono focus:outline-none"
-                                />
-                              </div>
-                            ) : (
-                              <>
-                                <div className="flex items-start justify-between gap-2 mb-2">
-                                  <div className="flex items-start gap-2 flex-1 min-w-0">
-                                    {/* Checkbox en modo selección */}
-                                    {selectionMode && (
-                                      <button
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          toggleSelection(session.id, e);
-                                        }}
-                                        className="flex-shrink-0 mt-0.5 hover:opacity-80 transition-opacity"
-                                      >
-                                        {selectedIds.has(session.id) ? (
-                                          <CheckSquare size={16} className="text-[var(--accent-color)]" />
-                                        ) : (
-                                          <Square size={16} className="text-[var(--ren-text-tertiary)]" />
-                                        )}
-                                      </button>
-                                    )}
-                                    {session.isFavorite && (
-                                      <Star size={14} className="text-yellow-400 fill-yellow-400 flex-shrink-0 mt-0.5" />
-                                    )}
-                                    {trickEmoji && (
-                                      <span className="flex-shrink-0 mt-0.5 text-sm leading-none">{trickEmoji}</span>
-                                    )}
-                                    <h3 className="text-sm font-mono text-[var(--ren-text-primary)] line-clamp-2 flex-1">
-                                      {session.title}
-                                    </h3>
-                                  </div>
-                                  {/* Botones: en selección no se muestran */}
-                                  {!selectionMode && (
-                                    <div className="flex items-center gap-1 flex-shrink-0">
-                                      <button
-                                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleStartEdit(session, e); }}
-                                        className="p-1.5 hover:bg-[var(--ren-bg-tertiary)] rounded-lg transition-colors opacity-60 hover:opacity-100"
-                                        title="Renombrar"
-                                      >
-                                        <Edit2 size={13} className="text-[var(--ren-text-tertiary)]" />
-                                      </button>
-                                      <button
-                                        onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleDeleteClick(session.id, session, e); }}
-                                        className="p-1.5 hover:bg-red-500/15 rounded-lg transition-colors opacity-60 hover:opacity-100 hover:text-red-400"
-                                        title="Eliminar"
-                                      >
-                                        <Trash2 size={13} className="text-[var(--ren-text-tertiary)] group-hover:text-red-400 transition-colors" />
-                                      </button>
+                              <a
+                                href={`/chat?session=${session.id}`}
+                                onClick={(e) => {
+                                  if (selectionMode) {
+                                    e.preventDefault();
+                                    toggleSelection(session.id, e);
+                                    return;
+                                  }
+                                  // Ctrl+Click / Cmd+Click / middle-click → new tab
+                                  if (e.ctrlKey || e.metaKey || e.button === 1) return;
+                                  e.preventDefault();
+                                  handleSelectSession(session.id);
+                                }}
+                                className="block w-full"
+                                style={{ textDecoration: 'none', color: 'inherit' }}
+                              >
+                              {editingId === session.id && !selectionMode ? (
+                                <div onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}>
+                                  <input
+                                    type="text"
+                                    value={editTitle}
+                                    onChange={(e) => setEditTitle(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') handleSaveEdit(session.id);
+                                      if (e.key === 'Escape') handleCancelEdit();
+                                    }}
+                                    onBlur={() => handleSaveEdit(session.id)}
+                                    autoFocus
+                                    className="w-full bg-[var(--ren-bg-secondary)] border border-[var(--accent-color)] rounded px-2 py-1 text-sm text-[var(--ren-text-primary)] font-mono focus:outline-none"
+                                  />
+                                </div>
+                              ) : (
+                                <>
+                                  <div className="flex items-start justify-between gap-2 mb-2">
+                                    <div className="flex items-start gap-2 flex-1 min-w-0">
+                                      {/* Expand/collapse toggle for parent sessions */}
+                                      {hasChildren && !selectionMode && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            e.preventDefault();
+                                            toggleExpand(session.id);
+                                          }}
+                                          className="flex-shrink-0 mt-0.5 p-0.5 hover:bg-[var(--ren-bg-tertiary)] rounded transition-colors"
+                                        >
+                                          {isExpanded ? (
+                                            <ChevronDown size={14} className="text-[var(--ren-text-tertiary)]" />
+                                          ) : (
+                                            <ChevronRight size={14} className="text-[var(--ren-text-tertiary)]" />
+                                          )}
+                                        </button>
+                                      )}
+                                      {/* Checkbox en modo selección */}
+                                      {selectionMode && (
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleSelection(session.id, e);
+                                          }}
+                                          className="flex-shrink-0 mt-0.5 hover:opacity-80 transition-opacity"
+                                        >
+                                          {selectedIds.has(session.id) ? (
+                                            <CheckSquare size={16} className="text-[var(--accent-color)]" />
+                                          ) : (
+                                            <Square size={16} className="text-[var(--ren-text-tertiary)]" />
+                                          )}
+                                        </button>
+                                      )}
+                                      {hasChildren && !selectionMode && (
+                                        <span className="flex-shrink-0 mt-0.5 text-xs text-[var(--ren-text-tertiary)] font-mono">
+                                          {children.length}
+                                        </span>
+                                      )}
+                                      {session.isFavorite && (
+                                        <Star size={14} className="text-yellow-400 fill-yellow-400 flex-shrink-0 mt-0.5" />
+                                      )}
+                                      {trickEmoji && (
+                                        <span className="flex-shrink-0 mt-0.5 text-sm leading-none">{trickEmoji}</span>
+                                      )}
+                                      <h3 className="text-sm font-mono text-[var(--ren-text-primary)] line-clamp-2 flex-1">
+                                        {session.title}
+                                      </h3>
                                     </div>
-                                  )}
-                                </div>
+                                    {/* Botones: en selección no se muestran */}
+                                    {!selectionMode && (
+                                      <div className="flex items-center gap-1 flex-shrink-0">
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleStartEdit(session, e); }}
+                                          className="p-1.5 hover:bg-[var(--ren-bg-tertiary)] rounded-lg transition-colors opacity-60 hover:opacity-100"
+                                          title="Renombrar"
+                                        >
+                                          <Edit2 size={13} className="text-[var(--ren-text-tertiary)]" />
+                                        </button>
+                                        <button
+                                          onClick={(e) => { handleDeleteClick(session.id, e); }}
+                                          className="p-1.5 hover:bg-red-500/15 rounded-lg transition-colors opacity-60 hover:opacity-100 hover:text-red-400"
+                                          title="Eliminar"
+                                        >
+                                          <Trash2 size={13} className="text-[var(--ren-text-tertiary)] group-hover:text-red-400 transition-colors" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
 
-                                <div className="flex items-center justify-between">
-                                  <span className="text-xs text-[var(--ren-text-tertiary)] font-mono">
-                                    {session.messages.length} mensajes
-                                  </span>
-                                  <span className="text-xs text-[var(--ren-text-tertiary)] font-mono">
-                                    {formatDistanceToNow(new Date(session.updatedAt), {
-                                      addSuffix: true,
-                                      locale: es
-                                    })}
-                                  </span>
-                                </div>
-                              </>
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs text-[var(--ren-text-tertiary)] font-mono">
+                                      {session.messages.length} mensajes
+                                    </span>
+                                    <span className="text-xs text-[var(--ren-text-tertiary)] font-mono">
+                                      {formatDistanceToNow(new Date(session.updatedAt), {
+                                        addSuffix: true,
+                                        locale: es
+                                      })}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
+                              </a>
+                            </motion.div>
+
+                            {/* Nested child sessions */}
+                            {hasChildren && isExpanded && (
+                              <div className="ml-4 space-y-1 border-l-2 border-[var(--ren-border)] pl-3">
+                                {children.map(child => {
+                                  const childLastMsg = child.messages[child.messages.length - 1];
+                                  const childTrickEmoji = childLastMsg?.activeTrick?.emoji;
+                                  return (
+                                    <motion.div
+                                      key={child.id}
+                                      initial={{ opacity: 0, y: -8 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      layout
+                                      className={`group relative p-2.5 rounded-lg border transition-all cursor-pointer text-sm ${
+                                        selectedIds.has(child.id)
+                                          ? 'bg-[var(--accent-color)]/15 border-[var(--accent-color)]/60'
+                                          : currentSessionId === child.id
+                                            ? 'bg-[var(--ren-bg-tertiary)] border-[var(--accent-color)]/50'
+                                            : 'ren-bg-primary border-[var(--ren-border)] hover:border-[var(--accent-color)]/30 hover:bg-[var(--ren-bg-tertiary)]'
+                                      }`}
+                                    >
+                                      <a
+                                        href={`/chat?session=${child.id}`}
+                                        onClick={(e) => {
+                                          if (selectionMode) {
+                                            e.preventDefault();
+                                            toggleSelection(child.id, e);
+                                            return;
+                                          }
+                                          if (e.ctrlKey || e.metaKey || e.button === 1) return;
+                                          e.preventDefault();
+                                          handleSelectSession(child.id);
+                                        }}
+                                        className="block w-full"
+                                        style={{ textDecoration: 'none', color: 'inherit' }}
+                                      >
+                                        <div className="flex items-start justify-between gap-2">
+                                          <div className="flex items-start gap-2 flex-1 min-w-0">
+                                            {selectionMode && (
+                                              <button
+                                                onClick={(e) => { e.stopPropagation(); toggleSelection(child.id, e); }}
+                                                className="flex-shrink-0 mt-0.5"
+                                              >
+                                                {selectedIds.has(child.id) ? (
+                                                  <CheckSquare size={14} className="text-[var(--accent-color)]" />
+                                                ) : (
+                                                  <Square size={14} className="text-[var(--ren-text-tertiary)]" />
+                                                )}
+                                              </button>
+                                            )}
+                                            {childTrickEmoji && (
+                                              <span className="flex-shrink-0 mt-0.5 text-xs leading-none">{childTrickEmoji}</span>
+                                            )}
+                                            <h4 className="text-xs font-mono text-[var(--ren-text-primary)] line-clamp-1 flex-1">
+                                              {child.title}
+                                            </h4>
+                                          </div>
+                                          {!selectionMode && (
+                                            <button
+                                              onClick={(e) => { handleDeleteClick(child.id, e); }}
+                                              className="p-1 hover:bg-red-500/15 rounded transition-colors opacity-40 hover:opacity-100"
+                                            >
+                                              <Trash2 size={11} className="text-red-400" />
+                                            </button>
+                                          )}
+                                        </div>
+                                        <div className="flex items-center justify-between mt-1">
+                                          <span className="text-[10px] text-[var(--ren-text-tertiary)] font-mono">
+                                            {child.messages.length} msgs
+                                          </span>
+                                          <span className="text-[10px] text-[var(--ren-text-tertiary)] font-mono">
+                                            {formatDistanceToNow(new Date(child.updatedAt), { addSuffix: true, locale: es })}
+                                          </span>
+                                        </div>
+                                      </a>
+                                    </motion.div>
+                                  );
+                                })}
+                              </div>
                             )}
-                            </a>
-                          </motion.div>
+                          </div>
                         );
                       })}
                     </div>
@@ -424,27 +505,6 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                 })
               )}
             </div>
-
-            {/* ── Toast de eliminación ── */}
-            {toastDeleteId && (
-              <div className="absolute bottom-4 left-4 right-4 z-30">
-                <motion.div
-                  initial={{ y: 40, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded-xl px-4 py-3 shadow-lg flex items-center justify-between"
-                >
-                  <span className="text-sm font-mono text-[var(--ren-text-primary)]">
-                    Conversación eliminada
-                  </span>
-                  <button
-                    onClick={handleUndoDelete}
-                    className="text-xs font-mono text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-semibold px-3 py-1.5 rounded-lg hover:bg-[var(--accent-color)]/10 transition-all"
-                  >
-                    Deshacer
-                  </button>
-                </motion.div>
-              </div>
-            )}
 
             {/* Invitado: call to action */}
             {!selectionMode && isGuest && filteredSessions.length > 0 && (

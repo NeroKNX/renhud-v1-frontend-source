@@ -26,6 +26,7 @@ export interface ChatSession {
   createdAt: string;
   updatedAt: string;
   isFavorite?: boolean;
+  parentId?: string;
 }
 
 const CACHE_KEY = 'ren_sessions_cache';

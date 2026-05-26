@@ -139,6 +139,7 @@ export default function ChatPage() {
       const mapped = serverData.map(s => ({
         id: s.id,
         title: s.title || 'Chat',
+        parentId: (s as any).parentId || undefined,
         messages: (s.messages || []).map((m: any) => {
           // 🐛 Fix: extraer trick metadata de respuesta del servidor
           let msgTrick = m.activeTrick;
