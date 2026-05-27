@@ -483,7 +483,26 @@ export default function ChatPage() {
         {
           onMeta: (meta) => {
             if (meta.session_id && meta.session_id !== currentSessionId) {
+              const prevSessionId = currentSessionId;
               setCurrentSessionId(meta.session_id);
+
+              // Add child session to sidebar immediately (don't wait for reload)
+              if (meta.is_child_session && prevSessionId && !isGuest) {
+                setServerSessions(prev => {
+                  if (prev.some(s => s.id === meta.session_id)) return prev;
+                  const childSession: ChatSession = {
+                    id: meta.session_id!,
+                    title: initTrickData?.emoji
+                      ? `${initTrickData.emoji} ${initTrickData.name || 'Skill'}`
+                      : (initTrickData?.name || 'Skill: ' + (activeTrick || 'unknown')),
+                    parentId: prevSessionId,
+                    messages: [],
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  };
+                  return [childSession, ...prev];
+                });
+              }
             }
           },
           onChunk: (text) => {
@@ -629,8 +648,27 @@ export default function ChatPage() {
       {
         onMeta: (meta) => {
           if (meta.session_id && meta.session_id !== resolvedSessionId) {
+            const prevSessionId = resolvedSessionId;
             resolvedSessionId = meta.session_id;
             setCurrentSessionId(resolvedSessionId);
+
+            // Add child session to sidebar immediately (don't wait for reload)
+            if (meta.is_child_session && prevSessionId && !isGuest) {
+              setServerSessions(prev => {
+                if (prev.some(s => s.id === meta.session_id)) return prev;
+                const childSession: ChatSession = {
+                  id: meta.session_id!,
+                  title: activeTrickData?.emoji
+                    ? `${activeTrickData.emoji} ${activeTrickData.name || 'Skill'}`
+                    : (activeTrickData?.name || 'Skill: ' + (activeTrick || 'unknown')),
+                  parentId: prevSessionId,
+                  messages: [],
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                };
+                return [childSession, ...prev];
+              });
+            }
           }
         },
         onChunk: (text) => {
@@ -930,10 +968,10 @@ export default function ChatPage() {
                 <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
               </button>
 
-              {/* Calculadoras */}
+              {/* Calculadoras — solo visible en desktop */}
               <button
                 onClick={() => router.push('/calculators')}
-                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                className="hidden md:inline-flex p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
                 title="Calculadoras clínicas"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]">
@@ -1008,6 +1046,16 @@ export default function ChatPage() {
                       zIndex: 100,
                     }}
                   >
+                    <button
+                      onClick={() => { router.push('/calculators'); setIsMobileMenuOpen(false); }}
+                      className="w-full flex items-center gap-2.5 px-3.5 py-2 text-sm font-mono hover:bg-[var(--ren-bg-tertiary)] transition-colors"
+                      style={{ color: 'var(--ren-text-secondary)' }}
+                    >
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                      </svg>
+                      Calculadoras
+                    </button>
                     {isGuest ? null : (
                       <button
                         onClick={() => { setIsProfileOpen(true); setIsMobileMenuOpen(false); }}

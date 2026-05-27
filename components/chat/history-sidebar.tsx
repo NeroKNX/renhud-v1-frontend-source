@@ -86,18 +86,31 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
     });
 
   // Separar parents (sin parentId) y children (con parentId)
-  const parentSessions = filteredSessions.filter(s => !s.parentId);
-  const childSessions = filteredSessions.filter(s => s.parentId);
+  const sessionsWithoutParent = filteredSessions.filter(s => !s.parentId);
+  const sessionsWithParent = filteredSessions.filter(s => s.parentId);
 
-  // Build children lookup: parentId → child sessions
+  // Build set of all session IDs for quick lookup
+  const allIds = new Set(filteredSessions.map(s => s.id));
+
+  // Build children lookup: parentId → child sessions (only valid, non-orphaned children)
   const childrenByParent: Record<string, ChatSession[]> = {};
-  for (const child of childSessions) {
+  const orphanedSessions: ChatSession[] = [];
+  for (const child of sessionsWithParent) {
     const pid = child.parentId!;
-    if (!childrenByParent[pid]) childrenByParent[pid] = [];
-    childrenByParent[pid].push(child);
+    if (allIds.has(pid)) {
+      // Valid child: parent exists in session list
+      if (!childrenByParent[pid]) childrenByParent[pid] = [];
+      childrenByParent[pid].push(child);
+    } else {
+      // Orphaned child: parent was deleted — show as standalone
+      orphanedSessions.push(child);
+    }
   }
 
-  // Agrupar PADRES por fecha (los hijos se renderizan anidados debajo de su padre)
+  // Combine top-level sessions: sessions without parentId + orphaned children
+  const parentSessions = [...sessionsWithoutParent, ...orphanedSessions];
+
+  // Agrupar por fecha (los hijos válidos se renderizan anidados debajo de su padre)
   const groupOrder = ['Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Más antiguo'];
   const groupedSessions: Record<string, ChatSession[]> = {};
   for (const session of parentSessions) {
