@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy } from 'lucide-react';
+import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { useAuth } from '@/lib/auth-context';
 
@@ -93,9 +93,6 @@ const fichasTecnicas: Record<string, {
     ],
     limitaciones: [
       'Requiere datos de las primeras 24 horas de ingreso a UCI; no aplica para reingresos con nuevo cálculo.',
-      'No valida en poblaciones no seleccionadas (ej. postquirúrgicos cardíacos fuera de UCI).',
-      'El coeficiente de diagnóstico tiene alto impacto; sin diagnóstico seleccionado el score no es interpretable.',
-      'Requiere selección explícita de ventilación mecánica para calcular el componente respiratorio correctamente.',
       'Los valores fisiológicos deben ser los PEORES de las primeras 24h, no los primeros disponibles.',
     ],
   },
@@ -109,10 +106,10 @@ const fichasTecnicas: Record<string, {
       { rango: '> 12', significado: 'Falla multiorgánica. Mortalidad > 50–80%.' },
     ],
     limitaciones: [
-      'El componente cardiovascular varía según protocolo local de vasopresores.',
-      'En basal desconocida, asumir 0 si no hay comorbilidad previa.',
-      'No aplica criterio de delta en primer cálculo; necesita valor previo para definir sepsis por Sepsis-3.',
-      'SOFA-2 en desarrollo (ESICM, validación en curso).',
+      'Cardiovascular: la puntuación depende del esquema local de vasopresores (dopamina, epinefrina, norepinefrina). Un mismo paciente puede puntuar distinto según protocolo.',
+      'Basal desconocida: si no hay disfunción orgánica previa conocida, asumir SOFA basal = 0. Esto puede subestimar el delta si el paciente tenía disfunción crónica.',
+      'Delta SOFA: el diagnóstico de sepsis por Sepsis-3 requiere aumento ≥2 puntos sobre basal. En el primer cálculo no hay basal, así que no se puede clasificar como sepsis solo con un SOFA de ingreso.',
+      'SOFA-2 (ESICM, en validación) podría reemplazar al SOFA actual; los puntos de corte pueden cambiar.',
     ],
     comoEvaluar: [
       { item: 'Respiratorio', detalle: 'Usar el PEOR valor PaO₂/FiO₂ del día. Si el paciente está ventilado mecánicamente, aplicar puntajes 3-4 solo cuando está en VM (no aplica en ventilación espontánea con máscara).', puntuacion: '0: ≥400 | 1: 300–399 | 2: 200–299 | 3: 100–199 | 4: <100' },
@@ -135,8 +132,8 @@ const fichasTecnicas: Record<string, {
     limitaciones: [
       'Diseñado para contexto hospitalario británico; validación en poblaciones latinoamericanas limitada.',
       'No sustituye valoración clínica ni el juicio del médico tratante.',
-      'Confusión nueva (C en ACVPU) puntúa 3 aunque el paciente parezca estable por otros parámetros.',
-      'La Escala 2 de SpO₂ solo debe usarse en hipercapnia crónica CONFIRMADA (EPOC avanzado con pCO₂ basal elevada documentada). Nunca por defecto.',
+      'Confusión (C en ACVPU): aplica SOLO si es de nueva aparición — no confundir con demencia crónica o deterioro cognitivo basal. "Nueva" significa que el personal de salud nota un cambio respecto al estado mental habitual del paciente. Puntúa automáticamente 3 aunque el resto de NEWS sea normal.',
+      'Escala 2 de SpO₂: usarla EXCLUSIVAMENTE en pacientes con hipercapnia crónica CONFIRMADA (EPOC GOLD III-IV con pCO₂ basal >45 mmHg documentada en gasometría previa). La meta de SpO₂ en estos pacientes es 88-92%. No se usa por defecto ni en pacientes con EPOC sin hipercapnia documentada. Usar Escala 1 para todo lo demás.',
     ],
     comoEvaluar: [
       { item: 'Frec. respiratoria', detalle: 'Contar las respiraciones en 60 segundos. No avisar al paciente. Registrar el valor en rpm.', puntuacion: '≤8: 3 | 9–11: 1 | 12–20: 0 | 21–24: 2 | ≥25: 3' },
@@ -169,19 +166,19 @@ const fichasTecnicas: Record<string, {
       'Administración: 5–8 minutos. Sin ayuda al paciente. Sin suposiciones.',
     ],
     comoEvaluar: [
-      { item: '1a. LOC — Alerta', detalle: 'Evaluar el nivel de conciencia. Si el paciente no responde completamente, aplicar estímulo verbal y luego doloroso (presión en lecho ungueal o trapecio).', puntuacion: '0: Alerta, responde bien. 1: No alerta pero responde a estímulo menor. 2: Solo responde a estímulos repetidos/dolor. 3: Sin respuesta o reflejos solamente.' },
-      { item: '1b. LOC — Preguntas', detalle: 'Preguntar el mes actual y la edad del paciente. Una sola oportunidad. No ayudar, no dar pistas. Si está intubado/afásico/barrera de idioma, puntuar 1.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
-      { item: '1c. LOC — Órdenes', detalle: 'Pedir: "abra y cierre los ojos", luego "cierre y abra la mano" (lado no parético). Si no puede usar las manos, usar comando alternativo de un paso. Puntuar según el mejor esfuerzo.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
+      { item: '1a. Alerta', detalle: 'Evaluar el nivel de conciencia. Si el paciente no responde completamente, aplicar estímulo verbal y luego doloroso (presión en lecho ungueal o trapecio).', puntuacion: '0: Alerta, responde bien. 1: No alerta pero responde a estímulo menor. 2: Solo responde a estímulos repetidos/dolor. 3: Sin respuesta o reflejos solamente.' },
+      { item: '1b. Preguntas', detalle: 'Preguntar el mes actual y la edad del paciente. Una sola oportunidad. No ayudar, no dar pistas. Si está intubado/afásico/barrera de idioma, puntuar 1.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
+      { item: '1c. Órdenes', detalle: 'Pedir: "abra y cierre los ojos", luego "cierre y abra la mano" (lado no parético). Si no puede usar las manos, usar comando alternativo de un paso. Puntuar según el mejor esfuerzo.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
       { item: '2. Mirada horizontal', detalle: 'Evaluar mirada conjugada horizontal. Pedir al paciente que siga su dedo. Solo movimientos voluntarios. No usar reflejo oculocefálico a menos que el paciente no pueda cooperar.', puntuacion: '0: Normal. 1: Paresia parcial de mirada. 2: Desviación forzada o paresia total.' },
       { item: '3. Campos visuales', detalle: 'Evaluar por confrontación. Contar dedos en cada cuadrante. Si el paciente no puede cooperar por afasia, usar amenaza visual (parpadeo).', puntuacion: '0: Sin pérdida. 1: Hemianopsia parcial. 2: Hemianopsia completa. 3: Ceguera bilateral.' },
       { item: '4. Paresia facial', detalle: 'Pedir: "enseñe los dientes" y "cierre los ojos con fuerza". Evaluar asimetría en tercio inferior de la cara. En paciente conciente, no usar reflejos.', puntuacion: '0: Normal. 1: Paresia leve (asimetría al sonreír). 2: Paresia parcial (cara inferior). 3: Parálisis completa uni o bilateral.' },
-      { item: '5a/5b. Motor — Brazos', detalle: 'Brazo extendido 90° (sentado) o 45° (supino), palma hacia abajo. Mantener 10 segundos. Evaluar cada brazo por separado. No ayudar.', puntuacion: '0: Sin caída. 1: Caída <10s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
-      { item: '6a/6b. Motor — Piernas', detalle: 'Pierna elevada 30°, rodilla extendida. Mantener 5 segundos. Evaluar cada pierna por separado. Paciente en supino.', puntuacion: '0: Sin caída. 1: Caída <5s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
-      { item: '7. Ataxia', detalle: 'Prueba dedo-nariz y talón-rodilla bilateral. Puntuar SOLO si el déficit es desproporcionado a la debilidad (si hay parálisis completa, documentar UN). Un intento.', puntuacion: '0: Ausente. 1: Ataxia en 1 miembro. 2: Ataxia en 2 miembros.' },
-      { item: '8. Sensibilidad', detalle: 'Pinchazo con aguja (no afilada). Evaluar cara, brazo, tronco, pierna. Si hay afasia, evaluar muecas al estímulo doloroso.', puntuacion: '0: Normal. 1: Leve-moderada pérdida (siente pero menos agudo). 2: Pérdida severa o total.' },
-      { item: '9. Lenguaje', detalle: 'Describir la lámina (disponible en el kit NIHSS). Nombrar objetos. Leer frases. Evaluar fluidez, comprensión y repetición.', puntuacion: '0: Normal. 1: Afasia leve-moderada. 2: Afasia severa (comunicación fragmentada). 3: Mutismo o afasia global.' },
-      { item: '10. Disartria', detalle: 'Leer o repetir palabras listadas en el kit NIHSS. Evaluar claridad articulatoria. Si intubado o barrera física, documentar UN.', puntuacion: '0: Normal. 1: Leve-moderada (inteligible). 2: Severa (ininteligible) o anártrico.' },
-      { item: '11. Extinción', detalle: 'Estímulo simultáneo bilateral (visual, táctil). Pedir al paciente que señale dónde siente. Evaluar negligencia en 2 modalidades.', puntuacion: '0: Normal. 1: Inatención a 1 modalidad. 2: Hemiinatención severa a >1 modalidad.' },
+      { item: '5a/5b. Brazos', detalle: 'Brazo extendido 90° (sentado) o 45° (supino), palma hacia abajo. Mantener 10 segundos. Evaluar cada brazo por separado. No ayudar.', puntuacion: '0: Sin caída. 1: Caída <10s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
+      { item: '6a/6b. Piernas', detalle: 'Pierna elevada 30°, rodilla extendida. Mantener 5 segundos. Evaluar cada pierna por separado. Paciente en supino.', puntuacion: '0: Sin caída. 1: Caída <5s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
+      { item: '7. Ataxia', detalle: 'Prueba dedo-nariz y talón-rodilla bilateral. DIFICULTAD: si el paciente tiene debilidad (paresia), la ataxia solo se puntúa si el movimiento es desproporcionadamente dismétrico para el grado de fuerza. Si hay parálisis completa (4), documentar UN. Si el paciente no coopera, documentar UN. Una sola oportunidad — no repetir.', puntuacion: '0: Ausente. 1: Ataxia en 1 miembro. 2: Ataxia en 2 miembros. UN: Parálisis/amputación/no coopera.' },
+      { item: '8. Sensibilidad', detalle: 'Pinchazo con aguja (no afilada) en cara, brazo, tronco, pierna bilateral. DIFERENCIA ENTRE 1 Y 2: puntuar 1 cuando el paciente REPORTA que siente el pinchazo pero "diferente" o "menos agudo" en un lado. Puntuar 2 cuando el paciente NO siente el pinchazo en absoluto en esa zona. Si hay afasia, evaluar por muecas o retirada al estímulo doloroso — si no hay respuesta, asumir 2.', puntuacion: '0: Normal bilateral. 1: Pérdida leve-moderada (siente pero menos agudo). 2: Pérdida severa o total (no siente el pinchazo).' },
+      { item: '9. Lenguaje', detalle: 'Describir la lámina del kit NIHSS. Nombrar objetos. Leer frases. Evaluar 3 ejes: fluidez (habla espontánea), comprensión (sigue instrucciones), repetición (repite frases). DIFERENCIA 1 VS 2: 1 = puedes mantener conversación aunque con errores. 2 = comunicación fragmentada, el paciente no puede expresar ideas completas. 3 = afasia global, no produce ni comprende lenguaje.', puntuacion: '0: Normal. 1: Afasia leve-moderada (conversación posible con errores). 2: Afasia severa (comunicación fragmentada, ideas incompletas). 3: Mutismo o afasia global.' },
+      { item: '10. Disartria', detalle: 'Pedir al paciente que lea o repita palabras de la lista estandarizada del NIHSS. Evaluar claridad articulatoria. DIFERENCIA 1 VS 2: 1 = el paciente es inteligible aunque suene arrastrado. 2 = el paciente es ininteligible incluso en contexto. Si está intubado, traqueostomizado o con barrera física que impida evaluar, marcar UN.', puntuacion: '0: Normal. 1: Leve-moderada (inteligible). 2: Severa (ininteligible) o anártrico. UN: Intubado/barrera física.' },
+      { item: '11. Extinción / Negligencia', detalle: 'Estimular ambos lados SIMULTÁNEAMENTE (visual: mover dedos en ambos campos; táctil: tocar ambos brazos). El paciente debe señalar dónde sintió. DIFERENCIA 1 VS 2: 1 = extingue en una modalidad (ej. táctil pero no visual) o la negligencia es leve. 2 = no responde a estímulos en un lado en MÚLTIPLES modalidades (visual + táctil + auditiva).', puntuacion: '0: Sin anomalía. 1: Inatención a 1 modalidad (visual O táctil). 2: Hemiinatención severa a >1 modalidad.' },
     ],
   },
 };
@@ -209,6 +206,7 @@ export default function CalculatorsPage() {
   const [schemaLoading, setSchemaLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fichaOpen, setFichaOpen] = useState(false);
+  const [fichaTab, setFichaTab] = useState(0);
 
   // Cargar lista de calculadoras
   useEffect(() => {
@@ -220,7 +218,7 @@ export default function CalculatorsPage() {
 
   // Cargar schema al seleccionar
   useEffect(() => {
-    if (!selectedId) { setSchema(null); setResult(null); setFichaOpen(false); return; }
+    if (!selectedId) { setSchema(null); setResult(null); setFichaOpen(false); setFichaTab(0); return; }
     setSchemaLoading(true);
     fetch(`/api/calculator/${selectedId}/schema`)
       .then(r => r.json())
@@ -465,6 +463,13 @@ export default function CalculatorsPage() {
                         {/* Panel de ficha técnica expandible */}
                         {fichaOpen && fichasTecnicas[selectedId] && (() => {
                           const f = fichasTecnicas[selectedId];
+                          const tabs = [
+                            { id: 'proposito', label: 'Propósito', icon: Info },
+                            { id: 'interpretacion', label: 'Interpretación', icon: BarChart3 },
+                            ...(f.comoEvaluar ? [{ id: 'como-evaluar', label: 'Cómo evaluar', icon: BookOpen }] : []),
+                            { id: 'limitaciones', label: 'Limitaciones', icon: AlertTriangle },
+                          ];
+                          const activeTabId = tabs[fichaTab]?.id;
                           return (
                             <motion.div
                               initial={{ opacity: 0, height: 0 }}
@@ -472,57 +477,104 @@ export default function CalculatorsPage() {
                               exit={{ opacity: 0, height: 0 }}
                               className="mt-3 rounded-xl border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)] overflow-hidden"
                             >
-                              <div className="p-4 space-y-4">
-                                {/* Propósito */}
-                                <div>
-                                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Propósito</p>
-                                  <p className="text-xs ren-text-secondary leading-relaxed">{f.proposito}</p>
+                              <div className="p-4">
+                                {/* Tabs — pills horizontales */}
+                                <div className="flex gap-1 overflow-x-auto ren-scrollbar mb-4">
+                                  {tabs.map((tab, idx) => (
+                                    <button
+                                      key={tab.id}
+                                      onClick={() => setFichaTab(idx)}
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all ${
+                                        fichaTab === idx
+                                          ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)]'
+                                          : 'bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] ren-text-secondary hover:text-[var(--accent-hover)]'
+                                      }`}
+                                    >
+                                      <tab.icon size={12} />
+                                      {tab.label}
+                                    </button>
+                                  ))}
                                 </div>
-                                {/* Origen */}
-                                <div>
-                                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Origen</p>
-                                  <p className="text-[11px] ren-text-tertiary italic leading-relaxed">{f.origen}</p>
-                                </div>
-                                {/* Interpretación */}
-                                <div>
-                                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1.5">Interpretación</p>
-                                  <div className="space-y-1">
-                                    {f.interpretacion.map((i, idx) => (
-                                      <div key={idx} className="flex items-baseline gap-2 text-xs">
-                                        <span className="font-mono font-semibold ren-text-primary whitespace-nowrap">{i.rango}</span>
-                                        <span className="ren-text-secondary">→ {i.significado}</span>
+
+                                {/* Contenido de tabs con animación fade */}
+                                <div className="min-h-[100px]">
+                                  {/* Tab: Propósito */}
+                                  {activeTabId === 'proposito' && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="mb-3">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Propósito</p>
+                                        <p className="text-xs ren-text-secondary leading-relaxed">{f.proposito}</p>
                                       </div>
-                                    ))}
-                                  </div>
-                                </div>
-                                {/* Cómo evaluar (si existe) */}
-                                {f.comoEvaluar && (
-                                  <div>
-                                    <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1.5">Cómo evaluar</p>
-                                    <div className="space-y-2">
-                                      {f.comoEvaluar.map((ce, idx) => (
-                                        <details key={idx} className="group">
-                                          <summary className="text-xs font-semibold ren-text-primary cursor-pointer hover:text-[var(--accent-hover)] transition-colors list-none flex items-center gap-1.5">
-                                            <ChevronRight size={11} className="ren-text-tertiary group-open:rotate-90 transition-transform shrink-0" />
-                                            {ce.item}
-                                          </summary>
-                                          <div className="mt-1 ml-4 space-y-1">
-                                            <p className="text-[11px] ren-text-secondary leading-relaxed">{ce.detalle}</p>
-                                            <p className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] rounded px-2 py-1">{ce.puntuacion}</p>
+                                      <div>
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Origen</p>
+                                        <p className="text-[11px] ren-text-tertiary italic leading-relaxed">{f.origen}</p>
+                                      </div>
+                                    </motion.div>
+                                  )}
+
+                                  {/* Tab: Interpretación */}
+                                  {activeTabId === 'interpretacion' && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        {f.interpretacion.map((i, idx) => (
+                                          <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                            <p className="text-xs font-mono font-semibold ren-text-primary mb-1">{i.rango}</p>
+                                            <p className="text-[11px] ren-text-secondary leading-relaxed">{i.significado}</p>
                                           </div>
-                                        </details>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                                {/* Limitaciones */}
-                                <div>
-                                  <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1.5">Limitaciones</p>
-                                  <ul className="list-disc list-inside space-y-0.5">
-                                    {f.limitaciones.map((l, idx) => (
-                                      <li key={idx} className="text-[11px] ren-text-tertiary leading-relaxed">{l}</li>
-                                    ))}
-                                  </ul>
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  )}
+
+                                  {/* Tab: Cómo evaluar */}
+                                  {activeTabId === 'como-evaluar' && f.comoEvaluar && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="space-y-1">
+                                        {f.comoEvaluar.map((ce, idx) => (
+                                          <details key={idx} className="group">
+                                            <summary className="text-xs font-semibold ren-text-primary cursor-pointer hover:text-[var(--accent-hover)] transition-colors list-none flex items-center gap-1.5 py-1">
+                                              <ChevronRight size={11} className="ren-text-tertiary group-open:rotate-90 transition-transform shrink-0" />
+                                              {ce.item}
+                                            </summary>
+                                            <div className="mt-1 ml-4 space-y-1 pb-1">
+                                              <p className="text-[11px] ren-text-secondary leading-relaxed">{ce.detalle}</p>
+                                              <p className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] rounded px-2 py-1">{ce.puntuacion}</p>
+                                            </div>
+                                          </details>
+                                        ))}
+                                      </div>
+                                    </motion.div>
+                                  )}
+
+                                  {/* Tab: Limitaciones */}
+                                  {activeTabId === 'limitaciones' && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <ul className="space-y-2">
+                                        {f.limitaciones.map((l, idx) => (
+                                          <li key={idx} className="text-[11px] ren-text-tertiary leading-relaxed flex items-start gap-2">
+                                            <span className="w-1 h-1 rounded-full bg-[var(--accent-color)]/60 mt-1.5 shrink-0" />
+                                            {l}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </motion.div>
+                                  )}
                                 </div>
                               </div>
                             </motion.div>
