@@ -269,9 +269,7 @@ export default function ApacheIVCalculator() {
   return (
     <div className="space-y-6 apache-iv-root">
 
-      {/* ═══════════ DATOS BASALES ═══════════ */}
       <Section title="Datos basales">
-        {/* Edad */}
         <div className="field" style={{ maxWidth: 200 }}>
           <FieldLabel>Edad <Sub>años</Sub></FieldLabel>
           <input
@@ -285,9 +283,6 @@ export default function ApacheIVCalculator() {
           />
         </div>
 
-        {/* nota eliminada por petición */}
-
-        {/* GCS */}
         <FieldLabel style={{ marginBottom: 8 }}>Glasgow <Sub>— toca cada componente</Sub></FieldLabel>
 
         {GCS_COMPONENTS.map(comp => {
@@ -319,7 +314,6 @@ export default function ApacheIVCalculator() {
           );
         })}
 
-        {/* GCS total + No evaluable toggle */}
         <div style={{ fontSize: 12, color: 'var(--text-dim)', paddingTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           <span>
             GCS total: <strong style={{ color: gcsNa ? 'var(--text-dim)' : 'var(--green)' }}>
@@ -346,9 +340,7 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ═══════════ COMORBILIDADES ═══════════ */}
       <Section title="Comorbilidades" count="toggle">
-        {/* nota eliminada */}
         <div className="pills">
           {COMORBIDITIES.map(c => (
             <span
@@ -366,10 +358,7 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ═══════════ FISIOLOGÍA & LABORATORIOS ═══════════ */}
       <Section title="Fisiología & laboratorios" count="numérico">
-        {/* nota eliminada */}
-
         <div className="row">
           <NumField label="Frecuencia cardíaca" unit="/min" key_="hr" value={numFields.hr || ''} onChange={v => updateNum('hr', v)} />
           <NumField label="Frecuencia respiratoria" unit="/min" key_="rr" value={numFields.rr || ''} onChange={v => updateNum('rr', v)} />
@@ -404,7 +393,6 @@ export default function ApacheIVCalculator() {
           <NumField label="Estancia pre-UCI" unit="días" key_="preICULos" value={numFields.preICULos || ''} onChange={v => updateNum('preICULos', v)} />
         </div>
 
-        {/* Toggles */}
         <div className="row" style={{ marginTop: 12 }}>
           <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal)" />
           <ToggleField label="AKI / FRA" value={aki} onChange={setAki} color="var(--orange)" />
@@ -414,10 +402,7 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ═══════════ DIAGNÓSTICO ═══════════ */}
       <Section title="Diagnóstico de ingreso" count="cascada">
-        {/* nota eliminada */}
-
         <div className="row">
           <div className="field">
             <FieldLabel>Tipo de admisión</FieldLabel>
@@ -476,7 +461,6 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ═══════════ BOTÓN CALCULAR ═══════════ */}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <button
           onClick={handleCalculate}
@@ -504,7 +488,6 @@ export default function ApacheIVCalculator() {
         </div>
       )}
 
-      {/* ═══════════ RESULTADO ═══════════ */}
       <AnimatePresence>
         {result && (
           <motion.div
@@ -541,7 +524,6 @@ export default function ApacheIVCalculator() {
                   <div className="section-title" style={{ marginBottom: 10, fontSize: 11 }}>
                     Score APS por sistema
                   </div>
-                  {/* nota eliminada */}
                   <div className="system-pills">
                     {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
                       const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
