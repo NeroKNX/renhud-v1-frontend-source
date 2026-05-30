@@ -123,3 +123,514 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── APACHE IV Calculator Styles ── */
+.apache-iv-root {
+  --bg: #0a0a0c;
+  --surface: #121218;
+  --surface2: #1a1a24;
+  --border: #2a2a3a;
+  --border-hover: #3a3a5a;
+  --text: #e0e0ee;
+  --text-dim: #8888aa;
+  --accent: #7c5cff;
+  --accent-glow: rgba(124, 92, 255, 0.15);
+  --red: #ff4466;
+  --orange: #ff8833;
+  --amber: #ffbb33;
+  --green: #33dd77;
+  --teal: #33ccbb;
+  --blue: #4488ff;
+  --purple: #a855f7;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+.apache-iv-root .section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.apache-iv-root .section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.apache-iv-root .section-title .count {
+  font-size: 10px;
+  background: var(--surface2);
+  padding: 1px 7px;
+  border-radius: 10px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+.apache-iv-root .note {
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--surface2);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  line-height: 1.5;
+}
+.apache-iv-root .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.apache-iv-root .row:last-child { margin-bottom: 0; }
+.apache-iv-root .field {
+  flex: 1;
+  min-width: 140px;
+}
+.apache-iv-root .field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.apache-iv-root .field-label .sub {
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+/* GCS Pills */
+.apache-iv-root .gcs-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+.apache-iv-root .gcs-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 3px 5px 2px;
+  min-width: 30px;
+  font-size: 9px;
+  font-weight: 500;
+  border-radius: 5px;
+  background: var(--surface2);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  line-height: 1.1;
+  user-select: none;
+  border: 1px solid transparent;
+}
+.apache-iv-root .gcs-pill .num {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.apache-iv-root .gcs-pill .desc {
+  font-size: 6.5px;
+  font-weight: 400;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.apache-iv-root .gcs-high { border-color: var(--green); }
+.apache-iv-root .gcs-med  { border-color: var(--amber); }
+.apache-iv-root .gcs-low  { border-color: var(--red); }
+.apache-iv-root .gcs-high.selected { background: rgba(51, 221, 119, 0.1); color: var(--green); }
+.apache-iv-root .gcs-med.selected  { background: rgba(255, 187, 51, 0.1); color: var(--amber); }
+.apache-iv-root .gcs-low.selected  { background: rgba(255, 68, 102, 0.1); color: var(--red); }
+.apache-iv-root .gcs-high.selected .desc,
+.apache-iv-root .gcs-med.selected .desc,
+.apache-iv-root .gcs-low.selected .desc { opacity: 0.8; }
+.apache-iv-root .gcs-pill:disabled {
+  opacity: 0.25;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* GCS No evaluable toggle */
+.apache-iv-root .ne-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 3px 8px 3px 10px;
+  border-radius: 20px;
+  border: 1px dashed var(--border);
+  transition: all 0.15s;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+.apache-iv-root .ne-toggle.active {
+  border-style: solid;
+  border-color: var(--orange);
+  background: rgba(255, 136, 51, 0.06);
+  color: var(--orange);
+}
+.apache-iv-root .ne-toggle-track {
+  width: 28px;
+  height: 14px;
+  border-radius: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.15s;
+}
+.apache-iv-root .ne-toggle.active .ne-toggle-track {
+  background: rgba(255, 136, 51, 0.2);
+  border-color: var(--orange);
+}
+.apache-iv-root .ne-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.15s;
+}
+.apache-iv-root .ne-toggle.active .ne-toggle-thumb {
+  left: 15px;
+  background: var(--orange);
+  box-shadow: 0 0 6px rgba(255, 136, 51, 0.3);
+}
+
+/* Numeric input */
+.apache-iv-root .num-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.apache-iv-root .num-input:focus { border-color: var(--accent); }
+.apache-iv-root .num-input::placeholder { color: var(--text-dim); opacity: 0.4; }
+
+.apache-iv-root .num-with-badge {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.apache-iv-root .num-with-badge .num-input { padding-right: 44px; }
+.apache-iv-root .num-with-badge .score-badge {
+  position: absolute;
+  right: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+/* Comorbidity pills */
+.apache-iv-root .pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.apache-iv-root .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.apache-iv-root .pill .indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.15s;
+}
+.apache-iv-root .pill.active { border-color: var(--red); background: rgba(255, 68, 102, 0.06); }
+.apache-iv-root .pill.active .indicator { background: var(--red); box-shadow: 0 0 6px rgba(255, 68, 102, 0.3); }
+.apache-iv-root .pill.inactive { opacity: 0.5; }
+.apache-iv-root .pill.inactive .indicator { background: var(--green); }
+.apache-iv-root .pill.inactive.active { opacity: 1; }
+
+/* Toggle fields */
+.apache-iv-root .toggle-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 10px;
+  color: var(--text-dim);
+  padding: 4px 10px 4px 6px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  transition: all 0.15s;
+}
+.apache-iv-root .toggle-field.active {
+  border-color: color-mix(in srgb, var(--toggle-color) 50%, transparent);
+  background: color-mix(in srgb, var(--toggle-color) 8%, transparent);
+  color: var(--toggle-color);
+}
+.apache-iv-root .toggle-field .toggle-track {
+  width: 22px;
+  height: 12px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  position: relative;
+  transition: all 0.15s;
+}
+.apache-iv-root .toggle-field .toggle-track.active {
+  background: color-mix(in srgb, var(--toggle-color) 30%, transparent);
+  border-color: var(--toggle-color);
+}
+.apache-iv-root .toggle-field .toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  transition: all 0.15s;
+}
+.apache-iv-root .toggle-field .toggle-thumb.active {
+  left: 11px;
+  background: var(--toggle-color);
+}
+
+/* Select */
+.apache-iv-root .select-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text);
+  font-size: 12px;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238888aa' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+.apache-iv-root .select-input:focus { border-color: var(--accent); }
+.apache-iv-root .select-input option { background: var(--surface); }
+.apache-iv-root .select-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Calc button */
+.apache-iv-root .calc-btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 24px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, var(--accent) 0%, #7c3aed 100%);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.apache-iv-root .calc-btn:hover {
+  box-shadow: 0 0 24px rgba(124, 92, 255, 0.3);
+  transform: translateY(-1px);
+}
+.apache-iv-root .calc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.apache-iv-root .spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Error message */
+.apache-iv-root .error-msg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 68, 102, 0.1);
+  border: 1px solid rgba(255, 68, 102, 0.25);
+  color: #ff4466;
+  font-size: 11px;
+  font-family: monospace;
+  margin-top: 8px;
+}
+
+/* Result card */
+.apache-iv-root .result-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.apache-iv-root .result-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+}
+.apache-iv-root .result-top {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.apache-iv-root .result-score {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--accent), var(--teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.apache-iv-root .result-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 2px;
+}
+.apache-iv-root .result-meta .label {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.apache-iv-root .result-meta .value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  -webkit-text-fill-color: var(--text);
+}
+.apache-iv-root .result-meta .value.mortality { color: var(--red); -webkit-text-fill-color: var(--red); }
+.apache-iv-root .result-meta .value.los { color: var(--teal); -webkit-text-fill-color: var(--teal); }
+
+.apache-iv-root .severity-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--surface2);
+  position: relative;
+  overflow: visible;
+}
+.apache-iv-root .severity-bar .fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--amber), var(--orange));
+  transition: width 0.3s;
+}
+
+/* System severity pills */
+.apache-iv-root .system-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.apache-iv-root .sys-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  letter-spacing: 0.03em;
+}
+.apache-iv-root .sys-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.apache-iv-root .sys-pill .pts {
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+/* Diagnosis badge */
+.apache-iv-root .diag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+/* Action buttons */
+.apache-iv-root .action-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: monospace;
+  color: var(--text-dim);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.apache-iv-root .action-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.apache-iv-root .action-btn.flex-1 {
+  flex: 1;
+}

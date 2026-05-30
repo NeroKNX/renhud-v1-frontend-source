@@ -530,4 +530,566 @@ html::after {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* ═══════════ APACHE IV Calculator Styles ═══════════ */
+
+.apache-iv-root .section {
+  background: var(--ren-bg-secondary);
+  border: 1px solid var(--ren-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+
+.apache-iv-root .section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.apache-iv-root .count {
+  font-size: 9px;
+  background: var(--ren-bg-tertiary);
+  color: var(--text-dim);
+  padding: 1px 8px;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 400;
+}
+
+.apache-iv-root .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.apache-iv-root .field {
+  flex: 1;
+  min-width: 110px;
+}
+
+.apache-iv-root .field-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.apache-iv-root .sub {
+  font-size: 9px;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.apache-iv-root .num-input {
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-light);
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+}
+
+.apache-iv-root .num-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.apache-iv-root .num-input::placeholder {
+  color: var(--text-dim);
+}
+
+.apache-iv-root .num-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.apache-iv-root .num-with-badge .num-input {
+  flex: 1;
+}
+
+.apache-iv-root .score-badge {
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dim);
+  min-width: 32px;
+  text-align: center;
+  font-family: monospace;
+}
+
+.apache-iv-root .note {
+  font-size: 10px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  border-left: 2px solid var(--ren-border);
+  padding-left: 10px;
+}
+
+.apache-iv-root .gcs-group {
+  display: flex;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.apache-iv-root .gcs-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 5px 2px;
+  border-radius: 8px;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  background: var(--ren-bg-tertiary);
+  transition: all 0.15s ease;
+  min-width: 30px;
+}
+
+.apache-iv-root .gcs-pill:hover:not(:disabled) {
+  border-color: var(--accent-color);
+  opacity: 0.8;
+}
+
+.apache-iv-root .gcs-pill:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.apache-iv-root .gcs-pill .num {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.apache-iv-root .gcs-pill .desc {
+  font-size: 6.5px;
+  line-height: 1.1;
+  margin-top: 1px;
+  white-space: nowrap;
+}
+
+.apache-iv-root .gcs-low {
+  color: var(--red, #ef4444);
+}
+.apache-iv-root .gcs-low.selected {
+  background: color-mix(in srgb, var(--red, #ef4444) 20%, transparent);
+  border-color: var(--red, #ef4444);
+}
+
+.apache-iv-root .gcs-med {
+  color: var(--amber, #f59e0b);
+}
+.apache-iv-root .gcs-med.selected {
+  background: color-mix(in srgb, var(--amber, #f59e0b) 20%, transparent);
+  border-color: var(--amber, #f59e0b);
+}
+
+.apache-iv-root .gcs-high {
+  color: var(--green, #22c55e);
+}
+.apache-iv-root .gcs-high.selected {
+  background: color-mix(in srgb, var(--green, #22c55e) 20%, transparent);
+  border-color: var(--green, #22c55e);
+}
+
+/* No evaluable toggle */
+.apache-iv-root .ne-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.apache-iv-root .ne-toggle:hover {
+  color: var(--text-light);
+}
+
+.apache-iv-root .ne-toggle.active {
+  color: var(--orange, #f97316);
+}
+
+.apache-iv-root .ne-toggle-label {
+  font-size: 10px;
+}
+
+.apache-iv-root .ne-toggle-track {
+  width: 28px;
+  height: 14px;
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  border-radius: 999px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.apache-iv-root .ne-toggle.active .ne-toggle-track {
+  background: color-mix(in srgb, var(--orange, #f97316) 30%, transparent);
+  border-color: var(--orange, #f97316);
+}
+
+.apache-iv-root .ne-toggle-thumb {
+  width: 10px;
+  height: 10px;
+  background: var(--text-dim);
+  border-radius: 50%;
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  transition: all 0.2s;
+}
+
+.apache-iv-root .ne-toggle.active .ne-toggle-thumb {
+  left: 14px;
+  background: var(--orange, #f97316);
+}
+
+/* Pills */
+.apache-iv-root .pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.apache-iv-root .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+
+.apache-iv-root .pill.inactive {
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  color: var(--text-dim);
+}
+
+.apache-iv-root .pill.inactive:hover {
+  border-color: var(--text-muted);
+  color: var(--text-light);
+}
+
+.apache-iv-root .pill.active {
+  background: color-mix(in srgb, var(--red, #ef4444) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red, #ef4444) 40%, transparent);
+  color: var(--red, #ef4444);
+}
+
+.apache-iv-root .pill .indicator {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  transition: all 0.15s;
+}
+
+.apache-iv-root .pill.inactive .indicator {
+  background: var(--text-dimmest, #3f3f46);
+}
+
+.apache-iv-root .pill.active .indicator {
+  background: var(--red, #ef4444);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--red, #ef4444) 50%, transparent);
+}
+
+/* Select inputs */
+.apache-iv-root .select-input {
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-light);
+  font-size: 12px;
+  font-family: inherit;
+  width: 100%;
+  outline: none;
+  cursor: pointer;
+}
+
+.apache-iv-root .select-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.apache-iv-root .select-input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Toggle fields */
+.apache-iv-root .toggle-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  color: var(--text-dim);
+}
+
+.apache-iv-root .toggle-field:hover {
+  border-color: var(--text-muted);
+}
+
+.apache-iv-root .toggle-field.active {
+  background: color-mix(in srgb, var(--toggle-color) 15%, transparent);
+  border-color: color-mix(in srgb, var(--toggle-color) 40%, transparent);
+  color: var(--toggle-color);
+}
+
+.apache-iv-root .toggle-track {
+  width: 22px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--ren-bg-primary);
+  border: 1px solid var(--ren-border);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.apache-iv-root .toggle-track.active {
+  background: color-mix(in srgb, var(--toggle-color) 40%, transparent);
+  border-color: var(--toggle-color);
+}
+
+.apache-iv-root .toggle-thumb {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  transition: all 0.2s;
+}
+
+.apache-iv-root .toggle-thumb.active {
+  left: 10px;
+  background: var(--toggle-color);
+}
+
+/* Calculate button */
+.apache-iv-root .calc-btn {
+  padding: 12px 40px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.apache-iv-root .calc-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--accent-color) 80%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--accent-color) 30%, transparent);
+}
+
+.apache-iv-root .calc-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Result card */
+.apache-iv-root .result-card {
+  background: var(--ren-bg-secondary);
+  border: 1px solid var(--accent-color);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.apache-iv-root .result-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.apache-iv-root .result-score {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.apache-iv-root .result-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.apache-iv-root .result-meta .label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+}
+
+.apache-iv-root .result-meta .value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.apache-iv-root .result-meta .value.mortality {
+  color: var(--red, #ef4444);
+}
+
+.apache-iv-root .result-meta .value.los {
+  color: var(--accent-color, #3b82f6);
+}
+
+/* Severity bar */
+.apache-iv-root .severity-bar {
+  position: relative;
+  height: 6px;
+  background: var(--ren-bg-tertiary);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.apache-iv-root .severity-bar .fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green, #22c55e), var(--amber, #f59e0b), var(--red, #ef4444));
+  transition: width 0.5s ease;
+}
+
+/* System pills */
+.apache-iv-root .system-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.apache-iv-root .sys-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.apache-iv-root .sys-pill .dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.apache-iv-root .sys-pill .pts {
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* Diagnosis badge */
+.apache-iv-root .diag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-light);
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+}
+
+/* Action buttons */
+.apache-iv-root .action-btn {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ren-bg-tertiary);
+  border: 1px solid var(--ren-border);
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.apache-iv-root .action-btn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-hover);
+}
+
+.apache-iv-root .action-btn.flex-1 {
+  flex: 1;
+}
+
+/* Error message */
+.apache-iv-root .error-msg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--red, #ef4444);
+  background: color-mix(in srgb, var(--red, #ef4444) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red, #ef4444) 25%, transparent);
+  margin-top: 12px;
+}
+
+/* Spinner */
+.apache-iv-root .spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: apache-spin 0.6s linear infinite;
+}
+
+@keyframes apache-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Animations */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.apache-iv-root .animate-in {
+  animation: fadeSlideUp 0.3s ease-out;
+}
 
