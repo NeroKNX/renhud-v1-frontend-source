@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { useAuth } from '@/lib/auth-context';
+import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
 
 type CalcVariable = {
   key: string;
@@ -610,6 +611,10 @@ export default function CalculatorsPage() {
                         <div className="h-12 bg-[var(--ren-bg-tertiary)] rounded-xl w-full md:w-[280px]" />
                       </div>
                     </div>
+                  ) : selectedId === 'apache-iv' ? (
+                    <div className="apache-iv-root">
+                      <ApacheIVCalculator />
+                    </div>
                   ) : (
                     <>
                   {/* Formulario — grupos con subtítulos */}
@@ -835,6 +840,8 @@ export default function CalculatorsPage() {
                     );
                   })()}
 
+                  {selectedId !== 'apache-iv' && (
+                    <>
                   {/* Botón Calcular */}
                   <div className="flex justify-center">
                     <button
@@ -861,8 +868,10 @@ export default function CalculatorsPage() {
                   </div>
                     </>
                   )}
+                    </>
+                  )}
 
-                  {error && (
+                  {selectedId !== 'apache-iv' && error && (
                     <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
                       <AlertCircle size={12} />
                       {error}
@@ -876,6 +885,7 @@ export default function CalculatorsPage() {
                 const calcId = selectedId;
                 const r = result as Record<string, any>;
                 if (!r) return null;
+                if (calcId === 'apache-iv') return null;
 
                 // ── Helper para badge de severidad ──
                 const SeverityBadge = ({ label, severityText }: { label: string; severityText: string }) => {
