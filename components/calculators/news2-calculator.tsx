@@ -187,16 +187,30 @@ export default function News2Calculator() {
         </div>
         <label className="block text-[10px] font-mono ren-text-tertiary mb-1.5 px-1">SpO₂ (%)</label>
         {formValues[NEWS2_KEYS.Escala2] ? (
-          <N2Slider
-            options={[
-              { label: '≥93% con O₂\no 88–92% (0)', score: 0, value: 90 },
-              { label: '86–87%\n(1)', score: 1, value: 86 },
-              { label: '84–85%\n(2)', score: 2, value: 84 },
-              { label: '≤83%\n(3)', score: 3, value: 80 },
-            ]}
-            value={formValues[NEWS2_KEYS.SpO2]}
-            onChange={(v) => updateValue(NEWS2_KEYS.SpO2, v)}
-          />
+          <div className="grid grid-cols-4 gap-1">
+            {[
+              { l: '≤83%\n(3)', s: 3, v: 5 },
+              { l: '84-85%\n(2)', s: 2, v: 84 },
+              { l: '86-87%\n(1)', s: 1, v: 86 },
+              { l: '88-92%\n(0)', s: 0, v: 90 },
+              { l: '93-94%+O₂\n(1)', s: 1, v: 93 },
+              { l: '95-96%+O₂\n(2)', s: 2, v: 95 },
+              { l: '≥97%+O₂\n(3)', s: 3, v: 97 },
+              { l: '≥93% sin O₂\n(0)', s: 0, v: 99 },
+            ].map(opt => {
+              const active = formValues[NEWS2_KEYS.SpO2] === opt.v;
+              return (
+                <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.SpO2, opt.v)} className={`relative py-2 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
+                  {opt.l}
+                  {active && (
+                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{ color: SCORE_COLORS[opt.s] || '#059669' }}>
+                      {opt.s}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         ) : (
           <N2Slider
             options={[

@@ -53,7 +53,7 @@ const NIHSS_ITEMS: ItemConfig[] = [
     key: 'nihss_loc',
     label: '1a. Nivel de conciencia',
     shortLabel: 'LOC',
-    icon: '🧠',
+    icon: 'Brain',
     options: [
       { value: '0', label: 'Alerta', score: 0 },
       { value: '1', label: 'Somnoliento', score: 1 },
@@ -296,7 +296,7 @@ export default function NihssCalculator() {
           <span className="text-xs font-mono ren-text-secondary">Subtotal estimado:</span>
           <span className="text-sm font-bold ren-text-primary tabular-nums">{estimatedTotal}<span className="text-[10px] font-mono ren-text-tertiary">/42</span></span>
           {estimatedTotal >= 7 && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 ml-auto">🧠 Ocl. gran vaso probable</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 ml-auto flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable</span>
           )}
         </div>
       )}
@@ -311,7 +311,6 @@ export default function NihssCalculator() {
           <div key={item.key} className="mb-3 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="text-xs">{item.icon}</span>
                 <div>
                   <h3 className="text-[11px] font-semibold ren-text-primary leading-tight">{item.label}</h3>
                   <button
@@ -418,7 +417,7 @@ export default function NihssCalculator() {
                   </span>
                   {(r.nihss_total ?? 0) >= 7 && (
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                      🧠 Ocl. gran vaso probable
+                      <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="inline-block mr-1"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable
                     </span>
                   )}
                 </div>
