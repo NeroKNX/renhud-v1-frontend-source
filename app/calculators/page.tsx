@@ -6,75 +6,11 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { useAuth } from '@/lib/auth-context';
+import SofaCalculator from '@/components/calculators/sofa-calculator';
+import News2Calculator from '@/components/calculators/news2-calculator';
+import NihssCalculator from '@/components/calculators/nihss-calculator';
 import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
 
-type CalcVariable = {
-  key: string;
-  label: string;
-  type: 'number' | 'select' | 'boolean';
-  unit?: string;
-  min?: number;
-  max?: number;
-  required?: boolean;
-  placeholder?: string;
-  step?: number;
-  defaultValue?: any;
-  options?: { value: string; label: string; groupDependency?: string; systemDependency?: string }[];
-  group?: string;
-  renderAs?: 'radio' | 'conditional';
-  condition?: { dependsOn: string; values: string[] };
-  cascade?: { trigger: string; field: string; parentTrigger?: string; parentField?: string; valueMap?: Record<string, string> };
-  disablable?: string; // key of boolean field that disables this input
-};
-
-type CalcSchema = {
-  id: string;
-  name: string;
-  shortName: string;
-  emoji: string;
-  description: string;
-  longDescription: string;
-  reference: string;
-  version: string;
-  variables: CalcVariable[];
-};
-
-type CalcListItem = {
-  id: string;
-  name: string;
-  shortName: string;
-  emoji: string;
-  description: string;
-  version: string;
-  variableCount: number;
-};
-
-type CalcResult = {
-  result: {
-    aps: number;
-    totalScore: number;
-    mortalityPct: number;
-    losDays: number;
-    severity: string;
-    gcsNaUsed: boolean;
-    gcsTotal: number;
-    gcsNote?: string;
-    details: Record<string, any>;
-    diagnosisLabel: string;
-  };
-};
-
-function calcIcon(id: string) {
-  switch (id) {
-    case 'apache-iv': return <Activity className="w-5 h-5" />;
-    case 'sofa': case 'qsofa': return <Zap className="w-5 h-5" />;
-    case 'news2': return <Heart className="w-5 h-5" />;
-    case 'nihss': return <Brain className="w-5 h-5" />;
-    default: return <Calculator className="w-5 h-5" />;
-  }
-}
-
-// ── Fichas técnicas de cada calculadora ──
 const fichasTecnicas: Record<string, {
   proposito: string;
   origen: string;
@@ -133,18 +69,18 @@ const fichasTecnicas: Record<string, {
     limitaciones: [
       'Diseñado para contexto hospitalario británico; validación en poblaciones latinoamericanas limitada.',
       'No sustituye valoración clínica ni el juicio del médico tratante.',
-      'Confusión (C en ACVPU): aplica SOLO si es de nueva aparición — no confundir con demencia crónica o deterioro cognitivo basal. "Nueva" significa que el personal de salud nota un cambio respecto al estado mental habitual del paciente. Puntúa automáticamente 3 aunque el resto de NEWS sea normal.',
-      'Escala 2 de SpO₂: usarla EXCLUSIVAMENTE en pacientes con hipercapnia crónica CONFIRMADA (EPOC GOLD III-IV con pCO₂ basal >45 mmHg documentada en gasometría previa). La meta de SpO₂ en estos pacientes es 88-92%. No se usa por defecto ni en pacientes con EPOC sin hipercapnia documentada. Usar Escala 1 para todo lo demás.',
+      'Confusión (C en ACVPU): aplica SOLO si es de nueva aparición — no confundir con demencia crónica o deterioro cognitivo basal.',
+      'Escala 2 de SpO₂: usarla EXCLUSIVAMENTE en pacientes con hipercapnia crónica CONFIRMADA (EPOC GOLD III-IV con pCO₂ basal >45 mmHg).',
     ],
     comoEvaluar: [
-      { item: 'Frec. respiratoria', detalle: 'Contar las respiraciones en 60 segundos. No avisar al paciente. Registrar el valor en rpm.', puntuacion: '≤8: 3 | 9–11: 1 | 12–20: 0 | 21–24: 2 | ≥25: 3' },
-      { item: 'SpO₂ (Escala 1)', detalle: 'Usar oxímetro de pulso. Escala 1 = uso rutinario, para pacientes SIN hipercapnia crónica. Esperar señal estable.', puntuacion: '≤91%: 3 | 92–93%: 2 | 94–95%: 1 | ≥96%: 0' },
+      { item: 'Frec. respiratoria', detalle: 'Contar las respiraciones en 60 segundos. No avisar al paciente.', puntuacion: '≤8: 3 | 9–11: 1 | 12–20: 0 | 21–24: 2 | ≥25: 3' },
+      { item: 'SpO₂ (Escala 1)', detalle: 'Oxímetro de pulso. Escala 1 = uso rutinario, para pacientes SIN hipercapnia crónica.', puntuacion: '≤91%: 3 | 92–93%: 2 | 94–95%: 1 | ≥96%: 0' },
       { item: 'SpO₂ (Escala 2)', detalle: 'SOLO para hipercapnia crónica confirmada. Meta SpO₂ 88–92%.', puntuacion: '≤83%: 3 | 84–85%: 2 | 86–87%: 1 | 88–92% o ≥93% con O₂: 0' },
-      { item: 'Oxígeno suplem.', detalle: '¿El paciente recibe oxígeno suplementario en este momento? Sí = 2, No = 0.', puntuacion: 'Sí: 2 | No: 0' },
-      { item: 'Temperatura', detalle: 'Tomar temperatura con termómetro electrónico. La vía (oral/axilar/timpánica) debe ser consistente.', puntuacion: '≤35.0: 3 | 35.1–36.0: 1 | 36.1–38.0: 0 | 38.1–39.0: 1 | ≥39.1: 2' },
+      { item: 'Oxígeno suplem.', detalle: '¿El paciente recibe oxígeno suplementario en este momento?', puntuacion: 'Sí: 2 | No: 0' },
+      { item: 'Temperatura', detalle: 'Tomar temperatura con termómetro electrónico.', puntuacion: '≤35.0: 3 | 35.1–36.0: 1 | 36.1–38.0: 0 | 38.1–39.0: 1 | ≥39.1: 2' },
       { item: 'PAS', detalle: 'Tomar con paciente en reposo. Brazo a la altura del corazón.', puntuacion: '≤90: 3 | 91–100: 2 | 101–110: 1 | 111–219: 0 | ≥220: 3' },
       { item: 'Frec. cardíaca', detalle: 'Palpación radial o monitor cardíaco. 60 segundos completos.', puntuacion: '≤40: 3 | 41–50: 1 | 51–90: 0 | 91–110: 1 | 111–130: 2 | ≥131: 3' },
-      { item: 'Nivel conciencia', detalle: 'Usar escala ACVPU. A=Alerta. C=Confusión de nueva aparición. V=Responde a voz. P=Responde a dolor. U=Inconsciente.', puntuacion: 'Alerta: 0 | C/ V/ P/ U: 3' },
+      { item: 'Nivel conciencia', detalle: 'Usar escala ACVPU. A=Alerta. C=Confusión nueva. V=Voz. P=Dolor. U=Inconsciente.', puntuacion: 'Alerta: 0 | C/ V/ P/ U: 3' },
     ],
   },
   'nihss': {
@@ -164,71 +100,44 @@ const fichasTecnicas: Record<string, {
       'Requiere examinador entrenado para máxima confiabilidad.',
       'Ítems UN (no testeable) no suman puntos pero deben documentarse.',
       'Anotar siempre lo que el paciente HACE, no lo que puede hacer.',
-      'Administración: 5–8 minutos. Sin ayuda al paciente. Sin suposiciones.',
     ],
     comoEvaluar: [
-      { item: '1a. Alerta', detalle: 'Evaluar el nivel de conciencia. Si el paciente no responde completamente, aplicar estímulo verbal y luego doloroso (presión en lecho ungueal o trapecio).', puntuacion: '0: Alerta, responde bien. 1: No alerta pero responde a estímulo menor. 2: Solo responde a estímulos repetidos/dolor. 3: Sin respuesta o reflejos solamente.' },
-      { item: '1b. Preguntas', detalle: 'Preguntar el mes actual y la edad del paciente. Una sola oportunidad. No ayudar, no dar pistas. Si está intubado/afásico/barrera de idioma, puntuar 1.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
-      { item: '1c. Órdenes', detalle: 'Pedir: "abra y cierre los ojos", luego "cierre y abra la mano" (lado no parético). Si no puede usar las manos, usar comando alternativo de un paso. Puntuar según el mejor esfuerzo.', puntuacion: '0: Ambas correctas. 1: Una correcta. 2: Ninguna correcta.' },
-      { item: '2. Mirada horizontal', detalle: 'Evaluar mirada conjugada horizontal. Pedir al paciente que siga su dedo. Solo movimientos voluntarios. No usar reflejo oculocefálico a menos que el paciente no pueda cooperar.', puntuacion: '0: Normal. 1: Paresia parcial de mirada. 2: Desviación forzada o paresia total.' },
-      { item: '3. Campos visuales', detalle: 'Evaluar por confrontación. Contar dedos en cada cuadrante. Si el paciente no puede cooperar por afasia, usar amenaza visual (parpadeo).', puntuacion: '0: Sin pérdida. 1: Hemianopsia parcial. 2: Hemianopsia completa. 3: Ceguera bilateral.' },
-      { item: '4. Paresia facial', detalle: 'Pedir: "enseñe los dientes" y "cierre los ojos con fuerza". Evaluar asimetría en tercio inferior de la cara. En paciente conciente, no usar reflejos.', puntuacion: '0: Normal. 1: Paresia leve (asimetría al sonreír). 2: Paresia parcial (cara inferior). 3: Parálisis completa uni o bilateral.' },
-      { item: '5a/5b. Brazos', detalle: 'Brazo extendido 90° (sentado) o 45° (supino), palma hacia abajo. Mantener 10 segundos. Evaluar cada brazo por separado. No ayudar.', puntuacion: '0: Sin caída. 1: Caída <10s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
-      { item: '6a/6b. Piernas', detalle: 'Pierna elevada 30°, rodilla extendida. Mantener 5 segundos. Evaluar cada pierna por separado. Paciente en supino.', puntuacion: '0: Sin caída. 1: Caída <5s sin tocar cama. 2: Cae a cama, contra gravedad. 3: Sin movimiento contra gravedad. 4: Sin movimiento.' },
-      { item: '7. Ataxia', detalle: 'Prueba dedo-nariz y talón-rodilla bilateral. DIFICULTAD: si el paciente tiene debilidad (paresia), la ataxia solo se puntúa si el movimiento es desproporcionadamente dismétrico para el grado de fuerza. Si hay parálisis completa (4), documentar UN. Si el paciente no coopera, documentar UN. Una sola oportunidad — no repetir.', puntuacion: '0: Ausente. 1: Ataxia en 1 miembro. 2: Ataxia en 2 miembros. UN: Parálisis/amputación/no coopera.' },
-      { item: '8. Sensibilidad', detalle: 'Pinchazo con aguja (no afilada) en cara, brazo, tronco, pierna bilateral. DIFERENCIA ENTRE 1 Y 2: puntuar 1 cuando el paciente REPORTA que siente el pinchazo pero "diferente" o "menos agudo" en un lado. Puntuar 2 cuando el paciente NO siente el pinchazo en absoluto en esa zona. Si hay afasia, evaluar por muecas o retirada al estímulo doloroso — si no hay respuesta, asumir 2.', puntuacion: '0: Normal bilateral. 1: Pérdida leve-moderada (siente pero menos agudo). 2: Pérdida severa o total (no siente el pinchazo).' },
-      { item: '9. Lenguaje', detalle: 'Describir la lámina del kit NIHSS. Nombrar objetos. Leer frases. Evaluar 3 ejes: fluidez (habla espontánea), comprensión (sigue instrucciones), repetición (repite frases). DIFERENCIA 1 VS 2: 1 = puedes mantener conversación aunque con errores. 2 = comunicación fragmentada, el paciente no puede expresar ideas completas. 3 = afasia global, no produce ni comprende lenguaje.', puntuacion: '0: Normal. 1: Afasia leve-moderada (conversación posible con errores). 2: Afasia severa (comunicación fragmentada, ideas incompletas). 3: Mutismo o afasia global.' },
-      { item: '10. Disartria', detalle: 'Pedir al paciente que lea o repita palabras de la lista estandarizada del NIHSS. Evaluar claridad articulatoria. DIFERENCIA 1 VS 2: 1 = el paciente es inteligible aunque suene arrastrado. 2 = el paciente es ininteligible incluso en contexto. Si está intubado, traqueostomizado o con barrera física que impida evaluar, marcar UN.', puntuacion: '0: Normal. 1: Leve-moderada (inteligible). 2: Severa (ininteligible) o anártrico. UN: Intubado/barrera física.' },
-      { item: '11. Extinción / Negligencia', detalle: 'Estimular ambos lados SIMULTÁNEAMENTE (visual: mover dedos en ambos campos; táctil: tocar ambos brazos). El paciente debe señalar dónde sintió. DIFERENCIA 1 VS 2: 1 = extingue en una modalidad (ej. táctil pero no visual) o la negligencia es leve. 2 = no responde a estímulos en un lado en MÚLTIPLES modalidades (visual + táctil + auditiva).', puntuacion: '0: Sin anomalía. 1: Inatención a 1 modalidad (visual O táctil). 2: Hemiinatención severa a >1 modalidad.' },
+      { item: '1a. Alerta', detalle: 'Evaluar el nivel de conciencia.', puntuacion: '0: Alerta | 1: Somnoliento | 2: Estuporoso | 3: Coma' },
+      { item: '1b. Preguntas', detalle: 'Preguntar el mes actual y la edad del paciente.', puntuacion: '0: Ambas | 1: Una | 2: Ninguna' },
+      { item: '1c. Órdenes', detalle: 'Pedir abrir/cerrar ojos y mano.', puntuacion: '0: Ambas | 1: Una | 2: Ninguna' },
+      { item: '2. Mirada horizontal', detalle: 'Evaluar mirada conjugada horizontal.', puntuacion: '0: Normal | 1: Paresia parcial | 2: Desviación forzada' },
+      { item: '3. Campos visuales', detalle: 'Evaluar por confrontación.', puntuacion: '0: Normal | 1: Hemianopsia parcial | 2: Hemianopsia completa | 3: Ceguera bilateral' },
+      { item: '4. Paresia facial', detalle: 'Pedir enseñar los dientes y cerrar ojos.', puntuacion: '0: Normal | 1: Leve | 2: Parcial | 3: Completa' },
+      { item: '5a/5b. Brazos', detalle: 'Brazo extendido 90°/45°, 10 segundos.', puntuacion: '0: Sin caída | 1: Caída <10s | 2: Cae a cama | 3: Sin mov. gravedad | 4: Sin mov.' },
+      { item: '6a/6b. Piernas', detalle: 'Pierna 30°, 5 segundos.', puntuacion: '0: Sin caída | 1: Caída <5s | 2: Cae a cama | 3: Sin mov. gravedad | 4: Sin mov.' },
+      { item: '7. Ataxia', detalle: 'Dedo-nariz y talón-rodilla.', puntuacion: '0: Ausente | 1: 1 extremidad | 2: 2 extremidades' },
+      { item: '8. Sensibilidad', detalle: 'Pinchazo con aguja.', puntuacion: '0: Normal | 1: Hipoestesia leve | 2: Hipoestesia severa' },
+      { item: '9. Lenguaje', detalle: 'Describir lámina, nombrar, leer.', puntuacion: '0: Normal | 1: Afasia leve | 2: Afasia severa | 3: Global' },
+      { item: '10. Disartria', detalle: 'Repetir palabras estandarizadas.', puntuacion: '0: Normal | 1: Leve | 2: Severa' },
+      { item: '11. Extinción', detalle: 'Estimulación simultánea bilateral.', puntuacion: '0: Normal | 1: 1 modalidad | 2: ≥2 modalidades' },
     ],
   },
 };
 
-function severityColor(severity: string) {
-  const s = severity?.toLowerCase() || '';
-  if (s.includes('leve') || s.includes('bajo') || s.includes('baja') || s.includes('sin stroke'))
-    return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25', bar: 'bg-emerald-500' };
-  if (s.includes('moderado') || s.includes('moderada') || s.includes('medio'))
-    return { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/25', bar: 'bg-orange-500' };
-  if (s.includes('severo') || s.includes('severa') || s.includes('alto') || s.includes('alta') || s.includes('muy'))
-    return { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/25', bar: 'bg-red-500' };
-  return { bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/25', bar: 'bg-gray-500' };
-}
-
-// ── Score intensity styling for SOFA buttons ──
-function sofaBtnStyle(score: number, active: boolean) {
-  if (!active) {
-    return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/40';
+function calcIcon(id: string) {
+  switch (id) {
+    case 'apache-iv': return <Activity className="w-5 h-5" />;
+    case 'sofa': case 'qsofa': return <Zap className="w-5 h-5" />;
+    case 'news2': return <Heart className="w-5 h-5" />;
+    case 'nihss': return <Brain className="w-5 h-5" />;
+    default: return <Calculator className="w-5 h-5" />;
   }
-  const map: Record<number, string> = {
-    0: 'bg-emerald-500/8 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-500/5',
-    1: 'bg-amber-500/8 border-amber-500/30 text-amber-400 shadow-xs shadow-amber-500/5',
-    2: 'bg-orange-500/10 border-orange-500/35 text-orange-400 shadow-sm shadow-orange-500/8',
-    3: 'bg-rose-500/12 border-rose-500/40 text-rose-400 shadow-sm shadow-rose-500/10',
-    4: 'bg-red-500/15 border-red-500/45 text-red-400 shadow-md shadow-red-500/15',
-  };
-  return map[score] || 'bg-[var(--accent-color)]/10 text-[var(--accent-hover)] border-[var(--accent-color)]/40';
-}
-
-function sofaPulse(score: number) {
-  return score >= 4;
 }
 
 export default function CalculatorsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const [calculators, setCalculators] = useState<CalcListItem[]>([]);
+  const [calculators, setCalculators] = useState<{ id: string; name: string; shortName: string; description: string; version: string; variableCount: number }[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [schema, setSchema] = useState<CalcSchema | null>(null);
-  const [formValues, setFormValues] = useState<Record<string, any>>({});
-  const [result, setResult] = useState<CalcResult['result'] | null>(null);
-  const [isCalculating, setIsCalculating] = useState(false);
-  const [schemaLoading, setSchemaLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [schema, setSchema] = useState<any>(null);
   const [fichaOpen, setFichaOpen] = useState(false);
   const [fichaTab, setFichaTab] = useState(0);
 
-  // Cargar lista de calculadoras
   useEffect(() => {
     fetch('/api/calculators')
       .then(r => r.json())
@@ -236,96 +145,18 @@ export default function CalculatorsPage() {
       .catch(() => {});
   }, []);
 
-  // Cargar schema al seleccionar
   useEffect(() => {
-    if (!selectedId) { setSchema(null); setResult(null); setFichaOpen(false); setFichaTab(0); return; }
-    setSchemaLoading(true);
+    if (!selectedId) { setSchema(null); setFichaOpen(false); setFichaTab(0); return; }
     fetch(`/api/calculator/${selectedId}/schema`)
       .then(r => r.json())
       .then(d => {
-        setSchemaLoading(false);
-        if (d.schema) {
-          setSchema(d.schema);
-          // Inicializar valores: SOLO select/boolean con defaultValue, sin pre-poblar fisiológicos
-          const defaults: Record<string, any> = {};
-          d.schema.variables.forEach((v: CalcVariable) => {
-            if (v.defaultValue !== undefined) {
-              defaults[v.key] = v.defaultValue;
-            } else if (v.type === 'boolean' && !v.renderAs) {
-              defaults[v.key] = false;
-            }
-          });
-          setFormValues(defaults);
-          setResult(null);
-          setError(null);
-        }
+        if (d.schema) setSchema(d.schema);
       })
-      .catch(() => {
-        setSchemaLoading(false);
-        setError('No se pudo cargar la calculadora');
-      });
+      .catch(() => {});
   }, [selectedId]);
-
-  const updateValue = (key: string, value: any) => {
-    setFormValues(prev => {
-      const next = { ...prev, [key]: value };
-
-      // Resetear diagnóstico en cascada cuando cambia admisión o sistema
-      if (key === 'admissionType') {
-        delete next.diagnosisSystem;
-        delete next.diagnosisKey;
-      } else if (key === 'diagnosisSystem') {
-        delete next.diagnosisKey;
-      }
-
-      return next;
-    });
-  };
-
-  const handleCalculate = async () => {
-    if (!selectedId || !schema) return;
-
-    // ── Validación de campos requeridos (APACHE IV) ──
-    if (selectedId === 'apache-iv') {
-      const requiredFields = schema.variables.filter(v => v.required === true);
-      const missing = requiredFields.filter(v => {
-        const val = formValues[v.key];
-        if (v.type === 'number') return val === '' || val === undefined || val === null || val < 0;
-        if (v.type === 'select') return !val || val === '';
-        if (v.type === 'boolean') return val === undefined || val === null;
-        return false;
-      });
-      if (missing.length > 0) {
-        setError(`Campos obligatorios: ${missing.map(v => v.label).join(', ')}`);
-        return;
-      }
-    }
-
-    setIsCalculating(true);
-    setError(null);
-    try {
-      const res = await fetch(`/api/calculator/${selectedId}/calculate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formValues),
-      });
-      const data = await res.json();
-      if (data.result) {
-        setResult(data.result);
-      } else {
-        setError(data.error || 'Error al calcular');
-      }
-    } catch {
-      setError('Error de conexión');
-    }
-    setIsCalculating(false);
-  };
-
-  const severity = result ? severityColor(result.severity) : null;
 
   return (
     <div className="h-dvh flex flex-col overflow-hidden">
-      {/* Header */}
       <header className="px-4 md:px-6 py-3 border-b border-[var(--ren-border)] flex items-center justify-between ren-bg-header shrink-0" style={{ position: 'relative', zIndex: 10 }}>
         <div className="flex items-center gap-3">
           <CrowIcon size="lg" animate />
@@ -349,7 +180,6 @@ export default function CalculatorsPage() {
       </header>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Selector — pills compactas para todas las pantallas */}
         <div className="overflow-x-auto ren-scrollbar border-b border-[var(--ren-border)] shrink-0">
           <div className="flex gap-1 p-2" style={{ minWidth: 'max-content' }}>
             {calculators.map(calc => (
@@ -368,16 +198,10 @@ export default function CalculatorsPage() {
           </div>
         </div>
 
-        {/* Contenido principal */}
         <main className="flex-1 overflow-y-auto ren-scrollbar">
           {!selectedId ? (
-            /* Pantalla de bienvenida — tarjetas de navegación */
             <div className="flex items-center justify-center min-h-full p-6">
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-lg"
-              >
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
                 <div className="text-center mb-8">
                   <div className="flex justify-center mb-4">
                     <div className="w-14 h-14 rounded-2xl bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/20 flex items-center justify-center">
@@ -385,9 +209,7 @@ export default function CalculatorsPage() {
                     </div>
                   </div>
                   <h2 className="text-lg font-bold ren-gradient-text mb-1">Calculadoras clínicas</h2>
-                  <p className="text-xs ren-text-secondary leading-relaxed">
-                    Scores pronósticos determinísticos. Resultados reproducibles — el modelo nunca interviene.
-                  </p>
+                  <p className="text-xs ren-text-secondary leading-relaxed">Scores pronósticos determinísticos. Resultados reproducibles — el modelo nunca interviene.</p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {calculators.map((calc, i) => (
@@ -415,7 +237,6 @@ export default function CalculatorsPage() {
             </div>
           ) : (
             <div className="p-3 md:p-5 max-w-2xl mx-auto">
-              {/* Encabezado de la calculadora */}
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedId}
@@ -424,16 +245,11 @@ export default function CalculatorsPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Volver a calculadoras */}
-                  <button
-                    onClick={() => { setSelectedId(null); setResult(null); }}
-                    className="flex items-center gap-1.5 text-xs font-mono ren-text-tertiary hover:text-[var(--accent-hover)] transition-colors mb-4"
-                  >
+                  <button onClick={() => { setSelectedId(null); }} className="flex items-center gap-1.5 text-xs font-mono ren-text-tertiary hover:text-[var(--accent-hover)] transition-colors mb-4">
                     <ArrowLeft size={14} />
                     Todas las calculadoras
                   </button>
 
-                  {/* Título y descripción */}
                   <div className="mb-5">
                     <div className="flex items-start gap-3">
                       <div className="w-9 h-9 rounded-lg bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 flex items-center justify-center shrink-0">
@@ -446,8 +262,7 @@ export default function CalculatorsPage() {
                         </div>
                         <p className="text-xs ren-text-secondary mt-0.5 leading-relaxed">{schema?.description}</p>
                         <div className="flex gap-4 mt-1.5">
-                        {schema?.longDescription && (
-                          <div>
+                          {schema?.longDescription && (
                             <button
                               onClick={() => {
                                 const detail = document.getElementById('calc-detail-' + selectedId);
@@ -458,16 +273,8 @@ export default function CalculatorsPage() {
                               <Info size={11} />
                               más información
                             </button>
-                            <div id={'calc-detail-' + selectedId} className="hidden mt-2">
-                              <p className="text-xs ren-text-secondary leading-relaxed pl-3 border-l-2 border-[var(--accent-color)]/40">{schema.longDescription}</p>
-                              {schema.reference && (
-                                <p className="text-[10px] ren-text-tertiary mt-1 pl-3 italic">Ref: {schema.reference}</p>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        {fichasTecnicas[selectedId] && (
-                          <div>
+                          )}
+                          {fichasTecnicas[selectedId] && (
                             <button
                               onClick={() => setFichaOpen(!fichaOpen)}
                               className={`text-[11px] font-mono cursor-pointer transition-colors flex items-center gap-1 ${
@@ -477,10 +284,14 @@ export default function CalculatorsPage() {
                               <FileText size={11} />
                               ficha técnica
                             </button>
-                          </div>
-                        )}
+                          )}
                         </div>
-                        {/* Panel de ficha técnica expandible */}
+                        <div id={'calc-detail-' + selectedId} className="hidden mt-2">
+                          <p className="text-xs ren-text-secondary leading-relaxed pl-3 border-l-2 border-[var(--accent-color)]/40">{schema?.longDescription}</p>
+                          {schema?.reference && (
+                            <p className="text-[10px] ren-text-tertiary mt-1 pl-3 italic">Ref: {schema.reference}</p>
+                          )}
+                        </div>
                         {fichaOpen && fichasTecnicas[selectedId] && (() => {
                           const f = fichasTecnicas[selectedId];
                           const tabs = [
@@ -498,7 +309,6 @@ export default function CalculatorsPage() {
                               className="mt-3 rounded-xl border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)] overflow-hidden"
                             >
                               <div className="p-4">
-                                {/* Tabs — pills horizontales */}
                                 <div className="flex gap-1 overflow-x-auto ren-scrollbar mb-4">
                                   {tabs.map((tab, idx) => (
                                     <button
@@ -515,16 +325,9 @@ export default function CalculatorsPage() {
                                     </button>
                                   ))}
                                 </div>
-
-                                {/* Contenido de tabs con animación fade */}
                                 <div className="min-h-[100px]">
-                                  {/* Tab: Propósito */}
                                   {activeTabId === 'proposito' && (
-                                    <motion.div
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      transition={{ duration: 0.2 }}
-                                    >
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                                       <div className="mb-3">
                                         <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Propósito</p>
                                         <p className="text-xs ren-text-secondary leading-relaxed">{f.proposito}</p>
@@ -535,14 +338,8 @@ export default function CalculatorsPage() {
                                       </div>
                                     </motion.div>
                                   )}
-
-                                  {/* Tab: Interpretación */}
                                   {activeTabId === 'interpretacion' && (
-                                    <motion.div
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      transition={{ duration: 0.2 }}
-                                    >
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {f.interpretacion.map((i, idx) => (
                                           <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
@@ -553,14 +350,8 @@ export default function CalculatorsPage() {
                                       </div>
                                     </motion.div>
                                   )}
-
-                                  {/* Tab: Cómo evaluar */}
                                   {activeTabId === 'como-evaluar' && f.comoEvaluar && (
-                                    <motion.div
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      transition={{ duration: 0.2 }}
-                                    >
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                                       <div className="space-y-1">
                                         {f.comoEvaluar.map((ce, idx) => (
                                           <details key={idx} className="group">
@@ -577,14 +368,8 @@ export default function CalculatorsPage() {
                                       </div>
                                     </motion.div>
                                   )}
-
-                                  {/* Tab: Limitaciones */}
                                   {activeTabId === 'limitaciones' && (
-                                    <motion.div
-                                      initial={{ opacity: 0 }}
-                                      animate={{ opacity: 1 }}
-                                      transition={{ duration: 0.2 }}
-                                    >
+                                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.2 }}>
                                       <ul className="space-y-2">
                                         {f.limitaciones.map((l, idx) => (
                                           <li key={idx} className="text-[11px] ren-text-tertiary leading-relaxed flex items-start gap-2">
@@ -604,773 +389,17 @@ export default function CalculatorsPage() {
                     </div>
                   </div>
 
-                  {schemaLoading ? (
-                    <div className="animate-pulse space-y-5 py-4">
-                      <div>
-                        <div className="h-3 bg-[var(--ren-bg-tertiary)] rounded w-1/4 mb-3" />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="h-3 bg-[var(--ren-bg-tertiary)] rounded w-1/3 mb-3" />
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                          <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                        </div>
-                      </div>
-                      <div>
-                        <div className="h-3 bg-[var(--ren-bg-tertiary)] rounded w-1/5 mb-3" />
-                        <div className="h-[42px] bg-[var(--ren-bg-tertiary)] rounded-lg" />
-                      </div>
-                      <div className="flex justify-center">
-                        <div className="h-12 bg-[var(--ren-bg-tertiary)] rounded-xl w-full md:w-[280px]" />
-                      </div>
-                    </div>
-                  ) : selectedId === 'apache-iv' ? (
+                  {/* Componentes por calculadora */}
+                  {selectedId === 'sofa' && <SofaCalculator />}
+                  {selectedId === 'news2' && <News2Calculator />}
+                  {selectedId === 'nihss' && <NihssCalculator />}
+                  {selectedId === 'apache-iv' && (
                     <div className="apache-iv-root">
                       <ApacheIVCalculator />
-                    </div>
-                  ) : (
-                    <>
-                  {/* ── Formulario: SOFA con range buttons, otras usan schema ── */}
-                  {selectedId === 'sofa' ? (
-                    <>
-                      {/* ── qSOFA inline — card diferenciado ── */}
-                      <div className="mb-8 rounded-xl border-l-4 border-l-amber-500/50 border border-[var(--accent-color)]/20 bg-gradient-to-r from-amber-500/[0.04] to-transparent p-4">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest flex items-center gap-1.5 text-amber-400">
-                            <Zap size={12} /> qSOFA — Cribado rápido
-                            <span className="text-[9px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-1.5 py-0.5 rounded border border-[var(--ren-border)] ml-1">Sepsis-3</span>
-                          </h3>
-                          <p className="text-[10px] ren-text-tertiary mt-0.5 ml-[1.125rem]">Alerta temprana · FR ≥ 22 · PAS ≤ 100 · GCS &lt; 15</p>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                          {/* FR */}
-                          <div>
-                            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">Frec. respiratoria ≥22 rpm</label>
-                            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-                              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-                              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
-                            </div>
-                          </div>
-                          {/* PAS */}
-                          <div>
-                            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">PAS ≤100 mmHg</label>
-                            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-                              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-                              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
-                            </div>
-                          </div>
-                          {/* GCS */}
-                          <div>
-                            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">GCS &lt;15</label>
-                            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-                              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-                              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
-                            </div>
-                          </div>
-                        </div>
-                        {/* Badge qSOFA en vivo */}
-                        {(() => {
-                          const hasQ = formValues.qsofa_rr != null && formValues.qsofa_sbp != null && formValues.qsofa_gcs != null;
-                          if (!hasQ) return null;
-                          const qTotal = Number(formValues.qsofa_rr) + Number(formValues.qsofa_sbp) + Number(formValues.qsofa_gcs);
-                          const qPos = qTotal >= 2;
-                          return (
-                            <div className={`mt-3 rounded-xl border overflow-hidden ${qPos ? 'border-red-500/25 bg-red-500/5' : 'border-emerald-500/25 bg-emerald-500/5'}`}>
-                              <div className="p-3 flex items-center gap-3">
-                                <span className="text-xl font-bold ren-text-primary tabular-nums">{qTotal}/3</span>
-                                {qPos ? (
-                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25">⚠️ Alto riesgo — evaluar SOFA</span>
-                                ) : (
-                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Bajo riesgo</span>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </div>
-
-                      {/* ── Separador qSOFA → SOFA ── */}
-                      <div className="mb-8 relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-dashed border-[var(--ren-border)]/30" />
-                        </div>
-                        <div className="relative flex justify-center">
-                          <span className="bg-[var(--ren-bg-primary)] px-3 text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">
-                            Disfunción orgánica
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Respiratorio ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <Wind size={12} /> Respiratorio — PaFi
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-5 gap-1.5">
-                          {[
-                            {l:'≥400',v:400,s:0,k:'pf_0'},
-                            {l:'300–399',v:350,s:1,k:'pf_1'},
-                            {l:'200–299',v:250,s:2,k:'pf_2'},
-                            {l:'100–199',v:150,s:3,k:'pf_3'},
-                            {l:'<100',v:50,s:4,k:'pf_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_paFi === r.v;
-                            return (
-                              <button key={r.k} onClick={() => updateValue('sofa_paFi', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]||'#059669'}}>{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Coagulación ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <Droplets size={12} /> Coagulación — Plaquetas (×10³/µL)
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-5 gap-1.5">
-                          {[
-                            {l:'≥150',v:150,s:0,k:'plt_0'},
-                            {l:'100–149',v:100,s:1,k:'plt_1'},
-                            {l:'50–99',v:50,s:2,k:'plt_2'},
-                            {l:'20–49',v:20,s:3,k:'plt_3'},
-                            {l:'<20',v:5,s:4,k:'plt_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_platelets === r.v;
-                            return (
-                              <button key={r.k} onClick={() => updateValue('sofa_platelets', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Hepático ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <span size={12}>🫁</span> Hepático — Bilirrubina (mg/dL)
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-5 gap-1.5">
-                          {[
-                            {l:'<1.2',v:1,s:0,k:'bili_0'},
-                            {l:'1.2–1.9',v:1.5,s:1,k:'bili_1'},
-                            {l:'2.0–5.9',v:3,s:2,k:'bili_2'},
-                            {l:'6.0–11.9',v:8,s:3,k:'bili_3'},
-                            {l:'≥12',v:13,s:4,k:'bili_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_bilirubin === r.v;
-                            return (
-                              <button key={r.k} onClick={() => updateValue('sofa_bilirubin', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Cardiovascular ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <Heart size={12} /> Cardiovascular — PAM + Vasopresores
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-1 gap-1.5">
-                          {[
-                            {l:'PAM ≥70, sin vasopresores', map:80, dopa:'none', s:0, k:'cv_0'},
-                            {l:'PAM <70, sin vasopresores', map:60, dopa:'none', s:1, k:'cv_1'},
-                            {l:'Dopamina ≤5 o Dobutamina', map:70, dopa:'low', s:2, k:'cv_2'},
-                            {l:'Dopa 5–15 o Epi/Norepi ≤0.1', map:70, dopa:'mid', s:3, k:'cv_3'},
-                            {l:'Dopa >15 o Epi/Norepi >0.1', map:70, dopa:'high', s:4, k:'cv_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_map === r.map && formValues.sofa_dopamine === r.dopa;
-                            return (
-                              <button key={r.k} onClick={() => { updateValue('sofa_map', r.map); updateValue('sofa_dopamine', r.dopa); }} className={`relative py-2.5 px-3 rounded-lg text-xs font-semibold transition-all border text-left ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 text-[9px] font-bold">{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Neurológico ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <Brain size={12} /> Neurológico — Glasgow
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-5 gap-1.5">
-                          {[
-                            {l:'15',v:15,s:0,k:'gcs_0'},
-                            {l:'13–14',v:13,s:1,k:'gcs_1'},
-                            {l:'10–12',v:11,s:2,k:'gcs_2'},
-                            {l:'6–9',v:8,s:3,k:'gcs_3'},
-                            {l:'<6',v:5,s:4,k:'gcs_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_gcs === r.v;
-                            return (
-                              <button key={r.k} onClick={() => updateValue('sofa_gcs', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* ── SOFA: Renal ── */}
-                      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-                        <div className="mb-4">
-                          <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <span size={12}>🫘</span> Renal — Creatinina (mg/dL) o Diuresis
-                          </h3>
-                        </div>
-                        <div className="grid grid-cols-5 gap-1.5 mb-2">
-                          {[
-                            {l:'<1.2', cr:1, urine:1000, s:0, k:'ren_0'},
-                            {l:'1.2–1.9', cr:1.5, urine:1000, s:1, k:'ren_1'},
-                            {l:'2.0–3.4', cr:3, urine:1000, s:2, k:'ren_2'},
-                            {l:'3.5–4.9 o diur<500', cr:4, urine:400, s:3, k:'ren_3'},
-                            {l:'≥5 o diur<200', cr:6, urine:100, s:4, k:'ren_4'},
-                          ].map(r => {
-                            const active = formValues.sofa_creatinine === r.cr && formValues.sofa_urine === r.urine;
-                            return (
-                              <button key={r.k} onClick={() => { updateValue('sofa_creatinine', r.cr); updateValue('sofa_urine', r.urine); }} className={`relative py-2.5 px-2 rounded-lg text-xs font-semibold transition-all border leading-tight ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
-                                {r.l}
-                                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    /* ── Schema-driven para otras calculadoras ── */
-                    (() => {
-                      const vars = schema?.variables || [];
-                      type GroupVar = typeof vars extends (infer V)[] ? V : never;
-                      const groups: { group: string; variables: typeof vars }[] = [];
-                      vars.forEach(v => {
-                        const g = v.group || 'General';
-                        let last = groups[groups.length - 1];
-                        if (!last || last.group !== g) {
-                          groups.push({ group: g, variables: [v] });
-                        } else {
-                          last.variables.push(v);
-                        }
-                      });
-                      return groups.map((grp, gi) => {
-                        const visibleVars = grp.variables.filter(variable => {
-                          if (variable.condition) {
-                            const depVal = formValues[variable.condition.dependsOn];
-                            if (!variable.condition.values.includes(depVal)) return false;
-                          }
-                          return true;
-                        });
-                        if (visibleVars.length === 0) return null;
-                        const filterOptions = (variable: CalcVariable): typeof variable.options => {
-                          if (!variable.cascade || !variable.options) return variable.options;
-                          let triggerVal = formValues[variable.cascade.trigger];
-                          let parentVal = variable.cascade.parentTrigger
-                            ? formValues[variable.cascade.parentTrigger]
-                            : null;
-                          const cascadeAny = variable.cascade as any;
-                          if (cascadeAny.valueMap && triggerVal != null && cascadeAny.valueMap[triggerVal] !== undefined) {
-                            triggerVal = cascadeAny.valueMap[triggerVal];
-                          }
-                          if (cascadeAny.parentValueMap && parentVal != null && cascadeAny.parentValueMap[parentVal] !== undefined) {
-                            parentVal = cascadeAny.parentValueMap[parentVal];
-                          }
-                          return variable.options.filter(opt => {
-                            const optAny = opt as any;
-                            const matchesCascade = triggerVal != null
-                              ? optAny[variable.cascade!.field] === triggerVal
-                              : false;
-                            const matchesParent = parentVal != null && variable.cascade!.parentField
-                              ? optAny[variable.cascade!.parentField] === parentVal
-                              : true;
-                            return matchesCascade && matchesParent;
-                          });
-                        };
-                        return (
-                          <div key={grp.group} className="mb-8">
-                            <div className="mb-4 pl-1">
-                              <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary">{grp.group}</h3>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                              {visibleVars.map(variable => (
-                                <motion.div key={variable.key} initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }}>
-                                  {variable.type === 'boolean' && variable.renderAs === 'radio' ? (
-                                    <div>
-                                      <label className="block text-xs font-mono ren-text-tertiary mb-1 px-1">{variable.label}{variable.required && <span className="text-red-400 ml-0.5">*</span>}</label>
-                                      <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-                                        <button onClick={() => updateValue(variable.key, true)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues[variable.key] === true ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
-                                        <button onClick={() => updateValue(variable.key, false)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues[variable.key] === false ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-                                      </div>
-                                    </div>
-                                  ) : variable.type === 'boolean' && variable.renderAs !== 'radio' ? (
-                                    <label className="flex items-center gap-3 p-3 rounded-lg border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)] hover:border-[var(--ren-border-subtle)] transition-all cursor-pointer h-full">
-                                      <input type="checkbox" checked={formValues[variable.key] || false} onChange={e => updateValue(variable.key, e.target.checked)} className="w-4 h-4 rounded border-[var(--ren-border)] bg-[var(--ren-bg-primary)] text-[var(--accent-color)] focus:ring-[var(--accent-color)]/50 shrink-0" />
-                                      <span className="text-sm ren-text-primary">{variable.label}</span>
-                                    </label>
-                                  ) : variable.type === 'select' ? (
-                                    <div>
-                                      <label className="block text-xs font-mono ren-text-tertiary mb-0.5 px-1">{variable.label}{variable.required && <span className="text-red-400 ml-0.5">*</span>}</label>
-                                      <div className="relative">
-                                        <select value={formValues[variable.key] ?? variable.defaultValue ?? ''} onChange={e => updateValue(variable.key, e.target.value)} disabled={variable.disablable ? formValues[variable.disablable] === true : false} className={`w-full bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] rounded-lg px-3 py-2.5 pr-8 text-sm ren-text-primary appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]/40 focus:border-[var(--accent-color)]/60 transition-all ${variable.disablable && formValues[variable.disablable] ? 'opacity-40 cursor-not-allowed' : ''}`}>
-                                          <option value="">— Seleccione —</option>
-                                          {filterOptions(variable)?.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-                                        </select>
-                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5"><ChevronDown size={14} className="ren-text-tertiary" /></div>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <div>
-                                      <label className="block text-xs font-mono ren-text-tertiary mb-0.5 px-1">{variable.label}{variable.required && <span className="text-red-400 ml-0.5">*</span>}</label>
-                                      <div className="relative">
-                                        <input type="number" value={formValues[variable.key] ?? ''} onChange={e => updateValue(variable.key, e.target.value ? Number(e.target.value) : '')} min={variable.min} max={variable.max} step={variable.step ?? 1} placeholder={variable.placeholder} disabled={variable.disablable ? formValues[variable.disablable] === true : false} className={`w-full bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] rounded-lg px-3 py-2.5 text-sm ren-text-primary placeholder:text-[var(--ren-text-tertiary)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]/40 focus:border-[var(--accent-color)]/60 transition-all [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none ${variable.disablable && formValues[variable.disablable] ? 'opacity-40 cursor-not-allowed' : ''}`} />
-                                        {variable.unit && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono ren-text-tertiary pointer-events-none">{variable.unit}</span>}
-                                      </div>
-                                    </div>
-                                  )}
-                                </motion.div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                      });
-                    })()
-                  )}
-
-                  {/* Botón Calcular */}
-                  <div className="flex justify-center">
-                    <button
-                      onClick={handleCalculate}
-                      disabled={isCalculating}
-                      className="w-full md:w-auto md:min-w-[280px] py-3 px-8 rounded-xl font-semibold text-sm transition-all disabled:opacity-60 ren-btn-glow"
-                      style={{
-                        background: 'linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%)',
-                        color: 'white',
-                      }}
-                    >
-                      {isCalculating ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Calculando...
-                        </span>
-                      ) : (
-                        <span className="flex items-center justify-center gap-2">
-                          <BarChart3 size={15} />
-                          Calcular
-                        </span>
-                      )}
-                    </button>
-                  </div>
-                    </>
-                  )}
-
-                  {selectedId !== 'apache-iv' && error && (
-                    <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
-                      <AlertCircle size={12} />
-                      {error}
                     </div>
                   )}
                 </motion.div>
               </AnimatePresence>
-
-              {/* Resultado — dinámico por tipo de calculadora */}
-              {(() => {
-                const calcId = selectedId;
-                const r = result as Record<string, any>;
-                if (!r || calcId === 'apache-iv') return null;
-
-                // ── Helper para badge de severidad ──
-                const SeverityBadge = ({ label, severityText }: { label: string; severityText: string }) => {
-                  const col = severityColor(severityText);
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`rounded-xl border ${col.border} ${col.bg} overflow-hidden`}
-                    >
-                      <div className="p-5">
-                        {label && (
-                          <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-2">{label}</p>
-                        )}
-                        {severityText && (
-                          <span className={`inline-block text-xs font-mono px-2 py-0.5 rounded-full ${col.bg} ${col.text} border ${col.border}`}>
-                            {severityText}
-                          </span>
-                        )}
-                      </div>
-                    </motion.div>
-                  );
-                };
-
-                // ── Helper: renderizar componentes detallados ──
-                const renderComponents = (components: Record<string, number>) => {
-                  return (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3">
-                      {Object.entries(components).map(([key, value]) => (
-                        <div key={key} className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                          <p className="text-[9px] font-mono uppercase tracking-wider ren-text-tertiary truncate">{key}</p>
-                          <p className="text-lg font-bold ren-text-primary tabular-nums">{value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  );
-                };
-
-                // ── Helper: botón copiar ──
-                const copyText = (text: string) => {
-                  navigator.clipboard.writeText(text).catch(() => {});
-                };
-
-                // ── APACHE IV ──
-                if (calcId === 'apache-iv') {
-                  const severityClass = severityColor(r.severity);
-                  return (
-                    <AnimatePresence>
-                      <motion.div
-                        initial={{ opacity: 0, y: 12, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-                        className="mt-4"
-                      >
-                        <div className={`rounded-xl border ${severityClass.border} ${severityClass.bg} overflow-hidden`}>
-                          <div className="p-5">
-                            <div className="grid grid-cols-2 gap-3 mb-4">
-                              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', damping: 16, stiffness: 140 }}>
-                                <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-0.5">APACHE IV Score</p>
-                                <span className="text-2xl font-bold ren-text-primary tabular-nums">{r.totalScore}</span>
-                              </motion.div>
-                              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', damping: 16, stiffness: 140, delay: 0.05 }} className="text-right">
-                                <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-0.5">APS</p>
-                                <span className="text-2xl font-bold ren-text-primary tabular-nums">{r.aps}</span>
-                              </motion.div>
-                              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', damping: 16, stiffness: 140, delay: 0.1 }}>
-                                <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-0.5">Mortalidad estimada</p>
-                                <div className="flex items-baseline gap-1.5">
-                                  <span className={`text-2xl font-bold tabular-nums ${severityClass.text}`}>{r.mortalityPct}%</span>
-                                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full ${severityClass.bg} ${severityClass.text} border ${severityClass.border}`}>{r.severity}</span>
-                                </div>
-                              </motion.div>
-                              <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: 'spring', damping: 16, stiffness: 140, delay: 0.15 }} className="text-right">
-                                <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-0.5">LOS estimada</p>
-                                <span className="text-2xl font-bold ren-text-primary tabular-nums">{r.losDays} <span className="text-xs ren-text-tertiary font-mono">días</span></span>
-                              </motion.div>
-                            </div>
-                            <div className="h-1.5 bg-[var(--ren-bg-tertiary)] rounded-full mb-4">
-                              <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(r.mortalityPct, 100)}%` }} transition={{ duration: 0.8, ease: 'easeOut' }} className={`h-full ${severityClass.bar} rounded-full`} />
-                            </div>
-                            {r.diagnosisLabel && (
-                              <div className="flex justify-center mb-1">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]">
-                                  <FileText size={11} className="ren-text-tertiary" />
-                                  {r.diagnosisLabel}
-                                </span>
-                              </div>
-                            )}
-                            {r.gcsNote && (
-                              <div className="flex justify-center mt-1">
-                                <span className="text-[10px] font-mono ren-text-tertiary">{r.gcsNote}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 mt-3 flex-wrap">
-                          <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-                          <button onClick={() => copyText(`APACHE IV | Score: ${r.totalScore} | APS: ${r.aps} | Mortalidad: ${r.mortalityPct}% | Severidad: ${r.severity} | LOS: ${r.losDays}d`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-                          <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-                }
-
-                // ── SOFA + qSOFA ──
-                if (calcId === 'sofa' || calcId === 'qsofa') {
-                  const severityClass = severityColor(r.sofa_severity || '');
-                  return (
-                    <AnimatePresence>
-                      <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', damping: 20, stiffness: 200 }} className="mt-4">
-                        {/* qSOFA — inline desde formValues */}
-                        {(() => {
-                          const qRR = Number(formValues.qsofa_rr);
-                          const qSBP = Number(formValues.qsofa_sbp);
-                          const qGCS = Number(formValues.qsofa_gcs);
-                          const hasQ = !isNaN(qRR) && !isNaN(qSBP) && !isNaN(qGCS);
-                          const qPts = hasQ ? qRR + qSBP + qGCS : 0;
-                          const qPos = hasQ && qPts >= 2;
-                          return (
-                            <div className="rounded-xl border bg-[var(--ren-bg-secondary)] border-[var(--ren-border)] mb-3 overflow-hidden">
-                              <div className="flex items-center gap-2 px-4 py-1.5 bg-[var(--ren-bg-tertiary)] border-b border-[var(--ren-border)]">
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                                <p className="text-[10px] font-mono uppercase tracking-widest ren-text-primary">qSOFA — Cribado rápido</p>
-                              </div>
-                              <div className="p-4">
-                                <div className="grid grid-cols-3 gap-2 mb-3">
-                                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">🫁 FR ≥22</p>
-                                    <p className={`text-lg font-bold tabular-nums ${qRR ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qRR : '-'}</p>
-                                  </div>
-                                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">❤️ PAS ≤100</p>
-                                    <p className={`text-lg font-bold tabular-nums ${qSBP ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qSBP : '-'}</p>
-                                  </div>
-                                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">🧠 GCS &lt;15</p>
-                                    <p className={`text-lg font-bold tabular-nums ${qGCS ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qGCS : '-'}</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <span className={`text-xl font-bold tabular-nums ${qPos ? 'text-red-400' : 'text-emerald-400'}`}>{hasQ ? qPts : '-'}<span className="text-xs font-mono ren-text-tertiary">/3</span></span>
-                                    <span className={`h-2 w-2 rounded-full ${qPos ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                                  </div>
-                                  {!hasQ ? null : qPos ? (
-                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25">⚠ Alto riesgo</span>
-                                  ) : (
-                                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Bajo riesgo</span>
-                                  )}
-                                </div>
-                                {hasQ && qPos && <p className="text-[9px] font-mono text-amber-500 mt-2">Sospecha clínica de sepsis — correlacionar con SOFA</p>}
-                              </div>
-                            </div>
-                          );
-                        })()}
-
-                        {/* SOFA completo */}
-                        <div className={`rounded-xl border ${severityClass.border} ${severityClass.bg} overflow-hidden`}>
-                          <div className="p-4">
-                            <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-3">SOFA — Disfunción orgánica</p>
-                            <div className="grid grid-cols-3 gap-2 mb-3">
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Resp</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_resp ?? '-'}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Coag</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_coag ?? '-'}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Hep</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_hepatic ?? '-'}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">CV</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_cv ?? '-'}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">SNC</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_cns ?? '-'}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Renal</p>
-                                <p className="text-xl font-bold ren-text-primary tabular-nums">{r.sofa_renal ?? '-'}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-baseline gap-3 mb-2">
-                              <span className="text-2xl font-bold ren-text-primary tabular-nums">{r.sofa_total}/24</span>
-                              <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${severityClass.bg} ${severityClass.text} border ${severityClass.border}`}>{r.sofa_severity}</span>
-                            </div>
-                            <p className="text-xs ren-text-tertiary font-mono">Mortalidad estimada: {r.sofa_mortality_estimate}</p>
-                            {r.paFi && <p className="text-[10px] ren-text-tertiary font-mono mt-1">PaFi: {r.paFi}</p>}
-                          </div>
-                        </div>
-
-                        {(r.components) && renderComponents(r.components as Record<string, number>)}
-                        <div className="flex gap-2 mt-3 flex-wrap">
-                          <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-                          <button onClick={() => copyText(`SOFA | qSOFA: ${(() => { const q = (Number(formValues.qsofa_rr)||0)+(Number(formValues.qsofa_sbp)||0)+(Number(formValues.qsofa_gcs)||0); return q+'/3'; })()} | SOFA total: ${r.sofa_total}/24 | Severidad: ${r.sofa_severity} | Mortalidad: ${r.sofa_mortality_estimate}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-                          <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-                }
-
-                // ── NEWS2 ──
-                if (calcId === 'news2') {
-                  const riskClass = r.clinical_risk_level === 'high' ? severityColor('ALTA') : r.clinical_risk_level === 'medium' ? severityColor('MODERADA') : severityColor('BAJA');
-                  return (
-                    <AnimatePresence>
-                      <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', damping: 20, stiffness: 200 }} className="mt-4">
-                        <div className={`rounded-xl border ${riskClass.border} ${riskClass.bg} overflow-hidden`}>
-                          <div className="p-5">
-                            <div className="flex items-baseline gap-3 mb-4">
-                              <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.total_score}/20</span>
-                              <span className={`text-sm font-mono px-2.5 py-0.5 rounded-full ${riskClass.bg} ${riskClass.text} border ${riskClass.border}`}>
-                                {r.color} {r.clinical_risk}
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">FR</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.rr_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">SpO₂</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.spo2_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">O₂</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.oxygen_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">PAS</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.sbp_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">FC</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.hr_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">AVPU</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.consciousness_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">T°</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.temp_score}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Escala SpO₂</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.spo2_scale_used}</p>
-                              </div>
-                            </div>
-                            <p className="text-xs ren-text-tertiary font-mono leading-relaxed">{r.clinical_response}</p>
-                            {r.has_individual_score_of_3 && (
-                              <p className="text-[10px] font-mono text-orange-400 mt-1">⚠ Cualquier puntuación individual de 3 activa respuesta urgente</p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 mt-3 flex-wrap">
-                          <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-                          <button onClick={() => copyText(`NEWS2 | Score: ${r.total_score}/20 | Riesgo: ${r.clinical_risk} | ${r.clinical_response}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-                          <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-                }
-
-                // ── NIHSS ──
-                if (calcId === 'nihss') {
-                  const severityClass = severityColor(r.nihss_severity || '');
-                  return (
-                    <AnimatePresence>
-                      <motion.div initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ type: 'spring', damping: 20, stiffness: 200 }} className="mt-4">
-                        <div className={`rounded-xl border ${severityClass.border} ${severityClass.bg} overflow-hidden`}>
-                          <div className="p-5">
-                            <div className="flex items-baseline gap-3 mb-4">
-                              <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.nihss_total}/42</span>
-                              <span className={`text-sm font-mono px-2.5 py-0.5 rounded-full ${severityClass.bg} ${severityClass.text} border ${severityClass.border}`}>
-                                {r.nihss_severity}
-                              </span>
-                              {(r.nihss_total ?? 0) >= 7 && (
-                                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                                  🧠 Ocl. gran vaso probable
-                                </span>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">LOC</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Preguntas</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc_questions ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Órdenes</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc_commands ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Mirada</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.gaze ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Visual</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.visual ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Facial</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.facial ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Brazo D</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_arm_r ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Brazo I</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_arm_l ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Pierna D</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_leg_r ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Pierna I</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_leg_l ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Ataxia</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.ataxia ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Sensib.</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.sensory ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Lenguaje</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.language ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Disartria</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.dysarthria ?? 0}</p>
-                              </div>
-                              <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                                <p className="text-[9px] font-mono ren-text-tertiary">Neglig.</p>
-                                <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.extinction ?? 0}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex gap-2 mt-3 flex-wrap">
-                          <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-                          <button onClick={() => copyText(`NIHSS | Score: ${r.nihss_total}/42 | Severidad: ${r.nihss_severity}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-                          <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  );
-                }
-
-                // Fallback genérico — muestra todo lo que devuelva
-                return null;
-              })()}
-
-              {/* Espaciador inferior */}
               <div className="h-6" />
             </div>
           )}
