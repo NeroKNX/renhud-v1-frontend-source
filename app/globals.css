@@ -558,6 +558,20 @@ html::after {
   gap: 8px;
 }
 
+.apache-iv-root .section-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 0 4px 0;
+  font-family: monospace;
+}
+
+.apache-iv-root .section-subtitle:first-of-type {
+  padding-top: 0;
+}
+
 .apache-iv-root .count {
   font-size: 9px;
   background: var(--ren-bg-tertiary);
@@ -620,24 +634,6 @@ html::after {
 .apache-iv-root .num-with-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.apache-iv-root .num-with-badge .num-input {
-  flex: 1;
-}
-
-.apache-iv-root .score-badge {
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-dim);
-  min-width: 32px;
-  text-align: center;
-  font-family: monospace;
 }
 
 .apache-iv-root .note {
@@ -791,14 +787,14 @@ html::after {
 }
 
 .apache-iv-root .pill.inactive {
-  background: color-mix(in srgb, var(--green, #22c55e) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--green, #22c55e) 25%, transparent);
-  color: var(--green, #22c55e);
+  background: color-mix(in srgb, var(--text-dim, #8888aa) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--text-dim, #8888aa) 25%, transparent);
+  color: var(--text-dim, #8888aa);
 }
 
 .apache-iv-root .pill.inactive:hover {
-  background: color-mix(in srgb, var(--green, #22c55e) 14%, transparent);
-  border-color: var(--green, #22c55e);
+  border-color: var(--text-dim, #8888aa);
+  opacity: 0.8;
 }
 
 .apache-iv-root .pill.active {
@@ -815,8 +811,8 @@ html::after {
 }
 
 .apache-iv-root .pill.inactive .indicator {
-  background: var(--green, #22c55e);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--green, #22c55e) 40%, transparent);
+  background: var(--text-dim, #8888aa);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--text-dim, #8888aa) 40%, transparent);
 }
 
 .apache-iv-root .pill.active .indicator {

@@ -152,6 +152,7 @@ export default function ApacheIVCalculator() {
   const [calculating, setCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Derived diagnosis options from schema
   const diagnosisOptions = (schema?.variables?.find(v => v.key === 'diagnosisKey')?.options as DiagnosisOption[]) || [];
   const systemOptions = (schema?.variables?.find(v => v.key === 'diagnosisSystem')?.options as DiagnosisOption[]) || [];
 
@@ -185,9 +186,11 @@ export default function ApacheIVCalculator() {
 
   const gcsTotal = gcsNa ? 0 : (gcs.gcsEye || 4) + (gcs.gcsVerbal || 5) + (gcs.gcsMotor || 6);
 
-  const showThrombolysis = diagnosisSystem?.toLowerCase().includes('neuro') ||
-    diagnosisSystem?.toLowerCase().includes('cerebro') ||
-    diagnosisSystem?.toLowerCase().includes('stroke');
+  const showThrombolysis = 
+    diagnosisSystem?.toLowerCase().includes('neuro') ||
+    diagnosisKey === 'stroke' ||
+    diagnosisKey === 'ich' ||
+    diagnosisKey === 'sah_aneurysm';
 
   const handleCalculate = async () => {
     if (!age) { setError('Ingresa la edad'); return; }
@@ -272,7 +275,6 @@ export default function ApacheIVCalculator() {
   return (
     <div className="space-y-6 apache-iv-root">
 
-      {/* ─── DATOS DEL PACIENTE ─── */}
       <Section title="Datos del paciente">
         <div className="field" style={{ maxWidth: 200 }}>
           <FieldLabel>Edad <Sub>años</Sub></FieldLabel>
@@ -329,7 +331,7 @@ export default function ApacheIVCalculator() {
             onClick={() => {
               setGcsNa(!gcsNa);
               if (!gcsNa) {
-                setGcs({ gcsEye: 1, gcsVerbal: 1, gcsMotor: 1 });
+                setGcs({ gcsEye: 1, gcsVerbal: 1, gcsMotor: 1 }); // set to minimum on NA
               } else {
                 setGcs({ gcsEye: 4, gcsVerbal: 5, gcsMotor: 6 });
               }
@@ -344,7 +346,6 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ─── COMORBILIDADES ─── */}
       <Section title="Comorbilidades">
         <div className="pills">
           {COMORBIDITIES.map(c => (
@@ -363,7 +364,6 @@ export default function ApacheIVCalculator() {
         </div>
       </Section>
 
-      {/* ─── ADMISIÓN ─── */}
       <Section title="Admisión">
         <div className="row">
           <div className="field">
@@ -397,12 +397,11 @@ export default function ApacheIVCalculator() {
             <ToggleField label="Reingreso UCI" value={readmission} onChange={setReadmission} color="var(--amber)" />
           </div>
         </div>
-        <div className="row" style={{ marginTop: 8 }}>
+        <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
           <ToggleField label="Cirugía de emergencia" value={emergencySurgery} onChange={setEmergencySurgery} color="var(--red)" />
         </div>
       </Section>
 
-      {/* ─── DIAGNÓSTICO DE INGRESO ─── */}
       <Section title="Diagnóstico de ingreso">
         <div className="row">
           <div className="field">
@@ -435,33 +434,18 @@ export default function ApacheIVCalculator() {
           </div>
         </div>
         {showThrombolysis && (
-          <div className="row" style={{ marginTop: 8 }}>
+          <div style={{ marginTop: 12 }}>
             <ToggleField label="Trombólisis" value={thrombolysis} onChange={setThrombolysis} color="var(--purple)" />
           </div>
         )}
       </Section>
 
-      {/* ─── FISIOLOGÍA & LABORATORIOS ─── */}
       <Section title="Fisiología & laboratorios">
-
-        {/* Signos vitales */}
-        <div className="section-subtitle">Signos vitales</div>
         <div className="row">
           <NumField label="Frecuencia cardíaca" unit="/min" key_="hr" value={numFields.hr || ''} onChange={v => updateNum('hr', v)} />
           <NumField label="Frecuencia respiratoria" unit="/min" key_="rr" value={numFields.rr || ''} onChange={v => updateNum('rr', v)} />
           <NumField label="PAM" unit="mmHg" key_="map" value={numFields.map || ''} onChange={v => updateNum('map', v)} />
           <NumField label="Temperatura" unit="°C" key_="temp" value={numFields.temp || ''} onChange={v => updateNum('temp', v)} step="0.1" />
-        </div>
-
-        {/* Soporte ventilatorio + gases */}
-        <div className="section-subtitle">
-          <Wind size={14} style={{ verticalAlign: 'middle', marginRight: 4, color: 'var(--teal, #33ccbb)' }} />
-          Soporte ventilatorio
-        </div>
-        <div className="row" style={{ marginBottom: 8 }}>
-          <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
-            <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal)" />
-          </div>
         </div>
         <div className="row">
           <NumField label="FiO₂" unit="%" key_="fio2" value={numFields.fio2 || ''} onChange={v => updateNum('fio2', v)} placeholder="21 (AA)" />
@@ -469,46 +453,35 @@ export default function ApacheIVCalculator() {
           <NumField label="PaCO₂" unit="mmHg" key_="paco2" value={numFields.paco2 || ''} onChange={v => updateNum('paco2', v)} />
           <NumField label="pH arterial" key_="ph" value={numFields.ph || ''} onChange={v => updateNum('ph', v)} step="0.001" />
         </div>
-
-        {/* Electrolitos + Renal */}
-        <div className="section-subtitle">
-          <Filter size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-          Electrolitos y función renal
+        <div className="row" style={{ marginTop: 4, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+            <Wind size={20} style={{ color: ventilated ? 'var(--teal, #33ccbb)' : 'var(--text-dim)' }} />
+            <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal)" />
+          </div>
         </div>
         <div className="row">
           <NumField label="Na⁺" unit="mEq/L" key_="na" value={numFields.na || ''} onChange={v => updateNum('na', v)} />
           <NumField label="K⁺" unit="mEq/L" key_="k" value={numFields.k || ''} onChange={v => updateNum('k', v)} />
           <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
         </div>
-        <div className="row" style={{ marginTop: 8 }}>
-          <ToggleField label="AKI / FRA" value={aki} onChange={setAki} color="var(--orange)" />
-        </div>
-
-        {/* Química */}
-        <div className="section-subtitle">Química</div>
         <div className="row">
           <NumField label="BUN" unit="mg/dL" key_="bun" value={numFields.bun || ''} onChange={v => updateNum('bun', v)} />
           <NumField label="Albumina" unit="g/dL" key_="alb" value={numFields.alb || ''} onChange={v => updateNum('alb', v)} />
           <NumField label="Bilirrubina" unit="mg/dL" key_="bili" value={numFields.bili || ''} onChange={v => updateNum('bili', v)} />
         </div>
-
-        {/* Hematología + Glucosa */}
-        <div className="section-subtitle">Hematología y metabolismo</div>
         <div className="row">
           <NumField label="Hto" unit="%" key_="hto" value={numFields.hto || ''} onChange={v => updateNum('hto', v)} />
           <NumField label="Leucocitos" unit="×10³/mm³" key_="wbc" value={numFields.wbc || ''} onChange={v => updateNum('wbc', v)} />
           <NumField label="Glucosa" unit="mg/dL" key_="gluc" value={numFields.gluc || ''} onChange={v => updateNum('gluc', v)} />
         </div>
-
-        {/* Diuresis */}
-        <div className="section-subtitle">Diuresis</div>
         <div className="row">
           <NumField label="Diuresis 24h" unit="mL" key_="urine24h" value={numFields.urine24h || ''} onChange={v => updateNum('urine24h', v)} />
+          <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
+            <ToggleField label="AKI / FRA" value={aki} onChange={setAki} color="var(--orange)" />
+          </div>
         </div>
-
       </Section>
 
-      {/* ─── BOTÓN CALCULAR ─── */}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         <button
           onClick={handleCalculate}
@@ -613,11 +586,12 @@ export default function ApacheIVCalculator() {
 
 /* ─── Subcomponents ─── */
 
-function Section({ title, children, style }: { title: string; children: React.ReactNode; style?: React.CSSProperties }) {
+function Section({ title, count, children, style }: { title: string; count?: string; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div className="section" style={style}>
       <div className="section-title">
         ✦ {title}
+        {count && <span className="count">{count}</span>}
       </div>
       {children}
     </div>

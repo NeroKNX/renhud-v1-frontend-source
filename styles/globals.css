@@ -164,6 +164,19 @@
   align-items: center;
   gap: 8px;
 }
+.apache-iv-root .section-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 0 4px 0;
+  font-family: monospace;
+}
+.apache-iv-root .section-subtitle:first-of-type {
+  padding-top: 0;
+}
+
 .apache-iv-root .section-title .count {
   font-size: 10px;
   background: var(--surface2);
@@ -328,23 +341,8 @@
 .apache-iv-root .num-input::placeholder { color: var(--text-dim); opacity: 0.4; }
 
 .apache-iv-root .num-with-badge {
-  position: relative;
   display: flex;
   align-items: center;
-}
-.apache-iv-root .num-with-badge .num-input { padding-right: 44px; }
-.apache-iv-root .num-with-badge .score-badge {
-  position: absolute;
-  right: 8px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-dim);
-  background: var(--surface);
-  padding: 1px 6px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  pointer-events: none;
-  opacity: 0.4;
 }
 
 /* Comorbidity pills */
@@ -377,7 +375,7 @@
 .apache-iv-root .pill.active { border-color: var(--red); background: rgba(255, 68, 102, 0.06); }
 .apache-iv-root .pill.active .indicator { background: var(--red); box-shadow: 0 0 6px rgba(255, 68, 102, 0.3); }
 .apache-iv-root .pill.inactive { opacity: 0.5; }
-.apache-iv-root .pill.inactive .indicator { background: var(--green); }
+.apache-iv-root .pill.inactive .indicator { background: var(--text-dim); }
 .apache-iv-root .pill.inactive.active { opacity: 1; }
 
 /* Toggle fields */
