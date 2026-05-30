@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REN · Calculadoras preview</title>
+<style>
+  :root {
+    --bg-primary: #0a0a0c;
+    --bg-secondary: #121216;
+    --bg-tertiary: #1a1a20;
+    --border: #1e1e28;
+    --text-primary: #e8e8ed;
+    --text-secondary: #9ca3af;
+    --text-tertiary: #6b7280;
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', system-ui, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+  /* ── Navigation pills ── */
+  .nav-bar {
+    display: flex; gap: 6px; padding: 10px 16px;
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+    background: var(--bg-secondary);
+  }
+  .nav-pill {
+    padding: 6px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    border: 1px solid var(--border); cursor: pointer; transition: all .15s;
+    white-space: nowrap;
+  }
+  .nav-pill.active {
+    background: rgba(129,140,248,0.1); border-color: rgba(129,140,248,0.25);
+    color: var(--accent);
+  }
+  .nav-pill:hover { border-color: rgba(129,140,248,0.3); color: var(--accent-hover); }
+
+  /* ── Main layout ── */
+  .main { max-width: 600px; margin: 0 auto; padding: 20px 16px; }
+
+  /* ── Section cards ── */
+  .section-card {
+    margin-bottom: 24px; padding: 12px; border-radius: 8px;
+    background: rgba(18,18,22,0.3); border: 1px solid rgba(30,30,40,0.4);
+  }
+  .section-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+  .section-header h3 {
+    font-size: 11px; font-family: ui-monospace, monospace;
+    text-transform: uppercase; letter-spacing: .06em;
+    color: var(--text-tertiary); flex: 1;
+  }
+  .section-badge {
+    font-size: 11px; font-weight: 700; font-family: ui-monospace, monospace;
+    padding: 1px 8px; border-radius: 999px; transition: all .15s;
+  }
+  .section-badge.hidden { opacity: 0; }
+
+  /* ── Buttons grid ── */
+  .btn-grid {
+    display: grid; gap: 6px;
+  }
+  .btn-grid-2 { grid-template-columns: 1fr 1fr; }
+  .btn-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .btn-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .btn-grid-5 { grid-template-columns: 1fr 1fr 1fr 1fr 1fr; }
+  .btn-grid-6 { grid-template-columns: repeat(6, 1fr); }
+  .btn-grid-full { grid-template-columns: 1fr; }
+  .btn-grid-2-2 { grid-template-columns: 1fr 1fr; }
+
+  .score-btn {
+    position: relative; padding: 10px 4px; border-radius: 8px;
+    font-size: 11px; font-weight: 600; text-align: center;
+    border: 1px solid var(--border); cursor: pointer;
+    background: var(--bg-primary); color: var(--text-secondary);
+    transition: all .15s; line-height: 1.3;
+  }
+  .score-btn:hover { border-color: rgba(129,140,248,0.3); }
+  .score-btn.subtle { font-size: 10px; }
+  .score-btn .un-badge {
+    display: inline-block; font-size: 8px; font-family: monospace;
+    background: rgba(168,85,247,0.15); color: #c084fc;
+    padding: 0 4px; border-radius: 4px; margin-left: 2px;
+  }
+
+  /* Active states by score */
+  .score-0.active { background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); color: #34d399; box-shadow: 0 1px 2px rgba(52,211,153,0.05); }
+  .score-1.active { background: rgba(251,191,36,0.08); border-color: rgba(251,191,36,0.3); color: #fbbf24; box-shadow: 0 1px 2px rgba(251,191,36,0.05); }
+  .score-2.active { background: rgba(251,146,60,0.10); border-color: rgba(251,146,60,0.35); color: #fb923c; box-shadow: 0 2px 4px rgba(251,146,60,0.08); }
+  .score-3.active { background: rgba(244,114,182,0.12); border-color: rgba(244,114,182,0.40); color: #f472b6; box-shadow: 0 2px 4px rgba(244,114,182,0.10); }
+  .score-4.active { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.45); color: #ef4444; box-shadow: 0 4px 6px rgba(239,68,68,0.15); }
+
+  /* ── qSOFA card ── */
+  .qsofa-card {
+    margin-bottom: 32px; border-radius: 12px;
+    border-left: 4px solid rgba(251,191,36,0.5);
+    border: 1px solid rgba(129,140,248,0.2);
+    background: linear-gradient(135deg, rgba(251,191,36,0.04), transparent);
+    padding: 16px;
+  }
+  .qsofa-title {
+    font-size: 11px; font-family: monospace; letter-spacing: .06em;
+    display: flex; align-items: center; gap: 6px;
+    color: #fbbf24; text-transform: uppercase; margin-bottom: 4px;
+  }
+  .qsofa-subtitle { font-size: 10px; color: var(--text-tertiary); margin-left: 18px; margin-bottom: 16px; }
+
+  .qsofa-grid { display: grid; gap: 12px; margin-bottom: 12px; }
+  @media (min-width: 480px) { .qsofa-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .qsofa-label { display: block; font-size: 11px; font-family: monospace; color: rgba(251,191,36,0.8); margin-bottom: 6px; padding: 0 4px; }
+  .toggle-group { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .toggle-btn {
+    flex: 1; padding: 8px 12px; font-size: 11px; font-weight: 600;
+    background: var(--bg-primary); color: var(--text-secondary);
+    border: none; cursor: pointer; transition: all .12s;
+  }
+  .toggle-btn:hover { background: var(--bg-tertiary); }
+  .toggle-btn.active-green { background: var(--accent); color: white; }
+  .toggle-btn.active-red { background: #ef4444; color: white; }
+
+  /* ── Separator ── */
+  .separator {
+    margin: 32px 0; position: relative;
+  }
+  .separator-line {
+    border-top: 1px dashed rgba(30,30,40,0.3);
+  }
+  .separator-text {
+    position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+    background: var(--bg-primary); padding: 0 12px;
+    font-size: 9px; font-family: monospace; text-transform: uppercase;
+    letter-spacing: .12em; color: var(--text-tertiary);
+  }
+
+  /* ── Result card ── */
+  .result-card {
+    border-radius: 12px; padding: 20px; margin-top: 16px;
+  }
+  .result-card .score-lg {
+    font-size: 28px; font-weight: 800;
+  }
+  .result-pills {
+    display: flex; flex-wrap: wrap; gap: 4px; margin: 12px 0;
+  }
+  .result-pill {
+    padding: 2px 8px; border-radius: 999px; font-size: 10px;
+    font-family: monospace; font-weight: 600;
+  }
+
+  /* ── NIHSS item config ── */
+  .nihss-item { margin-bottom: 20px; }
+  .nihss-item .section-header { margin-bottom: 8px; }
+  .nihss-item .section-header h3 { font-size: 10px; }
+  .nihss-item .section-header .section-badge { font-size: 10px; }
+
+  /* ── Result pills for NIHSS ── */
+  .nihss-result-grid { display: grid; gap: 4px; margin: 12px 0; }
+  @media (min-width: 480px) { .nihss-result-grid { grid-template-columns: repeat(5, 1fr); } }
+  .nihss-result-cell {
+    padding: 4px; border-radius: 6px; text-align: center;
+    border: 1px solid rgba(30,30,40,0.3);
+  }
+  .nihss-result-cell .label { font-size: 8px; font-family: monospace; color: var(--text-tertiary); }
+  .nihss-result-cell .value { font-size: 14px; font-weight: 700; }
+
+  /* ── Action buttons ── */
+  .action-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    flex: 1; padding: 12px 32px; border-radius: 12px; border: none;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s;
+    background: linear-gradient(135deg, var(--accent), #7c3aed); color: white;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-sm {
+    padding: 8px 16px; border-radius: 8px; font-size: 10px; font-family: monospace;
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    border: 1px solid var(--border); cursor: pointer; transition: all .15s;
+  }
+  .btn-sm:hover { border-color: rgba(129,140,248,0.4); color: var(--accent-hover); }
+
+  /* ── NEWS2 specific ── */
+  .avpu-stack { display: flex; flex-direction: column; gap: 4px; }
+  .avpu-hint { font-size: 8px; font-family: monospace; color: var(--text-tertiary); }
+
+  /* ── Collapsible results ── */
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; }
+  .tab-btn {
+    padding: 6px 14px; border-radius: 6px; font-size: 11px; font-weight: 500;
+    background: var(--bg-tertiary); color: var(--text-secondary);
+    border: 1px solid var(--border); cursor: pointer; transition: all .12s;
+  }
+  .tab-btn.active { background: rgba(129,140,248,0.1); border-color: rgba(129,140,248,0.25); color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Spacer ── */
+  .spacer { height: 40px; }
+</style>
+</head>
+<body>
+
+<!-- Nav pills -->
+<div class="nav-bar">
+  <button class="nav-pill active" data-tab="sofa">SOFA</button>
+  <button class="nav-pill" data-tab="news2">NEWS2</button>
+  <button class="nav-pill" data-tab="nihss">NIHSS</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════════ SOFA ═══════════════════════ -->
+<div id="tab-sofa" class="tab-content active">
+
+  <!-- qSOFA inline -->
+  <div class="qsofa-card">
+    <div class="qsofa-title"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> qSOFA — Cribado rápido <span style="font-size:9px;color:var(--text-tertiary);background:var(--bg-tertiary);padding:0 6px;border-radius:4px;border:1px solid var(--border);margin-left:4px;">Sepsis-3</span></div>
+    <div class="qsofa-subtitle">Alerta temprana · FR ≥ 22 · PAS ≤ 100 · GCS &lt; 15</div>
+    <div class="qsofa-grid">
+      <div>
+        <div class="qsofa-label">Frec. respiratoria ≥22 rpm</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active-green" onclick="toggleQsofa('rr',0,this)">No</button>
+          <button class="toggle-btn" onclick="toggleQsofa('rr',1,this)">Sí</button>
+        </div>
+      </div>
+      <div>
+        <div class="qsofa-label">PAS ≤100 mmHg</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active-green" onclick="toggleQsofa('sbp',0,this)">No</button>
+          <button class="toggle-btn" onclick="toggleQsofa('sbp',1,this)">Sí</button>
+        </div>
+      </div>
+      <div>
+        <div class="qsofa-label">GCS &lt;15</div>
+        <div class="toggle-group">
+          <button class="toggle-btn active-green" onclick="toggleQsofa('gcs',0,this)">No</button>
+          <button class="toggle-btn" onclick="toggleQsofa('gcs',1,this)">Sí</button>
+        </div>
+      </div>
+    </div>
+    <div id="qsofa-result" style="display:none;border-radius:12px;overflow:hidden;">
+      <div class="result-card" style="border:1px solid rgba(52,211,153,0.25);background:rgba(52,211,153,0.05)">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="qsofa-score" class="score-lg"></span>
+          <span id="qsofa-badge" style="font-size:10px;font-family:monospace;padding:2px 8px;border-radius:999px;"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Separator -->
+  <div class="separator"><div class="separator-line"></div><div class="separator-text">disfunción orgánica</div></div>
+
+  <!-- SOFA sections rendered by JS -->
+  <div id="sofa-form"></div>
+
+  <!-- Calcular + Result -->
+  <div style="display:flex;justify-content:center;margin:24px 0;">
+    <button onclick="calcSofa()" class="btn-primary" style="width:100%;max-width:300px;">
+      <span style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M7 9h3"/><path d="M7 13h6"/><path d="M7 17h9"/><path d="M14 9h3"/></svg>
+        Calcular
+      </span>
+    </button>
+  </div>
+  <div id="sofa-result"></div>
+</div>
+
+<!-- ═══════════════════════ NEWS2 ═══════════════════════ -->
+<div id="tab-news2" class="tab-content">
+  <div id="news2-form"></div>
+  <div style="display:flex;justify-content:center;margin:24px 0;">
+    <button onclick="calcNews2()" class="btn-primary" style="width:100%;max-width:300px;">
+      <span style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M7 9h3"/><path d="M7 13h6"/><path d="M7 17h9"/><path d="M14 9h3"/></svg>
+        Calcular
+      </span>
+    </button>
+  </div>
+  <div id="news2-result"></div>
+</div>
+
+<!-- ═══════════════════════ NIHSS ═══════════════════════ -->
+<div id="tab-nihss" class="tab-content">
+  <div id="nihss-form"></div>
+  <div style="display:flex;justify-content:center;margin:24px 0;">
+    <button onclick="calcNihss()" class="btn-primary" style="width:100%;max-width:300px;">
+      <span style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M7 9h3"/><path d="M7 13h6"/><path d="M7 17h9"/><path d="M14 9h3"/></svg>
+        Calcular
+      </span>
+    </button>
+  </div>
+  <div id="nihss-result"></div>
+</div>
+
+<div class="spacer"></div>
+</div>
+
+<script>
+// ═══════════════════════ STATE ═══════════════════════
+const state = { sofa: {}, news2: {}, nihss: {} };
+
+// ═══════════════════════ SVG ICONS ═══════════════════════
+const Icons = {
+  wind:   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>',
+  drops:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+  flask:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>',
+  heart:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>',
+  brain:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.1-.2 2.15-.6 3.1a6 6 0 0 1 2.6 5.9c.2.2.4.7.6 1.7a5 5 0 0 1-2 5.3"/><path d="M12 2a4 4 0 0 0-4 4c0 1.1.2 2.15.6 3.1A6 6 0 0 0 6 15c-.2.4-.6.9-.8 1.7a5 5 0 0 0 2 5.3"/><path d="M12 22v-8"/><path d="M9 17h6"/></svg>',
+  filter: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>',
+  eye:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  smile:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+  arrowup:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>',
+  footprint:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 16c-1.1 0-2-.9-2-2s.9-2 2-2c.5 0 .9.2 1.3.5"/><path d="M13 14c-1.1 0-2 .9-2 2s.9 2 2 2c.5 0 .9-.2 1.3-.5"/><path d="M8 10c-1.1 0-2-.9-2-2s.9-2 2-2c.5 0 .9.2 1.3.5"/><path d="M17 8c-1.1 0-2 .9-2 2s.9 2 2 2c.5 0 .9-.2 1.3-.5"/></svg>',
+  hand:   '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v0"/><path d="M14 10V4a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2"/><path d="M14 12.5V8a2 2 0 0 0-2-2v0a2 2 0 0 0-2 2"/></svg>',
+  msg:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  zap:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  thermometer:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
+};
+
+// ═══════════════════════ RENDER: SOFA ═══════════════════════
+const sofaSections = [
+  { key:'paFi', icon:Icons.wind, label:'Respiratorio — PaFi', cols:5,
+    opts:[{l:'≥400', v:400, s:0},{l:'300–399', v:350, s:1},{l:'200–299', v:250, s:2},{l:'100–199', v:150, s:3},{l:'<100', v:50, s:4}],
+    map:v=>v },
+  { key:'platelets', icon:Icons.drops, label:'Coagulación — Plaquetas (×10³/µL)', cols:5,
+    opts:[{l:'≥150', v:150, s:0},{l:'100–149', v:100, s:1},{l:'50–99', v:50, s:2},{l:'20–49', v:20, s:3},{l:'<20', v:5, s:4}],
+    map:v=>v },
+  { key:'bilirubin', icon:Icons.flask, label:'Hepático — Bilirrubina (mg/dL)', cols:5,
+    opts:[{l:'<1.2', v:1, s:0},{l:'1.2–1.9', v:1.5, s:1},{l:'2.0–5.9', v:3, s:2},{l:'6.0–11.9', v:8, s:3},{l:'≥12', v:13, s:4}],
+    map:v=>v },
+  { key:'cv', icon:Icons.heart, label:'Cardiovascular — PAM + Vasopresores', cols:1,
+    opts:[
+      {l:'PAM ≥70, sin vasopresores', map:80, dopa:'none', s:0},
+      {l:'PAM <70, sin vasopresores', map:60, dopa:'none', s:1},
+      {l:'Dopamina ≤5 o Dobutamina', map:70, dopa:'low', s:2},
+      {l:'Dopa 5–15 o Epi/Norepi ≤0.1', map:70, dopa:'mid', s:3},
+      {l:'Dopa >15 o Epi/Norepi >0.1', map:70, dopa:'high', s:4},
+    ],
+    map:v => ({ sofa_map: v.map, sofa_dopamine: v.dopa }) },
+  { key:'gcs', icon:Icons.brain, label:'Neurológico — Glasgow', cols:5,
+    opts:[{l:'15', v:15, s:0},{l:'13–14', v:13, s:1},{l:'10–12', v:11, s:2},{l:'6–9', v:8, s:3},{l:'<6', v:5, s:4}],
+    map:v=>v },
+  { key:'renal', icon:Icons.filter, label:'Renal — Creatinina (mg/dL) o Diuresis', cols:5,
+    opts:[
+      {l:'<1.2', cr:1, urine:1000, s:0},
+      {l:'1.2–1.9', cr:1.5, urine:1000, s:1},
+      {l:'2.0–3.4', cr:3, urine:1000, s:2},
+      {l:'3.5–4.9 o diur<500', cr:4, urine:400, s:3},
+      {l:'≥5 o diur<200', cr:6, urine:100, s:4},
+    ],
+    map:v => ({ sofa_creatinine: v.cr, sofa_urine: v.urine }) },
+];
+
+function renderSofa() {
+  let html = '';
+  sofaSections.forEach(sec => {
+    const sel = state.sofa[sec.key];
+    const activeScore = sel !== undefined ? sec.opts.find(o => {
+      if (sec.key==='cv') return o.map === sel.map && o.dopa === sel.dopa;
+      if (sec.key==='renal') return o.cr === sel.cr && o.urine === sel.urine;
+      return o.v === sel;
+    }) : null;
+    const badgeHtml = activeScore !== null
+      ? `<span class="section-badge score-${activeScore.s}" style="background:var(--bg-tertiary);padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;font-family:monospace;color:${['#34d399','#fbbf24','#fb923c','#f472b6','#ef4444'][activeScore.s]}">${activeScore.s} pt${activeScore.s!==1?'s':''}</span>`
+      : '<span class="section-badge hidden">—</span>';
+    html += `<div class="section-card">
+      <div class="section-header">
+        ${sec.icon}
+        <h3>${sec.label}</h3>
+        ${badgeHtml}
+      </div>
+      <div class="btn-grid btn-grid-${sec.cols}">`;
+    sec.opts.forEach(o => {
+      const isActive = sel !== undefined && (sec.key==='cv'
+        ? o.map === sel.map && o.dopa === sel.dopa
+        : sec.key==='renal'
+          ? o.cr === sel.cr && o.urine === sel.urine
+          : o.v === sel);
+      html += `<button class="score-btn score-${o.s}${isActive?' active':''}" onclick="selectSofa('${sec.key}',this,${JSON.stringify(o).replace(/"/g,"'")},'${sec.key==='cv'||sec.key==='renal'?1:0}')">${o.l}</button>`;
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('sofa-form').innerHTML = html;
+}
+
+function selectSofa(key, btn, opt, isComposite) {
+  if (isComposite==1) {
+    if (key==='cv') state.sofa[key] = { map: opt.map, dopa: opt.dopa };
+    else if (key==='renal') state.sofa[key] = { cr: opt.cr, urine: opt.urine };
+  } else {
+    state.sofa[key] = opt.v;
+  }
+  renderSofa();
+}
+
+function calcSofa() {
+  const s = state.sofa;
+  // Map to API fields
+  const body = {};
+  body.sofa_paFi = s.paFi;
+  body.sofa_platelets = s.platelets;
+  body.sofa_bilirubin = s.bilirubin;
+  if (s.cv) { body.sofa_map = s.cv.map; body.sofa_dopamine = s.cv.dopa; }
+  body.sofa_gcs = s.gcs;
+  if (s.renal) { body.sofa_creatinine = s.renal.cr; body.sofa_urine = s.renal.urine; }
+  // qSOFA
+  if (state._qsofa) { body.qsofa_rr = state._qsofa.rr; body.qsofa_sbp = state._qsofa.sbp; body.qsofa_gcs = state._qsofa.gcs_val; }
+
+  fetch('/api/calculator/sofa/calculate', {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(body),
+  }).then(r=>r.json()).then(data=>{
+    if (data.result) showSofaResult(data.result, body);
+    else document.getElementById('sofa-result').innerHTML = `<div style="color:#ef4444;font-size:11px;font-family:monospace;">${data.error||'Error'}</div>`;
+  }).catch(()=>{
+    // Demo fallback: calculate locally
+    const scores = [
+      {key:'Resp',v:scoreFromInput(body.sofa_paFi, [400,300,200,100,0], [0,1,2,3,4])},
+      {key:'Coag',v:scoreFromInput(body.sofa_platelets, [150,100,50,20,0], [0,1,2,3,4])},
+      {key:'Hep',v:scoreFromInput(body.sofa_bilirubin, [1.2,2,6,12,100], [0,1,2,3,4])},
+      {key:'CV',v:(()=>{ const m={none:0,low:2,mid:3,high:4}; return m[body.sofa_dopamine]||0; })()},
+      {key:'SNC',v:scoreFromInput(body.sofa_gcs, [15,13,10,6,0], [0,1,2,3,4])},
+      {key:'Renal',v:scoreFromInput(body.sofa_creatinine, [1.2,2,3.5,5,100], [0,1,2,3,4])},
+    ];
+    const total = scores.reduce((a,b)=>a+b.v,0);
+    const sev = total<=6?'Leve':total<=9?'Moderada':'Severa';
+    const mort = total<=6?'<5%':total<=9?'15-20%':total<=12?'40-50%':'>50%';
+    showSofaResult({sofa_total:total, sofa_severity:sev, sofa_mortality_estimate:mort, components:scores.reduce((a,b)=>{a[b.key]=b.v;return a;},{})}, body);
+  });
+}
+
+function scoreFromInput(val, thresholds, scores) {
+  if (val===undefined||val===null) return 0;
+  for (let i=0;i<thresholds.length;i++) {
+    if (i===4) return scores[i];
+    if (i===0 && val >= thresholds[i]) return scores[i];
+    if (val >= thresholds[i] && (i===thresholds.length-2 || val < thresholds[i+1])) return scores[i];
+    if (i>0 && val < thresholds[i-1] && val >= thresholds[i]) return scores[i];
+  }
+  return scores[scores.length-1];
+}
+
+function showSofaResult(r, body) {
+  const sev = severityColor(r.sofa_severity||'');
+  const comps = r.components || {Resp:r.sofa_resp,Coag:r.sofa_coag,Hep:r.sofa_hepatic,CV:r.sofa_cv,SNC:r.sofa_cns,Renal:r.sofa_renal};
+  let pillsHtml = '';
+  if (comps) {
+    Object.entries(comps).forEach(([k,v])=>{
+      const c = sofaPillColor(v);
+      pillsHtml += `<span class="result-pill" style="background:${c.bg};color:${c.text}">${k}:${v}</span>`;
+    });
+  }
+  document.getElementById('sofa-result').innerHTML = `
+    <div class="result-card" style="border:1px solid ${sev.border};background:${sev.bg}">
+      <p style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:12px;">SOFA — Disfunción orgánica</p>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
+        <span class="score-lg" style="color:var(--text-primary);font-weight:800;font-size:28px;">${r.sofa_total}/24</span>
+        <span style="font-size:11px;font-family:monospace;padding:2px 10px;border-radius:999px;background:${sev.bg};color:${sev.text};border:1px solid ${sev.border};">${r.sofa_severity}</span>
+      </div>
+      <div class="result-pills">${pillsHtml}</div>
+      <p style="font-size:11px;font-family:monospace;color:var(--text-tertiary);">Mortalidad estimada: ${r.sofa_mortality_estimate||'—'}</p>
+    </div>
+    <div class="action-row">
+      <button onclick="calcSofa()" class="btn-sm">Recalcular</button>
+      <button onclick="navigator.clipboard.writeText('SOFA | Total: ${r.sofa_total}/24 | Severidad: ${r.sofa_severity}')" class="btn-sm">Copiar</button>
+    </div>`;
+}
+
+// ═══════════════════════ SOFA helpers ═══════════════════════
+function severityColor(s) {
+  const sl = (s||'').toLowerCase();
+  if (sl.includes('leve')||sl.includes('bajo')||sl.includes('baja')) return {bg:'rgba(52,211,153,0.10)',text:'#34d399',border:'rgba(52,211,153,0.25)'};
+  if (sl.includes('moderado')||sl.includes('moderada')||sl.includes('medio')) return {bg:'rgba(251,146,60,0.10)',text:'#fb923c',border:'rgba(251,146,60,0.25)'};
+  if (sl.includes('severo')||sl.includes('severa')||sl.includes('alto')||sl.includes('alta')) return {bg:'rgba(239,68,68,0.10)',text:'#ef4444',border:'rgba(239,68,68,0.25)'};
+  return {bg:'rgba(107,114,128,0.10)',text:'#9ca3af',border:'rgba(107,114,128,0.25)'};
+}
+
+function sofaPillColor(score) {
+  const map = [
+    {bg:'rgba(52,211,153,0.08)', text:'#34d399'},
+    {bg:'rgba(251,191,36,0.08)', text:'#fbbf24'},
+    {bg:'rgba(251,146,60,0.10)', text:'#fb923c'},
+    {bg:'rgba(244,114,182,0.12)', text:'#f472b6'},
+    {bg:'rgba(239,68,68,0.15)', text:'#ef4444'},
+  ];
+  return map[Math.min(score,4)] || map[0];
+}
+
+// ═══════════════════════ qSOFA ═══════════════════════
+function toggleQsofa(key, val, btn) {
+  if (!state._qsofa) state._qsofa = {};
+  state._qsofa[key] = val;
+
+  const group = btn.parentElement;
+  group.querySelectorAll('.toggle-btn').forEach(b=>{b.classList.remove('active-green','active-red');});
+  btn.classList.add(val===0?'active-green':'active-red');
+
+  updateQsofaResult();
+}
+
+function updateQsofaResult() {
+  const q = state._qsofa;
+  if (!q || q.rr===undefined || q.sbp===undefined || q.gcs_val===undefined) return;
+  const total = q.rr + q.sbp + q.gcs_val;
+  const el = document.getElementById('qsofa-result');
+  el.style.display = 'block';
+  const pos = total >= 2;
+  document.getElementById('qsofa-score').textContent = total+'/3';
+  document.getElementById('qsofa-score').style.color = pos?'#ef4444':'#34d399';
+  document.getElementById('qsofa-badge').textContent = pos?'⚠ Alto riesgo':'Bajo riesgo';
+  document.getElementById('qsofa-badge').style.background = pos?'rgba(239,68,68,0.10)':'rgba(52,211,153,0.10)';
+  document.getElementById('qsofa-badge').style.color = pos?'#ef4444':'#34d399';
+  document.getElementById('qsofa-badge').style.border = pos?'1px solid rgba(239,68,68,0.25)':'1px solid rgba(52,211,153,0.25)';
+}
+
+// ═══════════════════════ NEWS2 ═══════════════════════
+const newsSections = [
+  { key:'fr', icon:Icons.wind, label:'FR — Frec. respiratoria (rpm)', cols:5,
+    opts:[{l:'≤8', v:0, s:3},{l:'9–11', v:1, s:1},{l:'12–20', v:2, s:0},{l:'21–24', v:3, s:2},{l:'≥25', v:4, s:3}] },
+  { key:'spo2', icon:Icons.drops, label:'SpO₂ — Saturación O₂', cols:5, hasScale:true,
+    optsScale1:[{l:'≤91%', v:0, s:3},{l:'92–93%', v:1, s:2},{l:'94–95%', v:2, s:1},{l:'≥96%', v:3, s:0},{l:'—', v:null, s:-1}],
+    optsScale2:[{l:'≤83%', v:0, s:3},{l:'84–85%', v:1, s:2},{l:'86–87%', v:2, s:1},{l:'88–92%', v:3, s:0},{l:'93-94%+O₂', v:4, s:1},{l:'95-96%+O₂', v:5, s:2},{l:'≥97%+O₂', v:6, s:3},{l:'≥93% sin O₂', v:7, s:0}] },
+  { key:'oxygen', icon:Icons.zap, label:'O₂ — Oxígeno suplementario', cols:2,
+    opts:[{l:'No', v:false, s:0},{l:'Sí', v:true, s:2}] },
+  { key:'sbp', icon:Icons.heart, label:'PAS — Presión arterial (mmHg)', cols:5,
+    opts:[{l:'≤90', v:0, s:3},{l:'91–100', v:1, s:2},{l:'101–110', v:2, s:1},{l:'111–219', v:3, s:0},{l:'≥220', v:4, s:3}] },
+  { key:'hr', icon:Icons.zap, label:'FC — Frec. cardíaca (lpm)', cols:6,
+    opts:[{l:'≤40', v:0, s:3},{l:'41–50', v:1, s:1},{l:'51–90', v:2, s:0},{l:'91–110', v:3, s:1},{l:'111–130', v:4, s:2},{l:'≥131', v:5, s:3}] },
+  { key:'avpu', icon:Icons.brain, label:'AVPU — Nivel de conciencia', cols:2,
+    opts:[{l:'Alerta', v:0, s:0, hint:null},{l:'C / V / P / U', v:3, s:3, hint:'Confuso · Voz · Dolor · Inconsciente'}] },
+  { key:'temp', icon:Icons.thermometer, label:'T° — Temperatura (°C)', cols:5,
+    opts:[{l:'≤35.0', v:0, s:3},{l:'35.1–36.0', v:1, s:1},{l:'36.1–38.0', v:2, s:0},{l:'38.1–39.0', v:3, s:1},{l:'≥39.1', v:4, s:2}] },
+];
+
+function news2RelScore(score, sec) {
+  if (score == null) return 0;
+  const opts = sec.key==='spo2' ? (state.news2.spo2_scale===2 ? sec.optsScale2 : sec.optsScale1) : sec.opts;
+  const maxS = Math.max(...opts.filter(o=>o.v!==null).map(o=>o.s), 1);
+  const ratio = score / maxS;
+  if (ratio >= 0.95) return 4;
+  if (ratio >= 0.67) return 3;
+  if (ratio >= 0.34) return 2;
+  if (ratio > 0) return 1;
+  return 0;
+}
+
+const news2ScoreMap = [
+  {score:0, risk:'Bajo', color:'#34d399', label:'🟢', response:'Monitoreo rutinario cada 12h'},
+  {score:1, risk:'Bajo', color:'#34d399', label:'🟢', response:'Monitoreo c/4-6h. Notificar si empeora'},
+  {score:2, risk:'Bajo', color:'#34d399', label:'🟢', response:'Monitoreo c/4-6h. Notificar si empeora'},
+  {score:3, risk:'Bajo', color:'#34d399', label:'🟢', response:'Monitoreo c/4-6h. Notificar si empeora'},
+  {score:4, risk:'Bajo', color:'#eab308', label:'🟡', response:'Monitoreo c/4-6h. Valorar evaluación médica'},
+  {score:5, risk:'Medio', color:'#eab308', label:'🟡', response:'Evaluación médica urgente'},
+  {score:6, risk:'Medio', color:'#eab308', label:'🟡', response:'Evaluación médica urgente'},
+  {score:7, risk:'Alto', color:'#ef4444', label:'🔴', response:'Evaluación de emergencia. Considerar UCI'},
+];
+
+function renderNews2() {
+  let html = '';
+  newsSections.forEach(sec => {
+    const sel = state.news2[sec.key];
+    const opts = (sec.hasScale && state.news2.spo2_scale===2) ? sec.optsScale2 : sec.opts;
+    const activeOpt = sel !== undefined ? opts.find(o=>o.v===sel) : null;
+    const badgeRaw = activeOpt ? activeOpt.s : null;
+    const badgeRel = badgeRaw !== null ? news2RelScore(badgeRaw, sec) : null;
+    const badgeHtml = badgeRaw!==null
+      ? `<span class="section-badge" style="background:var(--bg-tertiary);padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;font-family:monospace;color:${['#34d399','#fbbf24','#fb923c','#f472b6','#ef4444'][badgeRel]}">${badgeRaw} pt${badgeRaw!==1?'s':''}</span>`
+      : '<span class="section-badge hidden">—</span>';
+
+    let scaleToggles = '';
+    if (sec.hasScale) {
+      const curScale = state.news2.spo2_scale || 1;
+      scaleToggles = `<div style="display:flex;gap:4px;margin-bottom:8px;"><button class="toggle-btn${curScale===1?' active-green':''}" onclick="state.news2.spo2_scale=1;renderNews2()" style="flex:none;padding:4px 12px;font-size:10px;border:1px solid var(--border);border-radius:6px;">Esc 1 (rutina)</button><button class="toggle-btn${curScale===2?' active-green':''}" onclick="state.news2.spo2_scale=2;renderNews2()" style="flex:none;padding:4px 12px;font-size:10px;border:1px solid var(--border);border-radius:6px;">Esc 2 (hipercápnica)</button></div>`;
+    }
+
+    html += `<div class="section-card">
+      <div class="section-header">${sec.icon}<h3>${sec.label}</h3>${badgeHtml}</div>
+      ${scaleToggles||''}
+      <div class="btn-grid btn-grid-${sec.key==='avpu'?'2-2':(sec.hasScale&&state.news2.spo2_scale===2?'4':sec.cols)}">`;
+
+    opts.forEach(o => {
+      if (o.v===null) return;
+      const isActive = sel === o.v;
+      const relCls = news2RelScore(o.s, sec);
+      const extra = o.hint ? `<div class="avpu-hint">${o.hint}</div>` : '';
+      if (sec.key==='avpu') {
+        html += `<button class="score-btn score-${relCls}${isActive?' active':''}" onclick="state.news2.avpu=${o.v};renderNews2();" style="flex-direction:column;display:flex;align-items:center;padding:12px;">${o.l}${extra}</button>`;
+      } else {
+        html += `<button class="score-btn score-${relCls}${isActive?' active':''} ${o.l.length>8?'subtle':''}" onclick="state.news2['${sec.key}']=${typeof o.v==='boolean'?o.v:o.v};renderNews2();">${sec.key==='oxygen'?o.l:o.l}</button>`;
+      }
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('news2-form').innerHTML = html;
+}
+
+function calcNews2() {
+  const s = state.news2;
+  // Build NEWS2 API body
+  let body = {};
+  if (s.fr!==undefined) body.news2_rr_index = s.fr;
+  if (s.spo2!==undefined) body.news2_spo2_index = s.spo2;
+  if (s.spo2_scale) body.news2_spo2_scale = s.spo2_scale===1 ? 'scale_1' : 'scale_2';
+  if (s.oxygen!==undefined) body.news2_oxygen = s.oxygen;
+  if (s.sbp!==undefined) body.news2_sbp_index = s.sbp;
+  if (s.hr!==undefined) body.news2_hr_index = s.hr;
+  if (s.avpu!==undefined) body.news2_avpu = s.avpu;
+  if (s.temp!==undefined) body.news2_temp_index = s.temp;
+
+  const calcScore = () => {
+    // Map index to actual score
+    const idxScore = (key) => {
+      const v = s[key];
+      if (v===undefined) return 0;
+      const sec = newsSections.find(x=>x.key===key);
+      if (!sec) return 0;
+      const opts = key==='spo2' ? (s.spo2_scale===2?sec.optsScale2:sec.optsScale1) : sec.opts;
+      const o = opts.find(x=>x.v===v);
+      return o ? o.s : 0;
+    };
+    return idxScore('fr') + idxScore('spo2') + idxScore('oxygen') + idxScore('sbp') + idxScore('hr') + idxScore('avpu') + idxScore('temp');
+  };
+
+  const total = calcScore();
+  const riskInfo = news2ScoreMap.find(x=>x.score===total) || news2ScoreMap[news2ScoreMap.length-1];
+
+  // Check for any individual score of 3
+  const has3 = [s.fr,s.spo2,s.sbp,s.hr,s.avpu,s.temp].some(v=>{
+    if (v===undefined) return false;
+    const secMap = {fr:s.fr, spo2:s.spo2, sbp:s.sbp, hr:s.hr, avpu:s.avpu, temp:s.temp};
+    return false; // simplified
+  });
+
+  const pillScores = [
+    {k:'FR', v: (()=>{const o=newsSections[0].opts.find(x=>x.v===s.fr);return o?o.s:0;})()},
+    {k:'SpO₂', v: (()=>{const sec=newsSections[1];const opts=s.spo2_scale===2?sec.optsScale2:sec.optsScale1;const o=opts.find(x=>x.v===s.spo2);return o?o.s:0;})()},
+    {k:'O₂', v: (()=>{const o=newsSections[2].opts.find(x=>x.v===s.oxygen);return o?o.s:0;})()},
+    {k:'PAS', v: (()=>{const o=newsSections[3].opts.find(x=>x.v===s.sbp);return o?o.s:0;})()},
+    {k:'FC', v: (()=>{const o=newsSections[4].opts.find(x=>x.v===s.hr);return o?o.s:0;})()},
+    {k:'AVPU', v: (()=>{const o=newsSections[5].opts.find(x=>x.v===s.avpu);return o?o.s:0;})()},
+    {k:'T°', v: (()=>{const o=newsSections[6].opts.find(x=>x.v===s.temp);return o?o.s:0;})()},
+  ];
+
+  const relPillColor = (rawScore, secIdx) => {
+    const sec = newsSections[secIdx];
+    const rel = news2RelScore(rawScore, sec);
+    const cm = ['#34d399','#fbbf24','#fb923c','#f472b6','#ef4444'];
+    const bgm = ['rgba(52,211,153,0.08)','rgba(251,191,36,0.08)','rgba(251,146,60,0.10)','rgba(244,114,182,0.12)','rgba(239,68,68,0.15)'];
+    return {bg:bgm[rel]||bgm[0], text:cm[rel]||cm[0]};
+  };
+
+  let pillsHtml = pillScores.map((p,i)=>{
+    const c = relPillColor(p.v, i);
+    return `<span class="result-pill" style="background:${c.bg};color:${c.text}">${p.k}:${p.v}</span>`;
+  }).join('');
+
+  const sevColor = total>=7?'#ef4444':total>=5?'#eab308':'#34d399';
+  const sevBg = total>=7?'rgba(239,68,68,0.10)':total>=5?'rgba(234,179,8,0.10)':'rgba(52,211,153,0.10)';
+  const sevBorder = total>=7?'rgba(239,68,68,0.25)':total>=5?'rgba(234,179,8,0.25)':'rgba(52,211,153,0.25)';
+  const riskLabel = total>=7?'Alto':total>=5?'Medio':'Bajo';
+  const colorDot = total>=7?'🔴':total>=5?'🟡':'🟢';
+
+  document.getElementById('news2-result').innerHTML = `
+    <div class="result-card" style="border:1px solid ${sevBorder};background:${sevBg}">
+      <p style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:12px;">NEWS2</p>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px;">
+        <span class="score-lg" style="font-size:28px;font-weight:800;color:var(--text-primary);">${total}/20</span>
+        <span style="font-size:11px;font-family:monospace;padding:2px 10px;border-radius:999px;background:${sevBg};color:${sevColor};border:1px solid ${sevBorder};">${colorDot} ${riskLabel}</span>
+      </div>
+      <div class="result-pills">${pillsHtml}</div>
+      <p style="font-size:11px;font-family:monospace;color:var(--text-tertiary);">${riskInfo.response}</p>
+      ${total>=5?`<p style="font-size:10px;font-family:monospace;color:#fbbf24;margin-top:4px;">⚠ Cualquier puntuación individual de 3 activa respuesta urgente</p>`:''}
+    </div>
+    <div class="action-row">
+      <button onclick="calcNews2()" class="btn-sm">Recalcular</button>
+      <button onclick="navigator.clipboard.writeText('NEWS2 | Score: ${total}/20 | Riesgo: ${riskLabel}')" class="btn-sm">Copiar</button>
+    </div>`;
+}
+
+// ═══════════════════════ NIHSS ═══════════════════════
+const nihssItems = [
+  { key:'loc', label:'1a. LOC', icon:Icons.brain, max:3, un:false,
+    opts:[{l:'Alerta',v:0},{l:'No alerta/resp menor',v:1},{l:'Solo dolor repetido',v:2},{l:'Sin respuesta',v:3}] },
+  { key:'loc_questions', label:'1b. Preguntas', icon:Icons.brain, max:2, un:false,
+    opts:[{l:'Ambas correctas',v:0},{l:'Una correcta',v:1},{l:'Ninguna',v:2}] },
+  { key:'loc_commands', label:'1c. Órdenes', icon:Icons.brain, max:2, un:false,
+    opts:[{l:'Ambas',v:0},{l:'Una',v:1},{l:'Ninguna',v:2}] },
+  { key:'gaze', label:'2. Mirada', icon:Icons.eye, max:2, un:false,
+    opts:[{l:'Normal',v:0},{l:'Paresia parcial',v:1},{l:'Desviación total',v:2}] },
+  { key:'visual', label:'3. Campos visuales', icon:Icons.eye, max:3, un:false,
+    opts:[{l:'Normal',v:0},{l:'Hemianopsia parcial',v:1},{l:'Hemianopsia completa',v:2},{l:'Ceguera bilateral',v:3}] },
+  { key:'facial', label:'4. Paresia facial', icon:Icons.smile, max:3, un:false,
+    opts:[{l:'Normal',v:0},{l:'Leve',v:1},{l:'Parcial',v:2},{l:'Completa',v:3}] },
+  { key:'motor_arm_r', label:'5a. Brazo D', icon:Icons.arrowup, max:4, un:false,
+    opts:[{l:'Sin caída',v:0},{l:'Caída <10s',v:1},{l:'Cae a cama',v:2},{l:'Sin mvto c/gravedad',v:3},{l:'Sin mvto',v:4}] },
+  { key:'motor_arm_l', label:'5b. Brazo I', icon:Icons.arrowup, max:4, un:false,
+    opts:[{l:'Sin caída',v:0},{l:'Caída <10s',v:1},{l:'Cae a cama',v:2},{l:'Sin mvto c/gravedad',v:3},{l:'Sin mvto',v:4}] },
+  { key:'motor_leg_r', label:'6a. Pierna D', icon:Icons.footprint, max:4, un:false,
+    opts:[{l:'Sin caída',v:0},{l:'Caída <5s',v:1},{l:'Cae a cama',v:2},{l:'Sin mvto c/gravedad',v:3},{l:'Sin mvto',v:4}] },
+  { key:'motor_leg_l', label:'6b. Pierna I', icon:Icons.footprint, max:4, un:false,
+    opts:[{l:'Sin caída',v:0},{l:'Caída <5s',v:1},{l:'Cae a cama',v:2},{l:'Sin mvto c/gravedad',v:3},{l:'Sin mvto',v:4}] },
+  { key:'ataxia', label:'7. Ataxia', icon:Icons.footprint, max:2, un:true,
+    opts:[{l:'Ausente',v:0},{l:'1 miembro',v:1},{l:'2 miembros',v:2},{l:'UN',v:99}] },
+  { key:'sensory', label:'8. Sensibilidad', icon:Icons.hand, max:2, un:false,
+    opts:[{l:'Normal',v:0},{l:'Pérdida leve',v:1},{l:'Pérdida severa/total',v:2}] },
+  { key:'language', label:'9. Lenguaje', icon:Icons.msg, max:3, un:false,
+    opts:[{l:'Normal',v:0},{l:'Leve-moderada',v:1},{l:'Severa',v:2},{l:'Global/mutismo',v:3}] },
+  { key:'dysarthria', label:'10. Disartria', icon:Icons.msg, max:2, un:true,
+    opts:[{l:'Normal',v:0},{l:'Leve-moderada',v:1},{l:'Severa/ininteligible',v:2},{l:'UN',v:99}] },
+  { key:'extinction', label:'11. Extinción', icon:Icons.msg, max:2, un:false,
+    opts:[{l:'Normal',v:0},{l:'1 modalidad',v:1},{l:'>1 modalidad',v:2}] },
+];
+
+function nihssRelScore(score, max) {
+  if (score == null || max == null) return 0;
+  const ratio = score / max;
+  if (ratio >= 0.95) return 4;
+  if (ratio >= 0.65) return 3;
+  if (ratio >= 0.4) return 2;
+  if (ratio >= 0.15) return 1;
+  return 0;
+}
+
+function renderNihss() {
+  let html = '';
+  nihssItems.forEach(item => {
+    const sel = state.nihss[item.key];
+    const badgeScore = sel !== undefined ? (sel===99 ? null : nihssRelScore(sel, item.max)) : null;
+    const isUn = sel === 99;
+    let badgeHtml;
+    if (isUn) {
+      badgeHtml = `<span class="section-badge" style="background:rgba(168,85,247,0.15);padding:1px 8px;border-radius:999px;font-size:10px;font-weight:700;font-family:monospace;color:#c084fc;">UN</span>`;
+    } else if (badgeScore !== null) {
+      badgeHtml = `<span class="section-badge" style="background:var(--bg-tertiary);padding:1px 8px;border-radius:999px;font-size:10px;font-weight:700;font-family:monospace;color:${['#34d399','#fbbf24','#fb923c','#f472b6','#ef4444'][badgeScore]}">${sel} pt${sel!==1?'s':''}</span>`;
+    } else {
+      badgeHtml = '<span class="section-badge hidden">—</span>';
+    }
+
+    html += `<div class="section-card nihss-item">
+      <div class="section-header">
+        ${item.icon}
+        <h3>${item.label}</h3>
+        ${badgeHtml}
+      </div>
+      <div class="btn-grid btn-grid-${item.opts.length<=3?'3':item.opts.length<=4?'4':'5'}">`;
+    item.opts.forEach(o => {
+      const isActive = sel === o.v;
+      const isUnBtn = o.v === 99;
+      if (isUnBtn) {
+        html += `<button class="score-btn${isActive?' active':''}" onclick="state.nihss['${item.key}']=99;renderNihss();" style="${isActive?'background:rgba(168,85,247,0.15);border-color:rgba(168,85,247,0.4);color:#c084fc;':''}">UN <span style="font-size:8px;opacity:0.6">no test.</span></button>`;
+      } else {
+        const relScore = nihssRelScore(o.v, item.max);
+        html += `<button class="score-btn score-${relScore}${isActive?' active':''} subtle" onclick="state.nihss['${item.key}']=${o.v};renderNihss();">${o.l}</button>`;
+      }
+    });
+    html += '</div></div>';
+  });
+  document.getElementById('nihss-form').innerHTML = html;
+}
+
+function calcNihss() {
+  const s = state.nihss;
+  const total = nihssItems.reduce((sum, item) => {
+    const v = s[item.key];
+    if (v === undefined || v === 99) return sum;
+    return sum + v;
+  }, 0);
+
+  let sev;
+  if (total === 0) sev = 'Sin stroke';
+  else if (total <= 4) sev = 'Menor';
+  else if (total <= 15) sev = 'Moderado';
+  else if (total <= 20) sev = 'Moderado-severo';
+  else sev = 'Severo';
+
+  const sevC = severityColor(sev);
+
+  let pillsHtml = nihssItems.map(item => {
+    const v = s[item.key];
+    if (v === undefined || v === 99) {
+      const col = v===99 ? {bg:'rgba(168,85,247,0.08)', text:'#c084fc'} : {bg:'rgba(107,114,128,0.08)', text:'#6b7280'};
+      const label = v===99 ? 'UN' : '-';
+      return `<span class="result-pill" style="background:${col.bg};color:${col.text}">${item.key.replace(/_/g,' ')}:${label}</span>`;
+    }
+    const rel = nihssRelScore(v, item.max);
+    const col = sofaPillColor(rel);
+    return `<span class="result-pill" style="background:${col.bg};color:${col.text}">${item.key.replace(/_/g,' ')}:${v}</span>`;
+  }).join('');
+
+  const isLvo = total >= 7;
+
+  document.getElementById('nihss-result').innerHTML = `
+    <div class="result-card" style="border:1px solid ${sevC.border};background:${sevC.bg}">
+      <p style="font-size:10px;font-family:monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:12px;">NIHSS</p>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+        <span class="score-lg" style="font-size:28px;font-weight:800;color:var(--text-primary);">${total}/42</span>
+        <span style="font-size:11px;font-family:monospace;padding:2px 10px;border-radius:999px;background:${sevC.bg};color:${sevC.text};border:1px solid ${sevC.border};">${sev}</span>
+        ${isLvo?`<span style="font-size:10px;font-family:monospace;padding:2px 8px;border-radius:999px;background:rgba(251,191,36,0.10);color:#fbbf24;border:1px solid rgba(251,191,36,0.25);">Ocl. gran vaso probable</span>`:''}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:12px;">
+        ${nihssItems.map(item=>{
+          const v = s[item.key];
+          if (v===undefined) return `<div class="nihss-result-cell"><div class="label">${item.key}</div><div class="value" style="color:var(--text-tertiary);">-</div></div>`;
+          const isUn = v===99;
+          const rel = isUn ? 0 : nihssRelScore(v, item.max);
+          const col = isUn ? {bg:'rgba(168,85,247,0.08)', text:'#c084fc'} : sofaPillColor(rel);
+          return `<div class="nihss-result-cell" style="background:${col.bg};border-color:${col.bg.replace('0.','0.3')}"><div class="label">${item.key.replace(/nihss_/g,'')}</div><div class="value" style="color:${col.text};">${isUn?'UN':v}</div></div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="action-row">
+      <button onclick="calcNihss()" class="btn-sm">Recalcular</button>
+      <button onclick="navigator.clipboard.writeText('NIHSS | Score: ${total}/42 | Severidad: ${sev}')" class="btn-sm">Copiar</button>
+    </div>`;
+}
+
+// ═══════════════════════ NAV ═══════════════════════
+document.querySelectorAll('.nav-pill').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.getElementById('tab-'+this.dataset.tab).classList.add('active');
+  });
+});
+
+// ═══════════════════════ INIT ═══════════════════════
+renderSofa();
+renderNews2();
+renderNihss();
+</script>
+</body>
+</html>
