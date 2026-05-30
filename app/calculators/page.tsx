@@ -6,9 +6,6 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { useAuth } from '@/lib/auth-context';
-import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
-import News2Calculator from '@/components/calculators/news2-calculator';
-import NihssCalculator from '@/components/calculators/nihss-calculator';
 
 type CalcVariable = {
   key: string;
@@ -69,7 +66,7 @@ type CalcResult = {
 function calcIcon(id: string) {
   switch (id) {
     case 'apache-iv': return <Activity className="w-5 h-5" />;
-    case 'sofa': case 'qsofa': return <Zap className="w-5 h-5" />;
+    case 'sofa': return <Zap className="w-5 h-5" />;
     case 'news2': return <Heart className="w-5 h-5" />;
     case 'nihss': return <Brain className="w-5 h-5" />;
     default: return <Calculator className="w-5 h-5" />;
@@ -632,10 +629,6 @@ export default function CalculatorsPage() {
                         <div className="h-12 bg-[var(--ren-bg-tertiary)] rounded-xl w-full md:w-[280px]" />
                       </div>
                     </div>
-                  ) : selectedId === 'apache-iv' ? (
-                    <div className="apache-iv-root">
-                      <ApacheIVCalculator />
-                    </div>
                   ) : (
                     <>
                   {/* ── Formulario: SOFA con range buttons, otras usan schema ── */}
@@ -687,7 +680,7 @@ export default function CalculatorsPage() {
                               <div className="p-3 flex items-center gap-3">
                                 <span className="text-xl font-bold ren-text-primary tabular-nums">{qTotal}/3</span>
                                 {qPos ? (
-                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25 flex items-center gap-1"><AlertTriangle size={10} /> Alto riesgo — evaluar SOFA</span>
+                                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25">⚠️ Alto riesgo — evaluar SOFA</span>
                                 ) : (
                                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Bajo riesgo</span>
                                 )}
@@ -765,7 +758,7 @@ export default function CalculatorsPage() {
                       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
                         <div className="mb-4">
                           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <span size={12}><Wind size={12} /></span> Hepático — Bilirrubina (mg/dL)
+                            <span size={12}>🫁</span> Hepático — Bilirrubina (mg/dL)
                           </h3>
                         </div>
                         <div className="grid grid-cols-5 gap-1.5">
@@ -843,7 +836,7 @@ export default function CalculatorsPage() {
                       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
                         <div className="mb-4">
                           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-                            <span size={12}><Droplets size={12} /></span> Renal — Creatinina (mg/dL) o Diuresis
+                            <span size={12}>🫘</span> Renal — Creatinina (mg/dL) o Diuresis
                           </h3>
                         </div>
                         <div className="grid grid-cols-5 gap-1.5 mb-2">
@@ -865,10 +858,6 @@ export default function CalculatorsPage() {
                         </div>
                       </div>
                     </>
-                  ) : selectedId === 'news2' ? (
-                    <News2Calculator />
-                  ) : selectedId === 'nihss' ? (
-                    <NihssCalculator />
                   ) : (
                     /* ── Schema-driven para otras calculadoras ── */
                     (() => {
@@ -967,8 +956,7 @@ export default function CalculatorsPage() {
                     })()
                   )}
 
-                  {selectedId !== 'news2' && selectedId !== 'nihss' && (
-                  /* Botón Calcular */
+                  {/* Botón Calcular */}
                   <div className="flex justify-center">
                     <button
                       onClick={handleCalculate}
@@ -992,12 +980,10 @@ export default function CalculatorsPage() {
                       )}
                     </button>
                   </div>
-                  )}
-
                     </>
                   )}
 
-                  {selectedId !== 'apache-iv' && error && (
+                  {error && (
                     <div className="mt-2 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
                       <AlertCircle size={12} />
                       {error}
@@ -1007,10 +993,10 @@ export default function CalculatorsPage() {
               </AnimatePresence>
 
               {/* Resultado — dinámico por tipo de calculadora */}
-              {selectedId !== 'news2' && selectedId !== 'nihss' && (() => {
+              {(() => {
                 const calcId = selectedId;
                 const r = result as Record<string, any>;
-                if (!r || calcId === 'apache-iv') return null;
+                if (!r) return null;
 
                 // ── Helper para badge de severidad ──
                 const SeverityBadge = ({ label, severityText }: { label: string; severityText: string }) => {
@@ -1139,15 +1125,15 @@ export default function CalculatorsPage() {
                               <div className="p-4">
                                 <div className="grid grid-cols-3 gap-2 mb-3">
                                   <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">FR ≥22</p>
+                                    <p className="text-[9px] font-mono ren-text-tertiary">🫁 FR ≥22</p>
                                     <p className={`text-lg font-bold tabular-nums ${qRR ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qRR : '-'}</p>
                                   </div>
                                   <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">PAS ≤100</p>
+                                    <p className="text-[9px] font-mono ren-text-tertiary">❤️ PAS ≤100</p>
                                     <p className={`text-lg font-bold tabular-nums ${qSBP ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qSBP : '-'}</p>
                                   </div>
                                   <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                                    <p className="text-[9px] font-mono ren-text-tertiary">GCS &lt;15</p>
+                                    <p className="text-[9px] font-mono ren-text-tertiary">🧠 GCS &lt;15</p>
                                     <p className={`text-lg font-bold tabular-nums ${qGCS ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qGCS : '-'}</p>
                                   </div>
                                 </div>
@@ -1297,7 +1283,7 @@ export default function CalculatorsPage() {
                               </span>
                               {(r.nihss_total ?? 0) >= 7 && (
                                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
-                                  <Brain size={10} /> Ocl. gran vaso probable
+                                  🧠 Ocl. gran vaso probable
                                 </span>
                               )}
                             </div>
