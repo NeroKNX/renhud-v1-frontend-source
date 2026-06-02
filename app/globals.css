@@ -540,7 +540,7 @@ html::after {
 
 .apache-iv-root .section {
   margin-bottom: 24px;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 12px;
   background: color-mix(in srgb, var(--ren-bg-secondary) 30%, transparent);
   border: 1px solid color-mix(in srgb, var(--ren-border) 40%, transparent);

@@ -147,6 +147,8 @@ export default function ApacheIVCalculator() {
   const [diagnosisGroup, setDiagnosisGroup] = useState('medical');
   const [diagnosisSystem, setDiagnosisSystem] = useState('');
   const [diagnosisKey, setDiagnosisKey] = useState('');
+  // Collapsed sections
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({ fisio: true });
   // Result
   const [result, setResult] = useState<ApacheIVResult & { breakdown?: Record<string, number> } | null>(null);
   const [calculating, setCalculating] = useState(false);
@@ -182,6 +184,10 @@ export default function ApacheIVCalculator() {
   const selectGcs = useCallback((key: string, val: number) => {
     if (!gcsNa) setGcs(prev => ({ ...prev, [key]: val }));
   }, [gcsNa]);
+
+  const toggleSection = useCallback((key: string) => {
+    setCollapsedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  }, []);
 
   const gcsTotal = gcsNa ? 0 : (gcs.gcsEye || 4) + (gcs.gcsVerbal || 5) + (gcs.gcsMotor || 6);
 
@@ -345,7 +351,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── COMORBILIDADES ─── */}
-      <Section title="Comorbilidades">
+      <Section title="Comorbilidades" collapsed={collapsedSections.comorb} onToggle={() => toggleSection('comorb')}>
         <div className="pills">
           {COMORBIDITIES.map(c => (
             <span
@@ -364,7 +370,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── ADMISIÓN ─── */}
-      <Section title="Admisión">
+      <Section title="Admisión" collapsed={collapsedSections.admission} onToggle={() => toggleSection('admission')}>
         <div className="row">
           <div className="field">
             <FieldLabel>Origen del ingreso</FieldLabel>
@@ -403,7 +409,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── DIAGNÓSTICO DE INGRESO ─── */}
-      <Section title="Diagnóstico de ingreso">
+      <Section title="Diagnóstico de ingreso" collapsed={collapsedSections.diagnosis} onToggle={() => toggleSection('diagnosis')}>
         <div className="row">
           <div className="field">
             <FieldLabel>Sistema</FieldLabel>
@@ -442,7 +448,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── FISIOLOGÍA & LABORATORIOS ─── */}
-      <Section title="Fisiología & laboratorios">
+      <Section title="Fisiología & laboratorios" collapsed={collapsedSections.fisio} onToggle={() => toggleSection('fisio')}>
 
         {/* Signos vitales */}
         <div className="section-subtitle">Signos vitales</div>
@@ -543,59 +549,69 @@ export default function ApacheIVCalculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            <div className="result-card">
-              <div className="result-top">
-                <div className="result-score">{result.totalScore}</div>
-                <div className="result-meta">
-                  <span className="label">Mortalidad estimada</span>
-                  <span className="value mortality">{result.mortalityPct}%</span>
-                </div>
-                <div className="result-meta">
-                  <span className="label">LOS esperada</span>
-                  <span className="value los">{result.losDays} días</span>
-                </div>
-                <div className="result-meta">
-                  <span className="label">APS</span>
-                  <span className="value" style={{ color: 'var(--teal)' }}>{result.aps}</span>
+            {(() => {
+              const severityCol = severityColor(result.severity);
+              return (
+              <div className={`rounded-xl border backdrop-blur-sm ${severityCol.border} ${severityCol.bg} overflow-hidden`}>
+                <div className="p-4">
+                  <div className="flex items-end gap-5 mb-1">
+                    <div>
+                      <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Score total</p>
+                      <span className="text-3xl font-bold ren-text-primary tabular-nums">{result.totalScore}</span>
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Severidad</p>
+                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${severityCol.bg} ${severityCol.text} border ${severityCol.border} backdrop-blur-sm inline-block mt-0.5`}>{result.severity}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-5 flex-wrap mt-3">
+                    <div className="result-meta">
+                      <span className="label">Mortalidad estimada</span>
+                      <span className="value mortality">{result.mortalityPct}%</span>
+                    </div>
+                    <div className="result-meta">
+                      <span className="label">LOS esperada</span>
+                      <span className="value los">{result.losDays} días</span>
+                    </div>
+                    <div className="result-meta">
+                      <span className="label">APS</span>
+                      <span className="value" style={{ color: 'var(--teal)' }}>{result.aps}</span>
+                    </div>
+                  </div>
+
+                  {result.breakdown && (
+                    <>
+                      <div className="section-title" style={{ marginBottom: 10, fontSize: 11 }}>
+                        Score APS por sistema
+                      </div>
+                      <div className="system-pills">
+                        {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
+                          const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
+                          const col = systemSeverityPill(pts);
+                          return (
+                            <span key={sysKey} className={`sys-pill ${col.ring}`}>
+                              <span className={`dot ${col.dot}`} />
+                              {sys.label} <span className="pts">{pts}</span>
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+
+                  {result.diagnosisLabel && (
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                      <span className="diag-badge">
+                        <FileText size={11} />
+                        {result.diagnosisLabel}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              <div className="severity-bar" style={{ marginBottom: 18 }}>
-                <div className="fill" style={{ width: `${Math.min(result.mortalityPct, 100)}%` }} />
-                <span className="label" style={{ right: 0, top: -18, fontSize: 10, fontWeight: 600, color: result.mortalityPct > 40 ? 'var(--orange)' : 'var(--amber)' }}>
-                  {result.severity}
-                </span>
-              </div>
-
-              {result.breakdown && (
-                <>
-                  <div className="section-title" style={{ marginBottom: 10, fontSize: 11 }}>
-                    Score APS por sistema
-                  </div>
-                  <div className="system-pills">
-                    {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
-                      const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
-                      const col = systemSeverityPill(pts);
-                      return (
-                        <span key={sysKey} className={`sys-pill ${col.ring}`}>
-                          <span className={`dot ${col.dot}`} />
-                          {sys.label} <span className="pts">{pts}</span>
-                        </span>
-                      );
-                    })}
-                  </div>
-                </>
-              )}
-
-              {result.diagnosisLabel && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-                  <span className="diag-badge">
-                    <FileText size={11} />
-                    {result.diagnosisLabel}
-                  </span>
-                </div>
-              )}
-            </div>
+              );
+            })()}
 
             <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
               <button onClick={handleCalculate} className="action-btn flex-1">Recalcular</button>
@@ -623,14 +639,47 @@ function sectionIcon(title: string): React.ReactNode {
   return null;
 }
 
-function Section({ title, children, style }: { title: string; children: React.ReactNode; style?: React.CSSProperties }) {
+function Section({ title, children, style, collapsed, onToggle }: {
+  title: string;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   return (
     <div className="section" style={style}>
-      <div className="section-title">
+      <div
+        className="section-title"
+        style={onToggle ? { cursor: 'pointer', userSelect: 'none' } : undefined}
+        onClick={onToggle}
+      >
         {sectionIcon(title)}
         {title}
+        {onToggle && (
+          <ChevronDown
+            size={12}
+            style={{
+              marginLeft: 'auto',
+              transition: 'transform 0.2s',
+              transform: collapsed ? '' : 'rotate(180deg)',
+            }}
+          />
+        )}
       </div>
-      {children}
+      <AnimatePresence initial={false}>
+        {!collapsed && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{ overflow: 'hidden' }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
