@@ -78,6 +78,12 @@ const GCS_SOFA_COLORS = [
   'bg-red-600/18 border-red-600/50 text-red-300 shadow-md shadow-red-600/20',
 ];
 
+const GCS_GRID_CLASSES: Record<string, string> = {
+  gcsEye: 'grid grid-cols-2 sm:grid-cols-4 gap-1.5',
+  gcsVerbal: 'grid grid-cols-3 gap-1.5',
+  gcsMotor: 'grid grid-cols-3 gap-1.5',
+};
+
 function gcsToSofaLevel(key: string, score: number): number {
   switch (key) {
     case 'gcsEye':   return score >= 4 ? 0 : score >= 3 ? 1 : score >= 2 ? 2 : 4;
@@ -310,7 +316,7 @@ export default function ApacheIVCalculator() {
             <div key={comp.key} className="row" style={{ marginBottom: 8 }}>
               <div className="field">
                 <FieldLabel>{comp.label} <Sub>({comp.range[0]}–{comp.range[1]})</Sub></FieldLabel>
-                <div className="flex flex-wrap gap-1.5">
+                <div className={GCS_GRID_CLASSES[comp.key]}>
                   {Array.from({ length: comp.range[1] - comp.range[0] + 1 }, (_, i) => {
                     const score = comp.range[0] + i;
                     const selected = val === score;
