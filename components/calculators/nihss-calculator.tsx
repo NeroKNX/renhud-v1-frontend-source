@@ -289,12 +289,12 @@ export default function NihssCalculator() {
   const severityColor = (s: string) => {
     const sv = s?.toLowerCase() || '';
     if (sv.includes('leve') || sv.includes('bajo') || sv.includes('sin stroke'))
-      return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25' };
+      return { bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4', text: 'text-emerald-400', border: 'border-emerald-500/40', glow: 'shadow-[0_0_10px_rgba(52,211,153,0.12)]' };
     if (sv.includes('moderado'))
-      return { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/25' };
+      return { bg: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4', text: 'text-orange-400', border: 'border-orange-500/40', glow: 'shadow-[0_0_10px_rgba(251,146,60,0.12)]' };
     if (sv.includes('severo'))
-      return { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/25' };
-    return { bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/25' };
+      return { bg: 'bg-gradient-to-br from-red-600/22 to-red-600/6', text: 'text-red-300', border: 'border-red-600/45', glow: 'shadow-[0_0_14px_rgba(220,38,38,0.18)]' };
+    return { bg: 'bg-gradient-to-br from-gray-500/10 to-gray-500/4', text: 'text-gray-400', border: 'border-gray-500/30', glow: '' };
   };
 
   const sevClass = result ? severityColor(result.nihss_severity || '') : null;
@@ -303,12 +303,12 @@ export default function NihssCalculator() {
     <div>
       {/* Counters badge - live estimate */}
       {estimatedTotal !== null && (
-        <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]">
+        <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-br from-[var(--accent-color)]/8 to-transparent border border-[var(--accent-color)]/20 backdrop-blur-sm">
           <Brain size={14} className="text-[var(--accent-color)]" />
           <span className="text-xs font-mono ren-text-secondary">Subtotal estimado:</span>
           <span className="text-sm font-bold ren-text-primary tabular-nums">{estimatedTotal}<span className="text-[10px] font-mono ren-text-tertiary">/42</span></span>
           {estimatedTotal >= 7 && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 ml-auto flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border border-amber-500/30 shadow-[0_0_8px_rgba(251,191,36,0.10)] backdrop-blur-sm ml-auto flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable</span>
           )}
         </div>
       )}
@@ -359,7 +359,7 @@ export default function NihssCalculator() {
                     <span className="block">{opt.label}</span>
                     {active && (
                       <span
-                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center"
+                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-gradient-to-br from-[var(--accent-color)]/20 to-[var(--accent-color)]/4 text-[var(--accent-hover)] text-[9px] font-bold border border-[var(--accent-color)]/30 shadow-[0_0_6px_rgba(var(--accent-color-rgb),0.10)] backdrop-blur-sm flex items-center justify-center"
                         style={{ color: SCORE_COLORS[opt.score] || '#059669' }}
                       >
                         {opt.score}
@@ -413,7 +413,7 @@ export default function NihssCalculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            <div className={`rounded-xl border ${sevClass?.border} ${sevClass?.bg} overflow-hidden`}>
+            <div className={`rounded-xl border ${sevClass?.border} ${sevClass?.bg} ${sevClass?.glow || ''} backdrop-blur-sm overflow-hidden`}>
               <div className="p-5">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.nihss_total}/42</span>
@@ -421,7 +421,7 @@ export default function NihssCalculator() {
                     {r.nihss_severity}
                   </span>
                   {(r.nihss_total ?? 0) >= 7 && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 backdrop-blur-sm">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border border-amber-500/30 shadow-[0_0_8px_rgba(251,191,36,0.10)] backdrop-blur-sm">
                       <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="inline-block mr-1"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable
                     </span>
                   )}
