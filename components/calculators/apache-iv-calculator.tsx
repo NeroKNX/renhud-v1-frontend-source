@@ -206,7 +206,7 @@ export default function ApacheIVCalculator() {
 
   const gcsTotal = gcsNa ? 0 : (gcs.gcsEye || 4) + (gcs.gcsVerbal || 5) + (gcs.gcsMotor || 6);
 
-  const showThrombolysis = diagnosisKey === 'stroke';
+  const showThrombolysis = diagnosisKey && (diagnosisKey === 'stroke' || diagnosisKey.startsWith('ami_'));
 
   const handleCalculate = async () => {
     if (!age) { setError('Ingresa la edad'); return; }
@@ -498,7 +498,7 @@ export default function ApacheIVCalculator() {
           <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
         </div>
         <div className="row" style={{ marginTop: 8 }}>
-          <ToggleField label="AKI / FRA" value={aki} onChange={setAki} color="var(--orange)" />
+          <ToggleField label="ERC estadio V / Hemodiálisis" value={aki} onChange={setAki} color="var(--orange, #f97316)" />
         </div>
 
         {/* Química */}
