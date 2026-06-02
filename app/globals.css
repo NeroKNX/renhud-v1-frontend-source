@@ -536,34 +536,36 @@ html::after {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ═══════════ APACHE IV Calculator Styles ═══════════ */
+/* ═══════════ APACHE IV Calculator Styles — Glass+Glow ═══════════ */
 
 .apache-iv-root .section {
-  background: var(--ren-bg-secondary);
-  border: 1px solid var(--ren-border);
-  border-radius: 12px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ren-bg-secondary) 70%, transparent), color-mix(in srgb, var(--ren-bg-secondary) 25%, transparent));
+  border: 1px solid color-mix(in srgb, var(--ren-border) 60%, transparent);
+  border-radius: 14px;
   padding: 16px 18px;
   margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 1px 2px rgba(255,255,255,0.04);
 }
 
 .apache-iv-root .section-title {
-  font-size: 11px;
-  font-weight: 600;
+  font-family: monospace;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  color: var(--ren-text-tertiary);
   margin-bottom: 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .apache-iv-root .section-subtitle {
   font-size: 10px;
   font-weight: 700;
-  color: var(--text-light);
+  color: var(--ren-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   padding: 12px 0 4px 0;
   font-family: monospace;
 }
@@ -574,7 +576,7 @@ html::after {
 
 .apache-iv-root .count {
   font-size: 9px;
-  background: var(--ren-bg-tertiary);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
   color: var(--text-dim);
   padding: 1px 8px;
   border-radius: 999px;
@@ -611,24 +613,26 @@ html::after {
 }
 
 .apache-iv-root .num-input {
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
-  border-radius: 8px;
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
+  border-radius: 10px;
   padding: 8px 12px;
   color: var(--text-light);
   font-size: 13px;
   font-family: inherit;
   width: 100%;
   outline: none;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .num-input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 0 12px color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
 .apache-iv-root .num-input::placeholder {
   color: var(--text-dim);
+  opacity: 0.5;
 }
 
 .apache-iv-root .num-with-badge {
@@ -640,7 +644,7 @@ html::after {
   font-size: 10px;
   color: var(--text-dim);
   line-height: 1.5;
-  border-left: 2px solid var(--ren-border);
+  border-left: 2px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
   padding-left: 10px;
 }
 
@@ -658,9 +662,10 @@ html::after {
   border-radius: 8px;
   border: 1.5px solid transparent;
   cursor: pointer;
-  background: var(--ren-bg-tertiary);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
   transition: all 0.15s ease;
   min-width: 30px;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .gcs-pill:hover:not(:disabled) {
@@ -691,24 +696,27 @@ html::after {
   color: var(--red, #ef4444);
 }
 .apache-iv-root .gcs-low.selected {
-  background: color-mix(in srgb, var(--red, #ef4444) 20%, transparent);
-  border-color: var(--red, #ef4444);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--red, #ef4444) 25%, transparent), color-mix(in srgb, var(--red, #ef4444) 6%, transparent));
+  border-color: color-mix(in srgb, var(--red, #ef4444) 45%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--red, #ef4444) 12%, transparent);
 }
 
 .apache-iv-root .gcs-med {
   color: var(--amber, #f59e0b);
 }
 .apache-iv-root .gcs-med.selected {
-  background: color-mix(in srgb, var(--amber, #f59e0b) 20%, transparent);
-  border-color: var(--amber, #f59e0b);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--amber, #f59e0b) 25%, transparent), color-mix(in srgb, var(--amber, #f59e0b) 6%, transparent));
+  border-color: color-mix(in srgb, var(--amber, #f59e0b) 45%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--amber, #f59e0b) 12%, transparent);
 }
 
 .apache-iv-root .gcs-high {
   color: var(--green, #22c55e);
 }
 .apache-iv-root .gcs-high.selected {
-  background: color-mix(in srgb, var(--green, #22c55e) 20%, transparent);
-  border-color: var(--green, #22c55e);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--green, #22c55e) 25%, transparent), color-mix(in srgb, var(--green, #22c55e) 6%, transparent));
+  border-color: color-mix(in srgb, var(--green, #22c55e) 45%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--green, #22c55e) 12%, transparent);
 }
 
 /* No evaluable toggle */
@@ -738,15 +746,16 @@ html::after {
 .apache-iv-root .ne-toggle-track {
   width: 28px;
   height: 14px;
-  background: var(--ren-bg-tertiary);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
   border: 1px solid var(--ren-border);
   border-radius: 999px;
   position: relative;
   transition: all 0.2s;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .ne-toggle.active .ne-toggle-track {
-  background: color-mix(in srgb, var(--orange, #f97316) 30%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--orange, #f97316) 35%, transparent), color-mix(in srgb, var(--orange, #f97316) 10%, transparent));
   border-color: var(--orange, #f97316);
 }
 
@@ -764,6 +773,7 @@ html::after {
 .apache-iv-root .ne-toggle.active .ne-toggle-thumb {
   left: 14px;
   background: var(--orange, #f97316);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--orange, #f97316) 60%, transparent);
 }
 
 /* Pills */
@@ -787,20 +797,23 @@ html::after {
 }
 
 .apache-iv-root .pill.inactive {
-  background: color-mix(in srgb, var(--text-dim, #8888aa) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--text-dim, #8888aa) 25%, transparent);
-  color: var(--text-dim, #8888aa);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
+  color: var(--text-dim);
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .pill.inactive:hover {
-  border-color: var(--text-dim, #8888aa);
+  border-color: var(--text-dim);
   opacity: 0.8;
 }
 
 .apache-iv-root .pill.active {
-  background: color-mix(in srgb, var(--red, #ef4444) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--red, #ef4444) 40%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--red, #ef4444) 25%, transparent), color-mix(in srgb, var(--red, #ef4444) 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--red, #ef4444) 45%, transparent);
   color: var(--red, #ef4444);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--red, #ef4444) 15%, transparent);
+  backdrop-filter: blur(6px);
 }
 
 .apache-iv-root .pill .indicator {
@@ -811,20 +824,20 @@ html::after {
 }
 
 .apache-iv-root .pill.inactive .indicator {
-  background: var(--text-dim, #8888aa);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--text-dim, #8888aa) 40%, transparent);
+  background: var(--text-dim);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--text-dim) 40%, transparent);
 }
 
 .apache-iv-root .pill.active .indicator {
   background: var(--red, #ef4444);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--red, #ef4444) 50%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--red, #ef4444) 60%, transparent);
 }
 
 /* Select inputs */
 .apache-iv-root .select-input {
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
-  border-radius: 8px;
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
+  border-radius: 10px;
   padding: 8px 12px;
   color: var(--text-light);
   font-size: 12px;
@@ -832,11 +845,12 @@ html::after {
   width: 100%;
   outline: none;
   cursor: pointer;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .select-input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 0 12px color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
 .apache-iv-root .select-input:disabled {
@@ -856,9 +870,10 @@ html::after {
   cursor: pointer;
   transition: all 0.15s;
   user-select: none;
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
   color: var(--text-dim);
+  backdrop-filter: blur(6px);
 }
 
 .apache-iv-root .toggle-field:hover {
@@ -866,24 +881,27 @@ html::after {
 }
 
 .apache-iv-root .toggle-field.active {
-  background: color-mix(in srgb, var(--toggle-color) 15%, transparent);
-  border-color: color-mix(in srgb, var(--toggle-color) 40%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--toggle-color) 22%, transparent), color-mix(in srgb, var(--toggle-color) 5%, transparent));
+  border-color: color-mix(in srgb, var(--toggle-color) 45%, transparent);
   color: var(--toggle-color);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--toggle-color) 15%, transparent);
 }
 
 .apache-iv-root .toggle-track {
   width: 22px;
   height: 12px;
   border-radius: 999px;
-  background: var(--ren-bg-primary);
+  background: color-mix(in srgb, var(--ren-bg-primary) 60%, transparent);
   border: 1px solid var(--ren-border);
   position: relative;
   transition: all 0.2s;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .toggle-track.active {
-  background: color-mix(in srgb, var(--toggle-color) 40%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--toggle-color) 45%, transparent), color-mix(in srgb, var(--toggle-color) 15%, transparent));
   border-color: var(--toggle-color);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--toggle-color) 20%, transparent);
 }
 
 .apache-iv-root .toggle-thumb {
@@ -900,6 +918,7 @@ html::after {
 .apache-iv-root .toggle-thumb.active {
   left: 10px;
   background: var(--toggle-color);
+  box-shadow: 0 0 6px var(--toggle-color);
 }
 
 /* Calculate button */
@@ -914,13 +933,13 @@ html::after {
   border: none;
   cursor: pointer;
   transition: all 0.15s;
-  box-shadow: 0 0 16px color-mix(in srgb, var(--accent-color) 20%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color) 25%, transparent), 0 4px 16px rgba(0,0,0,0.25);
 }
 
 .apache-iv-root .calc-btn:hover:not(:disabled) {
   opacity: 0.9;
   transform: translateY(-1px);
-  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-color) 30%, transparent);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--accent-color) 35%, transparent), 0 6px 20px rgba(0,0,0,0.3);
 }
 
 .apache-iv-root .calc-btn:disabled {
@@ -930,10 +949,12 @@ html::after {
 
 /* Result card */
 .apache-iv-root .result-card {
-  background: var(--ren-bg-secondary);
-  border: 1px solid var(--accent-color);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ren-bg-secondary) 70%, transparent), color-mix(in srgb, var(--ren-bg-secondary) 30%, transparent));
+  border: 1px solid color-mix(in srgb, var(--accent-color) 25%, transparent);
   border-radius: 16px;
   padding: 24px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color) 10%, transparent), 0 8px 32px rgba(0,0,0,0.2);
 }
 
 .apache-iv-root .result-top {
@@ -952,6 +973,7 @@ html::after {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(167,139,250,0.30));
 }
 
 .apache-iv-root .result-meta {
@@ -962,8 +984,8 @@ html::after {
 .apache-iv-root .result-meta .label {
   font-size: 9px;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-dim);
+  letter-spacing: 0.10em;
+  color: var(--ren-text-tertiary);
 }
 
 .apache-iv-root .result-meta .value {
@@ -976,16 +998,17 @@ html::after {
 }
 
 .apache-iv-root .result-meta .value.los {
-  color: var(--accent-color, #3b82f6);
+  color: var(--accent-hover, #818cf8);
 }
 
 /* Severity bar */
 .apache-iv-root .severity-bar {
   position: relative;
   height: 6px;
-  background: var(--ren-bg-tertiary);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 60%, transparent);
   border-radius: 999px;
   overflow: hidden;
+  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .severity-bar .fill {
@@ -993,6 +1016,7 @@ html::after {
   border-radius: 999px;
   background: linear-gradient(90deg, var(--green, #22c55e), var(--amber, #f59e0b), var(--red, #ef4444));
   transition: width 0.5s ease;
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 /* System pills */
@@ -1011,32 +1035,32 @@ html::after {
   font-size: 10px;
   font-weight: 600;
   border: 1px solid;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
 .apache-iv-root .sys-pill.text-emerald-400 {
-  background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.04));
-  box-shadow: 0 0 8px rgba(52,211,153,0.08);
+  background: linear-gradient(135deg, rgba(52,211,153,0.18), rgba(52,211,153,0.05));
+  box-shadow: 0 0 10px rgba(52,211,153,0.10);
 }
 
 .apache-iv-root .sys-pill.text-amber-400 {
-  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.04));
-  box-shadow: 0 0 8px rgba(251,191,36,0.08);
+  background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(251,191,36,0.05));
+  box-shadow: 0 0 10px rgba(251,191,36,0.10);
 }
 
 .apache-iv-root .sys-pill.text-orange-400 {
-  background: linear-gradient(135deg, rgba(251,146,60,0.15), rgba(251,146,60,0.04));
-  box-shadow: 0 0 8px rgba(251,146,60,0.08);
+  background: linear-gradient(135deg, rgba(251,146,60,0.18), rgba(251,146,60,0.05));
+  box-shadow: 0 0 10px rgba(251,146,60,0.10);
 }
 
 .apache-iv-root .sys-pill.text-teal-400 {
-  background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(45,212,191,0.04));
-  box-shadow: 0 0 8px rgba(45,212,191,0.08);
+  background: linear-gradient(135deg, rgba(45,212,191,0.18), rgba(45,212,191,0.05));
+  box-shadow: 0 0 10px rgba(45,212,191,0.10);
 }
 
 .apache-iv-root .sys-pill.text-red-400 {
-  background: linear-gradient(135deg, rgba(220,38,38,0.18), rgba(220,38,38,0.05));
-  box-shadow: 0 0 8px rgba(220,38,38,0.10);
+  background: linear-gradient(135deg, rgba(220,38,38,0.20), rgba(220,38,38,0.06));
+  box-shadow: 0 0 10px rgba(220,38,38,0.12);
 }
 
 .apache-iv-root .sys-pill .dot {
@@ -1060,8 +1084,9 @@ html::after {
   font-size: 11px;
   font-weight: 500;
   color: var(--text-light);
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
+  backdrop-filter: blur(6px);
 }
 
 /* Action buttons */
@@ -1071,16 +1096,18 @@ html::after {
   font-size: 12px;
   font-weight: 500;
   font-family: var(--font-mono, monospace);
-  background: var(--ren-bg-tertiary);
-  border: 1px solid var(--ren-border);
+  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
   color: var(--ren-text-tertiary);
   cursor: pointer;
   transition: all 0.15s;
+  backdrop-filter: blur(6px);
 }
 
 .apache-iv-root .action-btn:hover {
   border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
   color: var(--accent-hover);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
 .apache-iv-root .action-btn.flex-1 {
@@ -1096,9 +1123,11 @@ html::after {
   border-radius: 10px;
   font-size: 12px;
   color: var(--red, #ef4444);
-  background: color-mix(in srgb, var(--red, #ef4444) 10%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--red, #ef4444) 15%, transparent), color-mix(in srgb, var(--red, #ef4444) 4%, transparent));
   border: 1px solid color-mix(in srgb, var(--red, #ef4444) 25%, transparent);
   margin-top: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--red, #ef4444) 10%, transparent);
 }
 
 /* Spinner */

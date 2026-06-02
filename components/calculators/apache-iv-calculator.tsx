@@ -613,11 +613,22 @@ export default function ApacheIVCalculator() {
 
 /* ─── Subcomponents ─── */
 
+function sectionIcon(title: string): React.ReactNode {
+  const s = 12;
+  if (title.includes('paciente')) return <Brain size={s} />;
+  if (title.includes('Comorbilidad')) return <Activity size={s} />;
+  if (title.includes('Admisión')) return <FileText size={s} />;
+  if (title.includes('Diagnóstico')) return <Filter size={s} />;
+  if (title.includes('Fisiología')) return <FlaskConical size={s} />;
+  return null;
+}
+
 function Section({ title, children, style }: { title: string; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div className="section" style={style}>
       <div className="section-title">
-        ✦ {title}
+        {sectionIcon(title)}
+        {title}
       </div>
       {children}
     </div>
