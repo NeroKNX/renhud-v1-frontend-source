@@ -28,8 +28,6 @@ const NEWS2_KEYS = {
   Temp: 'temperature',
 } as const;
 
-const SCORE_COLORS = ['#059669', '#d97706', '#ea580c', '#dc2626'];
-
 // ── Glass + Glow badge for NEWS2 (0–3 scale) ──
 function newsScoreBadge(score: number): string {
   const map: Record<number, string> = {
@@ -39,10 +37,6 @@ function newsScoreBadge(score: number): string {
     3: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-sm',
   };
   return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
-}
-
-function newsGlowPill(riskColor: string, textColor: string): string {
-  return `bg-gradient-to-br from-${riskColor}-500/20 to-${riskColor}-500/4 text-${textColor}-400 border-${riskColor}-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm`;
 }
 
 function N2Slider({ options, value, onChange }: {
@@ -125,6 +119,13 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Wind size={12} /> Frecuencia respiratoria
+            {(() => {
+              const v = formValues[NEWS2_KEYS.FR];
+              if (v == null) return null;
+              const m: Record<number,number> = {6:3,10:1,15:0,22:2,25:3};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <N2Slider
@@ -145,6 +146,15 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             Saturación de oxígeno (SpO₂)
+            {(() => {
+              const v = formValues[NEWS2_KEYS.SpO2];
+              if (v == null) return null;
+              const escala2Map: Record<number,number> = {5:3,84:2,86:1,90:0,93:1,95:2,97:3,99:0};
+              const escala1Map: Record<number,number> = {98:0,94:1,92:2,88:3};
+              const m = formValues[NEWS2_KEYS.Escala2] ? escala2Map : escala1Map;
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
@@ -155,7 +165,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.Escala2, false)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.Escala2] === false
-                    ? 'bg-[var(--accent-color)] text-white'
+                    ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -165,7 +175,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.Escala2, true)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.Escala2] === true
-                    ? 'bg-rose-500 text-white'
+                    ? 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-l border-rose-500/30 shadow-[0_0_8px_rgba(244,63,94,0.12)] backdrop-blur-sm'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -185,7 +195,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.O2, false)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.O2] === false
-                    ? 'bg-emerald-500 text-white'
+                    ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -195,7 +205,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.O2, true)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.O2] === true
-                    ? 'bg-red-500 text-white'
+                    ? 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-l border-orange-500/30 shadow-[0_0_8px_rgba(251,146,60,0.12)] backdrop-blur-sm'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -221,11 +231,6 @@ export default function News2Calculator() {
               return (
                 <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.SpO2, opt.v)} className={`relative py-2 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
                   {opt.l}
-                  {active && (
-                    <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{ color: SCORE_COLORS[opt.s] || '#059669' }}>
-                      {opt.s}
-                    </span>
-                  )}
                 </button>
               );
             })}
@@ -249,6 +254,13 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Presión arterial sistólica
+            {(() => {
+              const v = formValues[NEWS2_KEYS.SBP];
+              if (v == null) return null;
+              const m: Record<number,number> = {230:3,150:0,105:1,95:2,85:3};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <N2Slider
@@ -269,6 +281,13 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Frecuencia cardíaca
+            {(() => {
+              const v = formValues[NEWS2_KEYS.FC];
+              if (v == null) return null;
+              const m: Record<number,number> = {35:3,45:1,75:0,100:1,120:2,135:3};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-6 gap-1">
@@ -284,11 +303,6 @@ export default function News2Calculator() {
             return (
               <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.FC, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight ${newsBtnStyle(opt.s, active)}`}>
                 {opt.l}
-                {active && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{ color: SCORE_COLORS[opt.s] || '#059669' }}>
-                    {opt.s}
-                  </span>
-                )}
               </button>
             );
           })}
@@ -300,6 +314,13 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Brain size={12} /> Nivel de conciencia (ACVPU)
+            {(() => {
+              const v = formValues[NEWS2_KEYS.Conciencia];
+              if (v == null) return null;
+              const m: Record<string,number> = {'alert':0,'confusion':3,'voice':3,'pain':3,'unresponsive':3};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1">
@@ -312,13 +333,8 @@ export default function News2Calculator() {
           ].map(opt => {
             const active = formValues[NEWS2_KEYS.Conciencia] === opt.v;
             return (
-              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Conciencia, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${opt.s === 0 && active ? 'bg-emerald-500/8 border-emerald-500/30 text-emerald-400' : opt.s > 0 && active ? 'bg-rose-500/12 border-rose-500/40 text-rose-400 shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/40'}`}>
+              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Conciencia, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
                 {opt.l}
-                {active && opt.s > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{ color: '#dc2626' }}>
-                    {opt.s}
-                  </span>
-                )}
               </button>
             );
           })}
@@ -330,6 +346,13 @@ export default function News2Calculator() {
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Thermometer size={12} /> Temperatura (°C)
+            {(() => {
+              const v = formValues[NEWS2_KEYS.Temp];
+              if (v == null) return null;
+              const m: Record<number,number> = {34:3,35.5:1,37:0,38.5:1,40:2};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1">
@@ -344,11 +367,6 @@ export default function News2Calculator() {
             return (
               <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Temp, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
                 {opt.l}
-                {active && (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{ color: SCORE_COLORS[opt.s] || '#059669' }}>
-                    {opt.s}
-                  </span>
-                )}
               </button>
             );
           })}
