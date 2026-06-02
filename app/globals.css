@@ -660,17 +660,14 @@ html::after {
   align-items: center;
   padding: 4px 6px;
   border-radius: 8px;
-  border: 1.5px solid transparent;
+  border: 1.5px solid;
   cursor: pointer;
-  background: color-mix(in srgb, var(--ren-bg-tertiary) 50%, transparent);
   transition: all 0.15s ease;
   min-width: 30px;
-  backdrop-filter: blur(4px);
 }
 
 .apache-iv-root .gcs-pill:hover:not(:disabled) {
-  border-color: var(--accent-color);
-  opacity: 0.8;
+  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent) !important;
 }
 
 .apache-iv-root .gcs-pill:disabled {
@@ -690,33 +687,6 @@ html::after {
   line-height: 1.1;
   margin-top: 1px;
   white-space: nowrap;
-}
-
-.apache-iv-root .gcs-low {
-  color: var(--red, #ef4444);
-}
-.apache-iv-root .gcs-low.selected {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--red, #ef4444) 25%, transparent), color-mix(in srgb, var(--red, #ef4444) 6%, transparent));
-  border-color: color-mix(in srgb, var(--red, #ef4444) 45%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--red, #ef4444) 12%, transparent);
-}
-
-.apache-iv-root .gcs-med {
-  color: var(--amber, #f59e0b);
-}
-.apache-iv-root .gcs-med.selected {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--amber, #f59e0b) 25%, transparent), color-mix(in srgb, var(--amber, #f59e0b) 6%, transparent));
-  border-color: color-mix(in srgb, var(--amber, #f59e0b) 45%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--amber, #f59e0b) 12%, transparent);
-}
-
-.apache-iv-root .gcs-high {
-  color: var(--green, #22c55e);
-}
-.apache-iv-root .gcs-high.selected {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--green, #22c55e) 25%, transparent), color-mix(in srgb, var(--green, #22c55e) 6%, transparent));
-  border-color: color-mix(in srgb, var(--green, #22c55e) 45%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--green, #22c55e) 12%, transparent);
 }
 
 /* No evaluable toggle */

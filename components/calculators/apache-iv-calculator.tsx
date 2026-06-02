@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Wind, Droplets, FlaskConical, Heart, Activity, Brain, Filter, Thermometer, Zap, HeartPulse, Copy, AlertCircle, ChevronDown, BarChart3, FileText } from 'lucide-react';
+import { Wind, Droplets, FlaskConical, Heart, Activity, Brain, Filter, Thermometer, Zap, HeartPulse, Copy, AlertCircle, BarChart3, FileText } from 'lucide-react';
 
 /* ─── Types ─── */
 type GCSComponent = { key: string; label: string; range: [number, number]; labels: string[] };
@@ -69,12 +69,27 @@ const DIAGNOSIS_GROUPS = [
   { value: 'surgical', label: 'Quirúrgico (postoperatorio)' },
 ];
 
-function gcsPillColor(score: number, range: [number, number]): string {
-  const [min, max] = range;
-  const mid = (min + max) / 2;
-  if (score <= mid - 0.5) return 'low';
-  if (score >= max - 0.5) return 'high';
-  return 'med';
+/* ── SOFA-style GCS pill colors (exact same 5 colors as sofaBtnStyle in sofa-calculator.tsx) ── */
+const GCS_SOFA_COLORS = [
+  'bg-emerald-500/8 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-500/5',
+  'bg-amber-500/8 border-amber-500/30 text-amber-400 shadow-xs shadow-amber-500/5',
+  'bg-orange-500/10 border-orange-500/35 text-orange-400 shadow-sm shadow-orange-500/8',
+  'bg-pink-400/12 border-pink-400/40 text-pink-300 shadow-sm shadow-pink-400/10',
+  'bg-red-600/18 border-red-600/50 text-red-300 shadow-md shadow-red-600/20',
+];
+
+function gcsToSofaLevel(key: string, score: number): number {
+  switch (key) {
+    case 'gcsEye':   return score >= 4 ? 0 : score >= 3 ? 1 : score >= 2 ? 2 : 4;
+    case 'gcsVerbal': return score >= 5 ? 0 : score >= 4 ? 1 : score >= 3 ? 2 : score >= 2 ? 3 : 4;
+    case 'gcsMotor': return score >= 6 ? 0 : score >= 5 ? 1 : score >= 4 ? 2 : score >= 3 ? 3 : 4;
+    default:         return 0;
+  }
+}
+
+function gcsSofaStyle(key: string, score: number, active: boolean): string {
+  if (!active) return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] opacity-75 hover:opacity-90';
+  return GCS_SOFA_COLORS[gcsToSofaLevel(key, score)];
 }
 
 function severityColor(s: string) {
@@ -147,8 +162,6 @@ export default function ApacheIVCalculator() {
   const [diagnosisGroup, setDiagnosisGroup] = useState('medical');
   const [diagnosisSystem, setDiagnosisSystem] = useState('');
   const [diagnosisKey, setDiagnosisKey] = useState('');
-  // Collapsed sections
-  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({ fisio: true });
   // Result
   const [result, setResult] = useState<ApacheIVResult & { breakdown?: Record<string, number> } | null>(null);
   const [calculating, setCalculating] = useState(false);
@@ -184,10 +197,6 @@ export default function ApacheIVCalculator() {
   const selectGcs = useCallback((key: string, val: number) => {
     if (!gcsNa) setGcs(prev => ({ ...prev, [key]: val }));
   }, [gcsNa]);
-
-  const toggleSection = useCallback((key: string) => {
-    setCollapsedSections(prev => ({ ...prev, [key]: !prev[key] }));
-  }, []);
 
   const gcsTotal = gcsNa ? 0 : (gcs.gcsEye || 4) + (gcs.gcsVerbal || 5) + (gcs.gcsMotor || 6);
 
@@ -304,13 +313,12 @@ export default function ApacheIVCalculator() {
                 <div className="gcs-group">
                   {Array.from({ length: comp.range[1] - comp.range[0] + 1 }, (_, i) => {
                     const score = comp.range[0] + i;
-                    const color = gcsPillColor(score, comp.range);
                     const selected = val === score;
                     return (
                       <button
                         key={score}
                         onClick={() => selectGcs(comp.key, score)}
-                        className={`gcs-pill gcs-${color}${selected ? ' selected' : ''}`}
+                        className={`gcs-pill ${gcsSofaStyle(comp.key, score, selected)}`}
                         disabled={gcsNa}
                       >
                         <span className="num">{score}</span>
@@ -351,7 +359,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── COMORBILIDADES ─── */}
-      <Section title="Comorbilidades" collapsed={collapsedSections.comorb} onToggle={() => toggleSection('comorb')}>
+      <Section title="Comorbilidades">
         <div className="pills">
           {COMORBIDITIES.map(c => (
             <span
@@ -370,7 +378,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── ADMISIÓN ─── */}
-      <Section title="Admisión" collapsed={collapsedSections.admission} onToggle={() => toggleSection('admission')}>
+      <Section title="Admisión">
         <div className="row">
           <div className="field">
             <FieldLabel>Origen del ingreso</FieldLabel>
@@ -409,7 +417,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── DIAGNÓSTICO DE INGRESO ─── */}
-      <Section title="Diagnóstico de ingreso" collapsed={collapsedSections.diagnosis} onToggle={() => toggleSection('diagnosis')}>
+      <Section title="Diagnóstico de ingreso">
         <div className="row">
           <div className="field">
             <FieldLabel>Sistema</FieldLabel>
@@ -448,7 +456,7 @@ export default function ApacheIVCalculator() {
       </Section>
 
       {/* ─── FISIOLOGÍA & LABORATORIOS ─── */}
-      <Section title="Fisiología & laboratorios" collapsed={collapsedSections.fisio} onToggle={() => toggleSection('fisio')}>
+      <Section title="Fisiología & laboratorios">
 
         {/* Signos vitales */}
         <div className="section-subtitle">Signos vitales</div>
@@ -639,47 +647,18 @@ function sectionIcon(title: string): React.ReactNode {
   return null;
 }
 
-function Section({ title, children, style, collapsed, onToggle }: {
+function Section({ title, children, style }: {
   title: string;
   children: React.ReactNode;
   style?: React.CSSProperties;
-  collapsed?: boolean;
-  onToggle?: () => void;
 }) {
   return (
     <div className="section" style={style}>
-      <div
-        className="section-title"
-        style={onToggle ? { cursor: 'pointer', userSelect: 'none' } : undefined}
-        onClick={onToggle}
-      >
+      <div className="section-title">
         {sectionIcon(title)}
         {title}
-        {onToggle && (
-          <ChevronDown
-            size={12}
-            style={{
-              marginLeft: 'auto',
-              transition: 'transform 0.2s',
-              transform: collapsed ? '' : 'rotate(180deg)',
-            }}
-          />
-        )}
       </div>
-      <AnimatePresence initial={false}>
-        {!collapsed && (
-          <motion.div
-            key="content"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            style={{ overflow: 'hidden' }}
-          >
-            {children}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {children}
     </div>
   );
 }
