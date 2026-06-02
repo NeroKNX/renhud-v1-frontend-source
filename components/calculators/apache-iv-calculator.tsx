@@ -206,9 +206,7 @@ export default function ApacheIVCalculator() {
 
   const gcsTotal = gcsNa ? 0 : (gcs.gcsEye || 4) + (gcs.gcsVerbal || 5) + (gcs.gcsMotor || 6);
 
-  const showThrombolysis = diagnosisSystem?.toLowerCase().includes('neuro') ||
-    diagnosisSystem?.toLowerCase().includes('cerebro') ||
-    diagnosisSystem?.toLowerCase().includes('stroke');
+  const showThrombolysis = diagnosisKey === 'stroke';
 
   const handleCalculate = async () => {
     if (!age) { setError('Ingresa la edad'); return; }
@@ -413,11 +411,11 @@ export default function ApacheIVCalculator() {
         <div className="row">
           <NumField label="Estancia pre-UCI" unit="días" key_="preICULos" value={numFields.preICULos || ''} onChange={v => updateNum('preICULos', v)} />
           <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
-            <ToggleField label="Reingreso UCI" value={readmission} onChange={setReadmission} color="var(--amber)" />
+            <ToggleField label="Reingreso UCI" value={readmission} onChange={setReadmission} color="var(--amber, #f59e0b)" />
           </div>
         </div>
         <div className="row" style={{ marginTop: 8 }}>
-          <ToggleField label="Cirugía de emergencia" value={emergencySurgery} onChange={setEmergencySurgery} color="var(--red)" />
+          <ToggleField label="Cirugía de emergencia" value={emergencySurgery} onChange={setEmergencySurgery} color="var(--red, #ef4444)"/>
         </div>
       </Section>
 
@@ -455,7 +453,7 @@ export default function ApacheIVCalculator() {
         </div>
         {showThrombolysis && (
           <div className="row" style={{ marginTop: 8 }}>
-            <ToggleField label="Trombólisis" value={thrombolysis} onChange={setThrombolysis} color="var(--purple)" />
+            <ToggleField label="Trombólisis" value={thrombolysis} onChange={setThrombolysis} color="var(--purple, #a855f7)" />
           </div>
         )}
       </Section>
@@ -479,7 +477,7 @@ export default function ApacheIVCalculator() {
         </div>
         <div className="row" style={{ marginBottom: 8 }}>
           <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
-            <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal)" />
+            <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal, #14b8a6)" />
           </div>
         </div>
         <div className="row">
