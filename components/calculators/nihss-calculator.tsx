@@ -320,24 +320,22 @@ export default function NihssCalculator() {
           ? (SCORE_MAP[item.key]?.[String(currentVal)] ?? null)
           : null;
         return (
-          <div key={item.key} className="mb-3 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex items-center gap-2 min-w-0 flex-1">
-                <div>
-                  <h3 className="text-[11px] font-semibold ren-text-primary leading-tight">{item.label}</h3>
-                  <button
-                    onClick={() => setExpandedItem(expandedItem === item.key ? null : item.key)}
-                    className="text-[9px] font-mono ren-text-tertiary hover:text-[var(--accent-hover)] transition-colors mt-0.5"
-                  >
-                    {expandedItem === item.key ? 'ocultar' : 'cómo evaluar'}
-                  </button>
-                </div>
-              </div>
-              {currentScore !== null && (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${nihssScoreBadge(currentScore)} shrink-0 ml-2`}>
-                  {currentScore}
-                </span>
-              )}
+          <div key={item.key} className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+            <div className="mb-4">
+              <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
+                <Brain size={12} /> {item.label}
+                {currentScore !== null && (
+                  <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${nihssScoreBadge(currentScore)}`}>
+                    {currentScore} pt{currentScore !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </h3>
+              <button
+                onClick={() => setExpandedItem(expandedItem === item.key ? null : item.key)}
+                className="text-[9px] font-mono ren-text-tertiary hover:text-[var(--accent-hover)] transition-colors mt-0.5"
+              >
+                {expandedItem === item.key ? 'ocultar' : 'cómo evaluar'}
+              </button>
             </div>
 
             {expandedItem === item.key && (
@@ -357,14 +355,6 @@ export default function NihssCalculator() {
                     className={`relative py-2 px-1.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight text-center ${nihBtnStyle(opt.score, active)} ${opt.score >= 4 && active ? 'animate-pulse' : ''}`}
                   >
                     <span className="block">{opt.label}</span>
-                    {active && (
-                      <span
-                        className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-gradient-to-br from-[var(--accent-color)]/20 to-[var(--accent-color)]/4 text-[var(--accent-hover)] text-[9px] font-bold border border-[var(--accent-color)]/30 shadow-[0_0_6px_rgba(var(--accent-color-rgb),0.10)] backdrop-blur-sm flex items-center justify-center"
-                        style={{ color: SCORE_COLORS[opt.score] || '#059669' }}
-                      >
-                        {opt.score}
-                      </span>
-                    )}
                   </button>
                 );
               })}
