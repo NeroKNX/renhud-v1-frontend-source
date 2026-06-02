@@ -7,12 +7,12 @@ import { Brain, BarChart3, AlertCircle, Copy, Eye, Ear, MessageSquare, Wind } fr
 // Score colors matching SOFA style
 function nihBtnStyle(score: number, active: boolean) {
   if (!active) {
-    return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/40';
+    return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/70 hover:bg-[var(--ren-bg-secondary)]/80';
   }
   const map: Record<number, string> = {
-    0: 'bg-emerald-500/8 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-500/5',
-    1: 'bg-amber-500/8 border-amber-500/30 text-amber-400 shadow-xs shadow-amber-500/5',
-    2: 'bg-orange-500/10 border-orange-500/35 text-orange-400 shadow-sm shadow-orange-500/8',
+    0: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 shadow-xs shadow-emerald-500/5',
+    1: 'bg-amber-500/20 border-amber-500/40 text-amber-400 shadow-xs shadow-amber-500/5',
+    2: 'bg-orange-500/25 border-orange-500/45 text-orange-400 shadow-sm shadow-orange-500/8',
     3: 'bg-rose-500/12 border-rose-500/40 text-rose-400 shadow-sm shadow-rose-500/10',
     4: 'bg-red-500/15 border-red-500/45 text-red-400 shadow-md shadow-red-500/15',
   };
@@ -442,6 +442,52 @@ export default function NihssCalculator() {
                 </div>
               </div>
             </div>
+
+            {/* Trombolysis eligibility section */}
+            {(r.nihss_total >= 0 && r.nihss_total <= 42) && (
+              <div className={`mt-4 p-3 rounded-lg border backdrop-blur-sm ${
+                r.nihss_total >= 4 && r.nihss_total <= 25 
+                  ? "bg-emerald-500/10 border-emerald-500/30" 
+                  : r.nihss_total > 25 
+                    ? "bg-red-500/10 border-red-500/30"
+                    : "bg-amber-500/10 border-amber-500/30"
+              }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold tracking-widest uppercase ${
+                    r.nihss_total >= 4 && r.nihss_total <= 25 
+                      ? "text-emerald-400" 
+                      : r.nihss_total > 25 
+                        ? "text-red-400"
+                        : "text-amber-400"
+                  }`}>
+                    Trombolisis
+                  </span>
+                  <span className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-bold tracking-wider ${
+                    r.nihss_total >= 4 && r.nihss_total <= 25 
+                      ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40"
+                      : "bg-gray-500/10 text-gray-400 border border-gray-500/30"
+                  }`}>
+                    {r.nihss_total >= 4 && r.nihss_total <= 25 
+                      ? "ELEGIBLE" 
+                      : r.nihss_total > 25 
+                        ? "CONTRAINDICADO" 
+                        : "NO ELEGIBLE"}
+                  </span>
+                </div>
+                <p className={`text-[10px] mt-1 ${
+                  r.nihss_total >= 4 && r.nihss_total <= 25 
+                    ? "text-emerald-400/70" 
+                    : "text-gray-500"
+                }`}>
+                  {r.nihss_total >= 4 && r.nihss_total <= 25
+                    ? "NIHSS dentro del rango para terapia trombolítica (4-25 pts). Evaluar ventana de tiempo, anticoagulación y contraindicaciones."
+                    : r.nihss_total > 25
+                      ? "NIHSS > 25 pts: contraindicación relativa por alto riesgo de sangrado."
+                      : "NIHSS < 4 pts: déficit leve. Valorar riesgo/beneficio individualizado."}
+                </p>
+              </div>
+            )}
 
             <div className="flex gap-2 mt-3 flex-wrap">
               <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>

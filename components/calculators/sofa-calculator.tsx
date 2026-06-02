@@ -7,14 +7,14 @@ import { Wind, Droplets, Heart, Brain, Zap, BarChart3, AlertCircle, Copy, Chevro
 // ── Score intensity styling for SOFA buttons ──
 function sofaBtnStyle(score: number, active: boolean) {
   if (!active) {
-    return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/40';
+    return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/70 hover:bg-[var(--ren-bg-secondary)]/80';
   }
   const map: Record<number, string> = {
-    0: 'bg-emerald-500/8 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-500/5',
-    1: 'bg-amber-500/8 border-amber-500/30 text-amber-400 shadow-xs shadow-amber-500/5',
-    2: 'bg-orange-500/10 border-orange-500/35 text-orange-400 shadow-sm shadow-orange-500/8',
-    3: 'bg-pink-400/12 border-pink-400/40 text-pink-300 shadow-sm shadow-pink-400/10',
-    4: 'bg-red-600/18 border-red-600/50 text-red-300 shadow-md shadow-red-600/20',
+    0: 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400 shadow-xs shadow-emerald-500/5',
+    1: 'bg-amber-500/20 border-amber-500/40 text-amber-400 shadow-xs shadow-amber-500/5',
+    2: 'bg-orange-500/25 border-orange-500/45 text-orange-400 shadow-sm shadow-orange-500/8',
+    3: 'bg-pink-400/25 border-pink-400/50 text-pink-300 shadow-sm shadow-pink-400/10',
+    4: 'bg-red-600/35 border-red-600/60 text-red-300 shadow-md shadow-red-600/20',
   };
   return map[score] || 'bg-[var(--accent-color)]/10 text-[var(--accent-hover)] border-[var(--accent-color)]/40';
 }
