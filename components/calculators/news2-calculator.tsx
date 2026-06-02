@@ -30,6 +30,21 @@ const NEWS2_KEYS = {
 
 const SCORE_COLORS = ['#059669', '#d97706', '#ea580c', '#dc2626'];
 
+// ── Glass + Glow badge for NEWS2 (0–3 scale) ──
+function newsScoreBadge(score: number): string {
+  const map: Record<number, string> = {
+    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
+    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
+    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
+    3: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-sm',
+  };
+  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
+}
+
+function newsGlowPill(riskColor: string, textColor: string): string {
+  return `bg-gradient-to-br from-${riskColor}-500/20 to-${riskColor}-500/4 text-${textColor}-400 border-${riskColor}-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm`;
+}
+
 function N2Slider({ options, value, onChange }: {
   options: { label: string; score: number; value: any }[];
   value: any;
@@ -41,13 +56,13 @@ function N2Slider({ options, value, onChange }: {
         <button
           key={i}
           onClick={() => onChange(opt.value)}
-          className={`flex-1 px-2 py-2 text-[10px] font-semibold transition-all leading-tight ${
+          className={`relative flex-1 px-2 py-2 text-[10px] font-semibold transition-all leading-tight border ${
             value === opt.value
-              ? `${newsBtnStyle(opt.score, true).split(' ')[0]} border-0 text-white`
-              : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
+              ? newsBtnStyle(opt.score, true)
+              : 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] hover:border-[var(--accent-color)]/40'
           }`}
         >
-          {opt.label}
+          <span className="block">{opt.label}</span>
         </button>
       ))}
     </div>
@@ -93,11 +108,15 @@ export default function News2Calculator() {
   };
 
   const r = result as Record<string, any> | null;
-  const riskClass = r?.clinical_risk_level === 'high'
-    ? { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/25', bar: 'bg-red-500' }
-    : r?.clinical_risk_level === 'medium'
-    ? { bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/25', bar: 'bg-orange-500' }
-    : { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/25', bar: 'bg-emerald-500' };
+  const news2RiskClass = (level: string): { bg: string; text: string; border: string } => {
+    const map: Record<string, { bg: string; text: string; border: string }> = {
+      'high':   { bg: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4', text: 'text-rose-300', border: 'border-rose-500/40' },
+      'medium': { bg: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4', text: 'text-orange-300', border: 'border-orange-500/40' },
+      'low':    { bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4', text: 'text-emerald-300', border: 'border-emerald-500/40' },
+    };
+    return map[level] || map.low;
+  };
+  const riskClass = news2RiskClass(r?.clinical_risk_level || 'low');
 
   return (
     <div>
@@ -376,47 +395,30 @@ export default function News2Calculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            <div className={`rounded-xl border ${riskClass.border} ${riskClass.bg} overflow-hidden`}>
+            <div className={`rounded-xl border backdrop-blur-sm ${riskClass.border} ${riskClass.bg} overflow-hidden`}>
               <div className="p-5">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.total_score}/20</span>
-                  <span className={`text-sm font-mono px-2.5 py-0.5 rounded-full ${riskClass.bg} ${riskClass.text} border ${riskClass.border}`}>
+                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${riskClass.bg} ${riskClass.text} border ${riskClass.border} backdrop-blur-sm`}>
                     {r.color} {r.clinical_risk}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">FR</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.rr_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">SpO₂</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.spo2_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">O₂</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.oxygen_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">PAS</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.sbp_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">FC</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.hr_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">AVPU</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.consciousness_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">T°</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.temp_score}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Escala SpO₂</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.spo2_scale_used}</p>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-4">
+                  {[
+                    { l: 'FR', v: r.rr_score },
+                    { l: 'SpO₂', v: r.spo2_score },
+                    { l: 'O₂', v: r.oxygen_score },
+                    { l: 'PAS', v: r.sbp_score },
+                    { l: 'FC', v: r.hr_score },
+                    { l: 'AVPU', v: r.consciousness_score },
+                    { l: 'T°', v: r.temp_score },
+                    { l: 'Escala SpO₂', v: r.spo2_scale_used },
+                  ].map(item => (
+                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? newsScoreBadge(Math.min(Number(item.v), 3)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                      <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
+                      <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
+                    </div>
+                  ))}
                 </div>
                 <p className="text-xs ren-text-tertiary font-mono leading-relaxed">{r.clinical_response}</p>
                 {r.has_individual_score_of_3 && (

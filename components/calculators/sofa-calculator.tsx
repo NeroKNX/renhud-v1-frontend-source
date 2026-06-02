@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Wind, Droplets, Heart, Brain, Zap, BarChart3, AlertCircle, Copy, ChevronRight, FileText } from 'lucide-react';
+import { Wind, Droplets, Heart, Brain, Zap, BarChart3, AlertCircle, Copy, ChevronRight, FileText, FlaskConical, Filter } from 'lucide-react';
 
 // ── Score intensity styling for SOFA buttons ──
 function sofaBtnStyle(score: number, active: boolean) {
@@ -13,14 +13,26 @@ function sofaBtnStyle(score: number, active: boolean) {
     0: 'bg-emerald-500/8 border-emerald-500/30 text-emerald-400 shadow-xs shadow-emerald-500/5',
     1: 'bg-amber-500/8 border-amber-500/30 text-amber-400 shadow-xs shadow-amber-500/5',
     2: 'bg-orange-500/10 border-orange-500/35 text-orange-400 shadow-sm shadow-orange-500/8',
-    3: 'bg-rose-500/12 border-rose-500/40 text-rose-400 shadow-sm shadow-rose-500/10',
-    4: 'bg-red-500/15 border-red-500/45 text-red-400 shadow-md shadow-red-500/15',
+    3: 'bg-pink-400/12 border-pink-400/40 text-pink-300 shadow-sm shadow-pink-400/10',
+    4: 'bg-red-600/18 border-red-600/50 text-red-300 shadow-md shadow-red-600/20',
   };
   return map[score] || 'bg-[var(--accent-color)]/10 text-[var(--accent-hover)] border-[var(--accent-color)]/40';
 }
 
 function sofaPulse(score: number) {
   return score >= 4;
+}
+
+// ── Glass + Glow badge (Opción A) ──
+function sofaScoreBadge(score: number): string {
+  const map: Record<number, string> = {
+    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
+    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
+    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
+    3: 'bg-gradient-to-br from-pink-400/20 to-pink-400/4 text-pink-300 border-pink-400/40 shadow-[0_0_10px_rgba(244,114,182,0.12)] backdrop-blur-sm',
+    4: 'bg-gradient-to-br from-red-600/22 to-red-600/6 text-red-300 border-red-600/45 shadow-[0_0_14px_rgba(220,38,38,0.18)] backdrop-blur-sm',
+  };
+  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
 }
 
 function severityColor(severity: string) {
@@ -75,7 +87,7 @@ export default function SofaCalculator() {
   return (
     <div>
       {/* ── qSOFA inline ── */}
-      <div className="mb-8 rounded-xl border-l-4 border-l-amber-500/50 border border-[var(--accent-color)]/20 bg-gradient-to-r from-amber-500/[0.04] to-transparent p-4">
+      <div className="mb-8 rounded-xl border-l-4 border-l-amber-500/50 border border-[var(--accent-color)]/20 bg-gradient-to-r from-amber-500/[0.04] to-transparent p-4 backdrop-blur-sm">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest flex items-center gap-1.5 text-amber-400">
             <Zap size={12} /> qSOFA — Cribado rápido
@@ -87,22 +99,22 @@ export default function SofaCalculator() {
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">Frec. respiratoria ≥22 rpm</label>
             <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">PAS ≤100 mmHg</label>
             <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">GCS {'<'} 15</label>
             <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-[var(--accent-color)] text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-red-500 text-white shadow-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
         </div>
@@ -116,9 +128,9 @@ export default function SofaCalculator() {
               <div className="p-3 flex items-center gap-3">
                 <span className="text-xl font-bold ren-text-primary tabular-nums">{qTotal}/3</span>
                 {qPos ? (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25">⚠ Alto riesgo — evaluar SOFA</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.10)] backdrop-blur-sm">⚠ Alto riesgo — evaluar SOFA</span>
                 ) : (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Bajo riesgo</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.10)] backdrop-blur-sm">Bajo riesgo</span>
                 )}
               </div>
             </div>
@@ -141,6 +153,13 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Wind size={12} /> Respiratorio — PaFi
+            {(() => {
+              const v = formValues.sofa_paFi;
+              if (v == null) return null;
+              const m: Record<number,number> = {400:0,350:1,250:2,150:3,50:4};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1.5">
@@ -155,7 +174,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => updateValue('sofa_paFi', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]||'#059669'}}>{r.s}</span>}
               </button>
             );
           })}
@@ -167,6 +185,13 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Droplets size={12} /> Coagulación — Plaquetas (×10³/µL)
+            {(() => {
+              const v = formValues.sofa_platelets;
+              if (v == null) return null;
+              const m: Record<number,number> = {150:0,100:1,50:2,20:3,5:4};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1.5">
@@ -181,7 +206,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => updateValue('sofa_platelets', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
               </button>
             );
           })}
@@ -192,7 +216,14 @@ export default function SofaCalculator() {
       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-            🫁 Hepático — Bilirrubina (mg/dL)
+            <FlaskConical size={12} /> Hepático — Bilirrubina (mg/dL)
+            {(() => {
+              const v = formValues.sofa_bilirubin;
+              if (v == null) return null;
+              const m: Record<number,number> = {1:0,1.5:1,3:2,8:3,13:4};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1.5">
@@ -207,7 +238,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => updateValue('sofa_bilirubin', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
               </button>
             );
           })}
@@ -219,6 +249,14 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Cardiovascular — PAM + Vasopresores
+            {(() => {
+              const m = formValues.sofa_map;
+              const d = formValues.sofa_dopamine;
+              if (m == null || d == null) return null;
+              const cv: Record<string,number> = {'80_none':0,'60_none':1,'70_low':2,'70_mid':3,'70_high':4};
+              const s = cv[`${m}_${d}`];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-1 gap-1.5">
@@ -233,7 +271,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => { updateValue('sofa_map', r.map); updateValue('sofa_dopamine', r.dopa); }} className={`relative py-2.5 px-3 rounded-lg text-xs font-semibold transition-all border text-left ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-white/20 text-[9px] font-bold">{r.s}</span>}
               </button>
             );
           })}
@@ -245,6 +282,13 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Brain size={12} /> Neurológico — Glasgow
+            {(() => {
+              const v = formValues.sofa_gcs;
+              if (v == null) return null;
+              const m: Record<number,number> = {15:0,13:1,11:2,8:3,5:4};
+              const s = m[v];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1.5">
@@ -259,7 +303,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => updateValue('sofa_gcs', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
               </button>
             );
           })}
@@ -270,7 +313,15 @@ export default function SofaCalculator() {
       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-            🫘 Renal — Creatinina (mg/dL) o Diuresis
+            <Filter size={12} /> Renal — Creatinina (mg/dL) o Diuresis
+            {(() => {
+              const cr = formValues.sofa_creatinine;
+              const u = formValues.sofa_urine;
+              if (cr == null || u == null) return null;
+              const ren: Record<string,number> = {'1_1000':0,'1.5_1000':1,'3_1000':2,'4_400':3,'6_100':4};
+              const s = ren[`${cr}_${u}`];
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+            })()}
           </h3>
         </div>
         <div className="grid grid-cols-5 gap-1.5 mb-2">
@@ -285,7 +336,6 @@ export default function SofaCalculator() {
             return (
               <button key={r.k} onClick={() => { updateValue('sofa_creatinine', r.cr); updateValue('sofa_urine', r.urine); }} className={`relative py-2.5 px-2 rounded-lg text-xs font-semibold transition-all border leading-tight ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
-                {active && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center" style={{color: ['#059669','#d97706','#ea580c','#dc2626','#b91c1c'][r.s]}}>{r.s}</span>}
               </button>
             );
           })}
@@ -332,73 +382,36 @@ export default function SofaCalculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            {/* qSOFA inline desde formValues */}
-            {(() => {
-              const qRR = Number(formValues.qsofa_rr);
-              const qSBP = Number(formValues.qsofa_sbp);
-              const qGCS = Number(formValues.qsofa_gcs);
-              const hasQ = !isNaN(qRR) && !isNaN(qSBP) && !isNaN(qGCS);
-              const qPts = hasQ ? qRR + qSBP + qGCS : 0;
-              const qPos = hasQ && qPts >= 2;
-              return (
-                <div className="rounded-xl border bg-[var(--ren-bg-secondary)] border-[var(--ren-border)] mb-3 overflow-hidden">
-                  <div className="flex items-center gap-2 px-4 py-1.5 bg-[var(--ren-bg-tertiary)] border-b border-[var(--ren-border)]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                    <p className="text-[10px] font-mono uppercase tracking-widest ren-text-primary">qSOFA — Cribado rápido</p>
-                  </div>
-                  <div className="p-4">
-                    <div className="grid grid-cols-3 gap-2 mb-3">
-                      <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                        <p className="text-[9px] font-mono ren-text-tertiary">🫁 FR ≥22</p>
-                        <p className={`text-lg font-bold tabular-nums ${qRR ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qRR : '-'}</p>
-                      </div>
-                      <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                        <p className="text-[9px] font-mono ren-text-tertiary">❤️ PAS ≤100</p>
-                        <p className={`text-lg font-bold tabular-nums ${qSBP ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qSBP : '-'}</p>
-                      </div>
-                      <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center border border-[var(--ren-border)]">
-                        <p className="text-[9px] font-mono ren-text-tertiary">🧠 GCS {'<'}15</p>
-                        <p className={`text-lg font-bold tabular-nums ${qGCS ? 'text-red-400' : 'ren-text-primary'}`}>{hasQ ? qGCS : '-'}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xl font-bold tabular-nums ${qPos ? 'text-red-400' : 'text-emerald-400'}`}>{hasQ ? qPts : '-'}<span className="text-xs font-mono ren-text-tertiary">/3</span></span>
-                        <span className={`h-2 w-2 rounded-full ${qPos ? 'bg-red-500' : 'bg-emerald-500'}`} />
-                      </div>
-                      {hasQ && !qPos ? (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Bajo riesgo</span>
-                      ) : hasQ && qPos ? (
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/25">⚠ Alto riesgo</span>
-                      ) : null}
-                    </div>
-                    {hasQ && qPos && <p className="text-[9px] font-mono text-amber-500 mt-2">Sospecha clínica de sepsis — correlacionar con SOFA</p>}
-                  </div>
-                </div>
-              );
-            })()}
-
             {/* SOFA score */}
-            <div className={`rounded-xl border ${severityClass?.border} ${severityClass?.bg} overflow-hidden`}>
+            <div className={`rounded-xl border backdrop-blur-sm ${severityClass?.border} ${severityClass?.bg} overflow-hidden`}>
               <div className="p-4">
                 <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-3">SOFA — Disfunción orgánica</p>
-                <div className="grid grid-cols-3 gap-2 mb-3">
+                <div className="grid grid-cols-6 gap-1.5 mb-4">
                   {[
                     {l:'Resp',v:r.sofa_resp},{l:'Coag',v:r.sofa_coag},{l:'Hep',v:r.sofa_hepatic},
                     {l:'CV',v:r.sofa_cv},{l:'SNC',v:r.sofa_cns},{l:'Renal',v:r.sofa_renal},
                   ].map(item => (
-                    <div key={item.l} className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                      <p className="text-[9px] font-mono ren-text-tertiary">{item.l}</p>
-                      <p className="text-xl font-bold ren-text-primary tabular-nums">{item.v ?? '-'}</p>
+                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? sofaScoreBadge(item.v) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                      <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
+                      <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
                     </div>
                   ))}
                 </div>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-2xl font-bold ren-text-primary tabular-nums">{r.sofa_total}/24</span>
-                  <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${severityClass?.bg} ${severityClass?.text} border ${severityClass?.border}`}>{r.sofa_severity}</span>
+                <div className="flex items-end gap-5 mb-1">
+                  <div>
+                    <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Score total</p>
+                    <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.sofa_total}/24</span>
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Severidad</p>
+                    <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${severityClass?.bg} ${severityClass?.text} border ${severityClass?.border} backdrop-blur-sm inline-block mt-0.5`}>{r.sofa_severity}</span>
+                  </div>
                 </div>
-                <p className="text-xs ren-text-tertiary font-mono">Mortalidad estimada: {r.sofa_mortality_estimate}</p>
-                {r.paFi && <p className="text-[10px] ren-text-tertiary font-mono mt-1">PaFi: {r.paFi}</p>}
+                <div className="mt-2 pt-2 border-t border-[var(--ren-border)]/40">
+                  <p className="text-xs ren-text-tertiary font-mono">
+                    <span className="text-[var(--accent-hover)]">Mortalidad estimada:</span> {r.sofa_mortality_estimate}
+                  </p>
+                </div>
               </div>
             </div>
 

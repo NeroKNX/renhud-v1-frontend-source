@@ -905,22 +905,22 @@ html::after {
 /* Calculate button */
 .apache-iv-root .calc-btn {
   padding: 12px 40px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 14px;
   font-weight: 600;
-  background: linear-gradient(135deg, #a78bfa, #6366f1, #3b82f6);
-  background-size: 200% 200%;
+  min-width: 260px;
+  background: linear-gradient(135deg, var(--accent-color, #a78bfa) 0%, #7c3aed 100%);
   color: white;
   border: none;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.15s;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 .apache-iv-root .calc-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c4b5fd, #818cf8, #60a5fa);
-  background-size: 200% 200%;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px color-mix(in srgb, #6366f1 35%, transparent);
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent-color) 30%, transparent);
 }
 
 .apache-iv-root .calc-btn:disabled {
@@ -1006,11 +1006,37 @@ html::after {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 600;
   border: 1px solid;
+  backdrop-filter: blur(4px);
+}
+
+.apache-iv-root .sys-pill.text-emerald-400 {
+  background: linear-gradient(135deg, rgba(52,211,153,0.15), rgba(52,211,153,0.04));
+  box-shadow: 0 0 8px rgba(52,211,153,0.08);
+}
+
+.apache-iv-root .sys-pill.text-amber-400 {
+  background: linear-gradient(135deg, rgba(251,191,36,0.15), rgba(251,191,36,0.04));
+  box-shadow: 0 0 8px rgba(251,191,36,0.08);
+}
+
+.apache-iv-root .sys-pill.text-orange-400 {
+  background: linear-gradient(135deg, rgba(251,146,60,0.15), rgba(251,146,60,0.04));
+  box-shadow: 0 0 8px rgba(251,146,60,0.08);
+}
+
+.apache-iv-root .sys-pill.text-teal-400 {
+  background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(45,212,191,0.04));
+  box-shadow: 0 0 8px rgba(45,212,191,0.08);
+}
+
+.apache-iv-root .sys-pill.text-red-400 {
+  background: linear-gradient(135deg, rgba(220,38,38,0.18), rgba(220,38,38,0.05));
+  box-shadow: 0 0 8px rgba(220,38,38,0.10);
 }
 
 .apache-iv-root .sys-pill .dot {
@@ -1044,15 +1070,16 @@ html::after {
   border-radius: 10px;
   font-size: 12px;
   font-weight: 500;
+  font-family: var(--font-mono, monospace);
   background: var(--ren-bg-tertiary);
   border: 1px solid var(--ren-border);
-  color: var(--text-light);
+  color: var(--ren-text-tertiary);
   cursor: pointer;
   transition: all 0.15s;
 }
 
 .apache-iv-root .action-btn:hover {
-  border-color: var(--accent-color);
+  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent);
   color: var(--accent-hover);
 }
 

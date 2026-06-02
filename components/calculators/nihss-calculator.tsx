@@ -21,6 +21,18 @@ function nihBtnStyle(score: number, active: boolean) {
 
 const SCORE_COLORS = ['#059669', '#d97706', '#ea580c', '#dc2626', '#b91c1c'];
 
+// ── Glass + Glow badge for NIHSS (0–4 scale) ──
+function nihssScoreBadge(score: number): string {
+  const map: Record<number, string> = {
+    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
+    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
+    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
+    3: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-sm',
+    4: 'bg-gradient-to-br from-red-600/22 to-red-600/6 text-red-300 border-red-600/45 shadow-[0_0_14px_rgba(220,38,38,0.18)] backdrop-blur-sm',
+  };
+  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
+}
+
 // Map value to score for each subitem
 const SCORE_MAP: Record<string, Record<string, number>> = {
   nihss_loc: { '0': 0, '1': 1, '2': 2, '3': 3 },
@@ -322,14 +334,7 @@ export default function NihssCalculator() {
                 </div>
               </div>
               {currentScore !== null && (
-                <span
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ml-2"
-                  style={{
-                    backgroundColor: `${SCORE_COLORS[currentScore] || '#059669'}20`,
-                    color: SCORE_COLORS[currentScore] || '#059669',
-                    border: `1px solid ${SCORE_COLORS[currentScore] || '#059669'}40`,
-                  }}
-                >
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${nihssScoreBadge(currentScore)} shrink-0 ml-2`}>
                   {currentScore}
                 </span>
               )}
@@ -412,76 +417,38 @@ export default function NihssCalculator() {
               <div className="p-5">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.nihss_total}/42</span>
-                  <span className={`text-sm font-mono px-2.5 py-0.5 rounded-full ${sevClass?.bg} ${sevClass?.text} border ${sevClass?.border}`}>
+                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${sevClass?.bg} ${sevClass?.text} border ${sevClass?.border} backdrop-blur-sm`}>
                     {r.nihss_severity}
                   </span>
                   {(r.nihss_total ?? 0) >= 7 && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/25 backdrop-blur-sm">
                       <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="inline-block mr-1"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">LOC</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Preguntas</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc_questions ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Órdenes</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.loc_commands ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Mirada</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.gaze ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Visual</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.visual ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Facial</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.facial ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Brazo D</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_arm_r ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Brazo I</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_arm_l ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Pierna D</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_leg_r ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Pierna I</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.motor_leg_l ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Ataxia</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.ataxia ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Sensib.</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.sensory ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Lenguaje</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.language ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Disartria</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.dysarthria ?? 0}</p>
-                  </div>
-                  <div className="bg-[var(--ren-bg-tertiary)] rounded-lg p-2 text-center">
-                    <p className="text-[9px] font-mono ren-text-tertiary">Neglig.</p>
-                    <p className="text-lg font-bold ren-text-primary tabular-nums">{r.nihss_detail?.extinction ?? 0}</p>
-                  </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                  {[
+                    { l: 'LOC', v: r.nihss_detail?.loc },
+                    { l: 'Preguntas', v: r.nihss_detail?.loc_questions },
+                    { l: 'Órdenes', v: r.nihss_detail?.loc_commands },
+                    { l: 'Mirada', v: r.nihss_detail?.gaze },
+                    { l: 'Visual', v: r.nihss_detail?.visual },
+                    { l: 'Facial', v: r.nihss_detail?.facial },
+                    { l: 'Brazo D', v: r.nihss_detail?.motor_arm_r },
+                    { l: 'Brazo I', v: r.nihss_detail?.motor_arm_l },
+                    { l: 'Pierna D', v: r.nihss_detail?.motor_leg_r },
+                    { l: 'Pierna I', v: r.nihss_detail?.motor_leg_l },
+                    { l: 'Ataxia', v: r.nihss_detail?.ataxia },
+                    { l: 'Sensib.', v: r.nihss_detail?.sensory },
+                    { l: 'Lenguaje', v: r.nihss_detail?.language },
+                    { l: 'Disartria', v: r.nihss_detail?.dysarthria },
+                    { l: 'Neglig.', v: r.nihss_detail?.extinction },
+                  ].map(item => (
+                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? nihssScoreBadge(Math.min(Number(item.v), 4)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                      <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
+                      <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
