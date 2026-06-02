@@ -539,20 +539,18 @@ html::after {
 /* ═══════════ APACHE IV Calculator Styles — Glass+Glow ═══════════ */
 
 .apache-iv-root .section {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ren-bg-secondary) 70%, transparent), color-mix(in srgb, var(--ren-bg-secondary) 25%, transparent));
-  border: 1px solid color-mix(in srgb, var(--ren-border) 60%, transparent);
-  border-radius: 14px;
-  padding: 16px 18px;
-  margin-bottom: 16px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 24px rgba(0,0,0,0.15), 0 1px 2px rgba(255,255,255,0.04);
+  background: color-mix(in srgb, var(--ren-bg-secondary) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 40%, transparent);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 24px;
 }
 
 .apache-iv-root .section-title {
   font-family: monospace;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 10px;
+  letter-spacing: 0.2em;
+  font-size: 11px;
   color: var(--ren-text-tertiary);
   margin-bottom: 14px;
   display: flex;
@@ -923,11 +921,11 @@ html::after {
 
 /* Calculate button */
 .apache-iv-root .calc-btn {
-  padding: 12px 40px;
-  border-radius: 14px;
+  width: 100%;
+  padding: 12px 32px;
+  border-radius: 12px;
   font-size: 14px;
   font-weight: 600;
-  min-width: 260px;
   background: linear-gradient(135deg, var(--accent-color, #a78bfa) 0%, #7c3aed 100%);
   color: white;
   border: none;
@@ -947,14 +945,21 @@ html::after {
   cursor: not-allowed;
 }
 
+@media (min-width: 768px) {
+  .apache-iv-root .calc-btn {
+    width: auto;
+    min-width: 280px;
+  }
+}
+
 /* Result card */
 .apache-iv-root .result-card {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--ren-bg-secondary) 70%, transparent), color-mix(in srgb, var(--ren-bg-secondary) 30%, transparent));
-  border: 1px solid color-mix(in srgb, var(--accent-color) 25%, transparent);
-  border-radius: 16px;
-  padding: 24px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 0 20px color-mix(in srgb, var(--accent-color) 10%, transparent), 0 8px 32px rgba(0,0,0,0.2);
+  background: color-mix(in srgb, var(--ren-bg-secondary) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(4px);
+  box-shadow: none;
 }
 
 .apache-iv-root .result-top {
@@ -966,8 +971,8 @@ html::after {
 }
 
 .apache-iv-root .result-score {
-  font-size: 56px;
-  font-weight: 800;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
   background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
   -webkit-background-clip: text;
