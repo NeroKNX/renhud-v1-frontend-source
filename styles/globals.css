@@ -147,15 +147,24 @@
 }
 
 .apache-iv-root .section {
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(18, 18, 24, 0.6), rgba(18, 18, 24, 0.2));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(42, 42, 58, 0.4);
   padding: 20px;
   margin-bottom: 24px;
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.apache-iv-root .section:hover {
+  border-color: rgba(42, 42, 58, 0.6);
+  box-shadow: 0 0 24px rgba(124, 92, 255, 0.06);
 }
 .apache-iv-root .section-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
+  font-family: monospace;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-dim);
@@ -237,7 +246,9 @@
   font-size: 9px;
   font-weight: 500;
   border-radius: 5px;
-  background: var(--surface2);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.4), rgba(26, 26, 36, 0.1));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   color: var(--text-dim);
   cursor: pointer;
   transition: all 0.15s;
@@ -262,9 +273,9 @@
 .apache-iv-root .gcs-high { border-color: var(--green); }
 .apache-iv-root .gcs-med  { border-color: var(--amber); }
 .apache-iv-root .gcs-low  { border-color: var(--red); }
-.apache-iv-root .gcs-high.selected { background: rgba(51, 221, 119, 0.1); color: var(--green); }
-.apache-iv-root .gcs-med.selected  { background: rgba(255, 187, 51, 0.1); color: var(--amber); }
-.apache-iv-root .gcs-low.selected  { background: rgba(255, 68, 102, 0.1); color: var(--red); }
+.apache-iv-root .gcs-high.selected { background: linear-gradient(135deg, rgba(51, 221, 119, 0.25), rgba(51, 221, 119, 0.06)); box-shadow: 0 0 10px rgba(51, 221, 119, 0.12); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: var(--green); }
+.apache-iv-root .gcs-med.selected  { background: linear-gradient(135deg, rgba(255, 187, 51, 0.25), rgba(255, 187, 51, 0.06)); box-shadow: 0 0 10px rgba(255, 187, 51, 0.12); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: var(--amber); }
+.apache-iv-root .gcs-low.selected  { background: linear-gradient(135deg, rgba(255, 68, 102, 0.25), rgba(255, 68, 102, 0.06)); box-shadow: 0 0 10px rgba(255, 68, 102, 0.12); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: var(--red); }
 .apache-iv-root .gcs-high.selected .desc,
 .apache-iv-root .gcs-med.selected .desc,
 .apache-iv-root .gcs-low.selected .desc { opacity: 0.8; }
@@ -304,8 +315,9 @@
   transition: all 0.15s;
 }
 .apache-iv-root .ne-toggle.active .ne-toggle-track {
-  background: rgba(255, 136, 51, 0.2);
+  background: linear-gradient(135deg, rgba(255, 136, 51, 0.35), rgba(255, 136, 51, 0.1));
   border-color: var(--orange);
+  box-shadow: 0 0 8px rgba(255, 136, 51, 0.15);
 }
 .apache-iv-root .ne-toggle-thumb {
   position: absolute;
@@ -325,8 +337,10 @@
 
 /* Numeric input */
 .apache-iv-root .num-input {
-  background: var(--surface2);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.5), rgba(26, 26, 36, 0.15));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(42, 42, 58, 0.4);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   color: var(--text);
@@ -335,9 +349,12 @@
   font-weight: 500;
   width: 100%;
   outline: none;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
-.apache-iv-root .num-input:focus { border-color: var(--accent); }
+.apache-iv-root .num-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(124, 92, 255, 0.12);
+}
 .apache-iv-root .num-input::placeholder { color: var(--text-dim); opacity: 0.4; }
 
 .apache-iv-root .num-with-badge {
@@ -372,8 +389,8 @@
   background: var(--text-dim);
   transition: all 0.15s;
 }
-.apache-iv-root .pill.active { border-color: var(--red); background: rgba(255, 68, 102, 0.06); }
-.apache-iv-root .pill.active .indicator { background: var(--red); box-shadow: 0 0 6px rgba(255, 68, 102, 0.3); }
+.apache-iv-root .pill.active { border-color: rgba(255, 68, 102, 0.5); background: linear-gradient(135deg, rgba(255, 68, 102, 0.2), rgba(255, 68, 102, 0.04)); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.apache-iv-root .pill.active .indicator { background: var(--red); box-shadow: 0 0 8px rgba(255, 68, 102, 0.35); }
 .apache-iv-root .pill.inactive { opacity: 0.5; }
 .apache-iv-root .pill.inactive .indicator { background: var(--text-dim); }
 .apache-iv-root .pill.inactive.active { opacity: 1; }
@@ -394,7 +411,9 @@
 }
 .apache-iv-root .toggle-field.active {
   border-color: color-mix(in srgb, var(--toggle-color) 50%, transparent);
-  background: color-mix(in srgb, var(--toggle-color) 8%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--toggle-color) 20%, transparent), color-mix(in srgb, var(--toggle-color) 4%, transparent));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   color: var(--toggle-color);
 }
 .apache-iv-root .toggle-field .toggle-track {
@@ -493,22 +512,28 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 8px;
-  background: rgba(255, 68, 102, 0.1);
-  border: 1px solid rgba(255, 68, 102, 0.25);
+  background: linear-gradient(135deg, rgba(255, 68, 102, 0.15), rgba(255, 68, 102, 0.04));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 68, 102, 0.3);
   color: #ff4466;
   font-size: 11px;
   font-family: monospace;
   margin-top: 8px;
+  box-shadow: 0 0 12px rgba(255, 68, 102, 0.08);
 }
 
 /* Result card */
 .apache-iv-root .result-card {
-  background: var(--surface);
+  background: linear-gradient(135deg, rgba(18, 18, 24, 0.6), rgba(18, 18, 24, 0.15));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(42, 42, 58, 0.4);
   padding: 20px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 0 30px rgba(124, 92, 255, 0.06);
 }
 .apache-iv-root .result-card::before {
   content: '';
@@ -534,6 +559,7 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  filter: drop-shadow(0 0 12px rgba(124, 92, 255, 0.2));
 }
 .apache-iv-root .result-meta {
   display: flex;
@@ -584,8 +610,10 @@
   font-size: 10px;
   font-weight: 600;
   border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
+  border: 1px solid rgba(42, 42, 58, 0.4);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.5), rgba(26, 26, 36, 0.15));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   letter-spacing: 0.03em;
 }
 .apache-iv-root .sys-pill .dot {
@@ -607,8 +635,10 @@
   font-size: 11px;
   font-weight: 500;
   border-radius: 20px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.5), rgba(26, 26, 36, 0.15));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(42, 42, 58, 0.4);
   color: var(--text-dim);
 }
 
@@ -620,14 +650,17 @@
   font-weight: 500;
   font-family: monospace;
   color: var(--text-dim);
-  background: var(--surface2);
-  border: 1px solid var(--border);
+  background: linear-gradient(135deg, rgba(26, 26, 36, 0.5), rgba(26, 26, 36, 0.15));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(42, 42, 58, 0.4);
   cursor: pointer;
   transition: all 0.15s;
 }
 .apache-iv-root .action-btn:hover {
   border-color: var(--accent);
   color: var(--accent);
+  box-shadow: 0 0 12px rgba(124, 92, 255, 0.1);
 }
 .apache-iv-root .action-btn.flex-1 {
   flex: 1;
