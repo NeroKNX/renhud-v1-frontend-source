@@ -647,48 +647,6 @@ html::after {
   border-left: 2px solid color-mix(in srgb, var(--ren-border) 50%, transparent);
   padding-left: 10px;
 }
-
-.apache-iv-root .gcs-group {
-  display: flex;
-  gap: 3px;
-  flex-wrap: wrap;
-}
-
-.apache-iv-root .gcs-pill {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4px 6px;
-  border-radius: 8px;
-  border: 1.5px solid;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-width: 30px;
-}
-
-.apache-iv-root .gcs-pill:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--accent-color) 40%, transparent) !important;
-}
-
-.apache-iv-root .gcs-pill:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.apache-iv-root .gcs-pill .num {
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.apache-iv-root .gcs-pill .desc {
-  font-size: 8px;
-  line-height: 1.1;
-  margin-top: 1px;
-  white-space: nowrap;
-}
-
 /* No evaluable toggle */
 .apache-iv-root .ne-toggle {
   display: inline-flex;

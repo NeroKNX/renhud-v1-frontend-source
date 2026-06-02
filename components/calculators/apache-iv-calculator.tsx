@@ -310,7 +310,7 @@ export default function ApacheIVCalculator() {
             <div key={comp.key} className="row" style={{ marginBottom: 8 }}>
               <div className="field">
                 <FieldLabel>{comp.label} <Sub>({comp.range[0]}–{comp.range[1]})</Sub></FieldLabel>
-                <div className="gcs-group">
+                <div className="flex flex-wrap gap-1.5">
                   {Array.from({ length: comp.range[1] - comp.range[0] + 1 }, (_, i) => {
                     const score = comp.range[0] + i;
                     const selected = val === score;
@@ -318,11 +318,10 @@ export default function ApacheIVCalculator() {
                       <button
                         key={score}
                         onClick={() => selectGcs(comp.key, score)}
-                        className={`gcs-pill ${gcsSofaStyle(comp.key, score, selected)}`}
+                        className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${gcsSofaStyle(comp.key, score, selected)}`}
                         disabled={gcsNa}
                       >
-                        <span className="num">{score}</span>
-                        <span className="desc">{comp.labels[i]}</span>
+                        {score} {comp.labels[i]}
                       </button>
                     );
                   })}
