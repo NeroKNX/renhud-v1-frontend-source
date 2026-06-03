@@ -162,7 +162,7 @@ export default function ApacheIVCalculator() {
   const [emergencySurgery, setEmergencySurgery] = useState(false);
   const [readmission, setReadmission] = useState(false);
   const [thrombolysis, setThrombolysis] = useState(false);
-  const [aki, setAki] = useState(false);
+  const [erc, setErc] = useState(false);
   // Admission
   const [admissionSource, setAdmissionSource] = useState('other');
   const [diagnosisGroup, setDiagnosisGroup] = useState('medical');
@@ -230,7 +230,7 @@ export default function ApacheIVCalculator() {
       ph: numFields.ph ? Number(numFields.ph) : null,
       na: numFields.na ? Number(numFields.na) : null,
       cr: numFields.cr ? Number(numFields.cr) : null,
-      aki: aki,
+      erc: erc,
       hto: numFields.hto ? Number(numFields.hto) : null,
       wbc: numFields.wbc ? Number(numFields.wbc) : null,
       alb: numFields.alb ? Number(numFields.alb) : null,
@@ -498,7 +498,7 @@ export default function ApacheIVCalculator() {
           <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
         </div>
         <div className="row" style={{ marginTop: 8 }}>
-          <ToggleField label="ERC estadio V / Hemodiálisis" value={aki} onChange={setAki} color="var(--orange, #f97316)" />
+          <ToggleField label="ERC estadio V / Hemodiálisis" value={erc} onChange={setErc} color="var(--orange, #f97316)" />
         </div>
 
         {/* Química */}
