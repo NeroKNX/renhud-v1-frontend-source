@@ -154,7 +154,15 @@ export default function ApacheIVCalculator() {
   const [gcsNa, setGcsNa] = useState(false);
   const [age, setAge] = useState<string>('');
   // Numeric fields
-  const [numFields, setNumFields] = useState<Record<string, string>>({});
+  const DEFAULTS: Record<string, string> = {
+    temp: '37', map: '70', hr: '80', rr: '15',
+    pao2: '90', paco2: '40', ph: '7.4',
+    na: '140', cr: '1', bun: '14',
+    hto: '40', wbc: '10',
+    alb: '4.0', bili: '1', gluc: '100',
+  };
+  const [numFields, setNumFields] = useState<Record<string, string>>(DEFAULTS);
+  const resetFields = useCallback(() => setNumFields({ ...DEFAULTS }), []);
   // Comorbidities
   const [comorbidities, setComorbidities] = useState<Record<string, boolean>>({});
   // Toggles
@@ -561,78 +569,119 @@ export default function ApacheIVCalculator() {
             initial={{ opacity: 0, y: 12, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+            className="space-y-3"
           >
             {(() => {
-              const severityCol = severityColor(result.severity);
+              const sevCol = severityColor(result.severity);
+              const scorePct = result.totalScore / 286;
+              const apsPct = result.aps / 239;
+              const mortPct = result.mortalityPct;
               return (
-              <div className={`rounded-xl border backdrop-blur-sm ${severityCol.border} ${severityCol.bg} overflow-hidden`}>
-                <div className="p-4">
-                  <div className="flex items-end gap-5 mb-1">
-                    <div>
-                      <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Score total</p>
-                      <span className="text-3xl font-bold ren-text-primary tabular-nums">{result.totalScore}</span>
+              <>
+              {/* ─── GRID 2x2 ─── */}
+              <div className="rounded-xl border backdrop-blur-sm overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <div className="grid grid-cols-2" style={{ gap: 0 }}>
+                  {/* APACHE IV Score */}
+                  <div style={{ padding: '20px 12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                      <BarChart3 size={12} style={{ color: '#9CA3AF' }} />
+                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>APACHE IV Score</span>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Severidad</p>
-                      <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${severityCol.bg} ${severityCol.text} border ${severityCol.border} backdrop-blur-sm inline-block mt-0.5`}>{result.severity}</span>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: sevCol.bar.replace('bg-', '').includes('emerald') ? '#34D399' : sevCol.bar.replace('bg-', '').includes('amber') ? '#FBBF24' : sevCol.bar.replace('bg-', '').includes('orange') ? '#FB923C' : '#F87171' }}>{result.totalScore}</span>
+                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>/286</span>
+                    </div>
+                    <div style={{ marginTop: 6, width: 44, height: 4, borderRadius: 999, background: sevCol.bar.replace('bg-', '').includes('emerald') ? '#34D399' : sevCol.bar.replace('bg-', '').includes('amber') ? '#FBBF24' : sevCol.bar.replace('bg-', '').includes('orange') ? '#FB923C' : '#F87171', margin: '6px auto 0' }} />
+                  </div>
+                  {/* APS Score */}
+                  <div style={{ padding: '20px 12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                      <Heart size={12} style={{ color: '#9CA3AF' }} />
+                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>APS Score</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: '#3EFCA5' }}>{result.aps}</span>
+                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>/239</span>
+                    </div>
+                    <div style={{ marginTop: 6, width: 44, height: 4, borderRadius: 999, background: '#3EFCA5', margin: '6px auto 0' }} />
+                  </div>
+                  {/* Mortalidad */}
+                  <div style={{ padding: '20px 12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                      <HeartPulse size={12} style={{ color: '#9CA3AF' }} />
+                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Mortalidad</span>
+                    </div>
+                    <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: mortPct < 10 ? '#34D399' : mortPct < 30 ? '#FBBF24' : '#FE3B3B' }}>{result.mortalityPct}%</span>
+                    <div style={{ marginTop: 6, width: 52, height: 3, borderRadius: 999, background: mortPct < 10 ? '#34D399' : mortPct < 30 ? '#FBBF24' : '#FE3B3B', margin: '6px auto 0' }} />
+                  </div>
+                  {/* LOS */}
+                  <div style={{ padding: '20px 12px', textAlign: 'center' }}>
+                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
+                      <Activity size={12} style={{ color: '#9CA3AF' }} />
+                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Estancia UCI</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: '#A78BFA' }}>{result.losDays}</span>
+                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>días</span>
                     </div>
                   </div>
-
-                  <div className="flex items-start gap-5 flex-wrap mt-3">
-                    <div className="result-meta">
-                      <span className="label">Mortalidad estimada</span>
-                      <span className="value mortality">{result.mortalityPct}%</span>
-                    </div>
-                    <div className="result-meta">
-                      <span className="label">LOS esperada</span>
-                      <span className="value los">{result.losDays} días</span>
-                    </div>
-                    <div className="result-meta">
-                      <span className="label">APS</span>
-                      <span className="value" style={{ color: 'var(--teal)' }}>{result.aps}</span>
-                    </div>
-                  </div>
-
-                  {result.breakdown && (
-                    <>
-                      <div className="section-title" style={{ marginBottom: 10, fontSize: 11 }}>
-                        Score APS por sistema
-                      </div>
-                      <div className="system-pills">
-                        {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
-                          const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
-                          const col = systemSeverityPill(pts);
-                          return (
-                            <span key={sysKey} className={`sys-pill ${col.ring}`}>
-                              <span className={`dot ${col.dot}`} />
-                              {sys.label} <span className="pts">{pts}</span>
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-
-                  {result.diagnosisLabel && (
-                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
-                      <span className="diag-badge">
-                        <FileText size={11} />
-                        {result.diagnosisLabel}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
+
+              {/* ─── Severidad + Diagnóstico ─── */}
+              <div className="rounded-xl border backdrop-blur-sm" style={{ background: 'rgba(30,30,30,1)', borderColor: 'rgba(255,255,255,0.06)', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Severidad</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 999, padding: '1px 10px 1px 8px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', border: '1px solid ' + (sevCol.bar.includes('emerald') ? 'rgba(52,211,153,0.28)' : sevCol.bar.includes('amber') ? 'rgba(251,191,36,0.28)' : sevCol.bar.includes('orange') ? 'rgba(251,146,60,0.28)' : 'rgba(248,113,113,0.28)'), background: sevCol.bar.includes('emerald') ? 'rgba(52,211,153,0.15)' : sevCol.bar.includes('amber') ? 'rgba(251,191,36,0.15)' : sevCol.bar.includes('orange') ? 'rgba(251,146,60,0.15)' : 'rgba(248,113,113,0.15)' }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: sevCol.bar.includes('emerald') ? '#166534' : sevCol.bar.includes('amber') ? '#92400E' : sevCol.bar.includes('orange') ? '#9A3412' : '#991B1B' }} />
+                    {result.severity} <span style={{ fontWeight: 600 }}>({result.mortalityPct}%)</span>
+                  </span>
+                </div>
+                {result.diagnosisLabel && (
+                  <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
+                    <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Diagnóstico</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 999, padding: '3px 10px', fontSize: 10, fontWeight: 600, background: '#9CA3AF', color: '#0a0a0c', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <FileText size={11} />
+                      {result.diagnosisLabel}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* ─── System pills ─── */}
+              {result.breakdown && (
+                <div className="rounded-xl border backdrop-blur-sm" style={{ background: 'rgba(30,30,30,1)', borderColor: 'rgba(255,255,255,0.06)', padding: '10px 14px' }}>
+                  <div className="text-[9px] font-semibold tracking-widest uppercase mb-2" style={{ color: '#9CA3AF' }}>Score APS por sistema</div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
+                      const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
+                      const col = systemSeverityPill(pts);
+                      return (
+                        <span key={sysKey} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium border ${col.ring}`}>
+                          <span className={`w-[5px] h-[5px] rounded-full ${col.dot}`} />
+                          {sys.label} <span className="font-bold">{pts}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* ─── Botones ─── */}
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button onClick={handleCalculate} className="action-btn flex-1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                  <Zap size={12} /> Recalcular
+                </button>
+                <button onClick={copyResult} className="action-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px' }}>
+                  <Copy size={12} /> Copiar
+                </button>
+                <button onClick={() => setResult(null)} className="action-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px' }}>
+                  <Zap size={12} /> Limpiar
+                </button>
+              </div>
+              </>
               );
             })()}
-
-            <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-              <button onClick={handleCalculate} className="action-btn flex-1">Recalcular</button>
-              <button onClick={copyResult} className="action-btn" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Copy size={12} /> Copiar
-              </button>
-              <button onClick={() => setResult(null)} className="action-btn">Limpiar</button>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
