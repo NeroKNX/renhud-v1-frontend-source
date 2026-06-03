@@ -461,19 +461,19 @@ export default function ApacheIVCalculator() {
       {/* ─── FISIOLOGÍA & LABORATORIOS ─── */}
       <Section title="Fisiología & laboratorios">
 
-        {/* Signos vitales */}
+        {/* Signos vitales - T primero */}
         <div className="section-subtitle">Signos vitales</div>
         <div className="row">
+          <NumField label="Temperatura" unit="°C" key_="temp" value={numFields.temp || ''} onChange={v => updateNum('temp', v)} step="0.1" />
+          <NumField label="PAM" unit="mmHg" key_="map" value={numFields.map || ''} onChange={v => updateNum('map', v)} />
           <NumField label="Frecuencia cardíaca" unit="/min" key_="hr" value={numFields.hr || ''} onChange={v => updateNum('hr', v)} />
           <NumField label="Frecuencia respiratoria" unit="/min" key_="rr" value={numFields.rr || ''} onChange={v => updateNum('rr', v)} />
-          <NumField label="PAM" unit="mmHg" key_="map" value={numFields.map || ''} onChange={v => updateNum('map', v)} />
-          <NumField label="Temperatura" unit="°C" key_="temp" value={numFields.temp || ''} onChange={v => updateNum('temp', v)} step="0.1" />
         </div>
 
-        {/* Soporte ventilatorio + gases */}
+        {/* Oxigenación / Gasometría */}
         <div className="section-subtitle">
           <Wind size={14} style={{ verticalAlign: 'middle', marginRight: 4, color: 'var(--teal, #33ccbb)' }} />
-          Soporte ventilatorio
+          Oxigenación / Gasometría
         </div>
         <div className="row" style={{ marginBottom: 8 }}>
           <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
@@ -487,40 +487,42 @@ export default function ApacheIVCalculator() {
           <NumField label="pH arterial" key_="ph" value={numFields.ph || ''} onChange={v => updateNum('ph', v)} step="0.001" />
         </div>
 
-        {/* Electrolitos + Renal */}
+        {/* Función renal */}
         <div className="section-subtitle">
           <Filter size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
-          Electrolitos y función renal
+          Función renal
         </div>
         <div className="row">
           <NumField label="Na⁺" unit="mEq/L" key_="na" value={numFields.na || ''} onChange={v => updateNum('na', v)} />
-          <NumField label="K⁺" unit="mEq/L" key_="k" value={numFields.k || ''} onChange={v => updateNum('k', v)} />
           <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
         </div>
         <div className="row" style={{ marginTop: 8 }}>
           <ToggleField label="ERC estadio V / Hemodiálisis" value={erc} onChange={setErc} color="var(--orange, #f97316)" />
         </div>
-
-        {/* Química */}
-        <div className="section-subtitle">Química</div>
         <div className="row">
           <NumField label="BUN" unit="mg/dL" key_="bun" value={numFields.bun || ''} onChange={v => updateNum('bun', v)} />
-          <NumField label="Albumina" unit="g/dL" key_="alb" value={numFields.alb || ''} onChange={v => updateNum('alb', v)} />
-          <NumField label="Bilirrubina" unit="mg/dL" key_="bili" value={numFields.bili || ''} onChange={v => updateNum('bili', v)} />
+          <NumField label="Diuresis 24h" unit="mL" key_="urine24h" value={numFields.urine24h || ''} onChange={v => updateNum('urine24h', v)} />
         </div>
 
-        {/* Hematología + Glucosa */}
-        <div className="section-subtitle">Hematología y metabolismo</div>
+        {/* Hematología */}
+        <div className="section-subtitle">
+          <Droplets size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+          Hematología
+        </div>
         <div className="row">
           <NumField label="Hto" unit="%" key_="hto" value={numFields.hto || ''} onChange={v => updateNum('hto', v)} />
           <NumField label="Leucocitos" unit="×10³/mm³" key_="wbc" value={numFields.wbc || ''} onChange={v => updateNum('wbc', v)} />
-          <NumField label="Glucosa" unit="mg/dL" key_="gluc" value={numFields.gluc || ''} onChange={v => updateNum('gluc', v)} />
         </div>
 
-        {/* Diuresis */}
-        <div className="section-subtitle">Diuresis</div>
+        {/* Química hepática */}
+        <div className="section-subtitle">
+          <FlaskConical size={14} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+          Química hepática
+        </div>
         <div className="row">
-          <NumField label="Diuresis 24h" unit="mL" key_="urine24h" value={numFields.urine24h || ''} onChange={v => updateNum('urine24h', v)} />
+          <NumField label="Albumina" unit="g/dL" key_="alb" value={numFields.alb || ''} onChange={v => updateNum('alb', v)} />
+          <NumField label="Glucosa" unit="mg/dL" key_="gluc" value={numFields.gluc || ''} onChange={v => updateNum('gluc', v)} />
+          <NumField label="Bilirrubina" unit="mg/dL" key_="bili" value={numFields.bili || ''} onChange={v => updateNum('bili', v)} />
         </div>
 
       </Section>
