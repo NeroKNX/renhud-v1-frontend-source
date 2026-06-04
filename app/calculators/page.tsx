@@ -211,18 +211,13 @@ export default function CalculatorsPage() {
         <div className="flex items-center gap-3">
           <CrowIcon size="lg" animate />
           <div>
-            <h1 className="text-base md:text-lg font-mono tracking-tight ren-text-primary flex items-center gap-2">
-              Calculadoras <span className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-1.5 py-0.5 rounded border border-[var(--ren-border)]">α</span>
+            <h1 className="text-base md:text-lg font-mono tracking-tight">
+              <span className="ren-gradient-text">Calculadoras</span>
             </h1>
-            <p className="text-[10px] md:text-[11px] ren-text-tertiary font-mono">Herramientas clínicas</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {!authLoading && !user && (
-            <button onClick={() => { window.history.replaceState({}, '', '/calculators'); router.push('/login'); }} className="text-[12px] px-3 py-1.5 rounded-lg bg-[var(--accent-color)]/10 text-[var(--accent-color)] border border-[var(--accent-color)]/30 hover:bg-[var(--accent-color)]/20 transition-all font-mono">
-              Iniciar sesión
-            </button>
-          )}
+
           <CalculatorThemeToggle />
           <button
             onClick={() => {
@@ -245,52 +240,25 @@ export default function CalculatorsPage() {
       </header>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Selector — pills compactas para todas las pantallas */}
-        <div className="overflow-x-auto ren-scrollbar border-b border-[var(--ren-border)] shrink-0">
-          <div className="flex gap-1 p-2" style={{ minWidth: 'max-content' }}>
-            {calculators.map(calc => (
-              <button
-                key={calc.id}
-                onClick={() => {
-                  setSelectedId(calc.id);
-                  const url = new URL(window.location.href);
-                  url.searchParams.set('calc', calc.id);
-                  window.history.replaceState({}, '', url.toString());
-                }}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
-                  selectedId === calc.id
-                    ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)]'
-                    : 'bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] ren-text-secondary'
-                }`}
-              >
-                {calc.shortName || calc.name}
-              </button>
-            ))}
-          </div>
-        </div>
+
 
         {/* Contenido principal */}
         <main className="flex-1 overflow-y-auto ren-scrollbar">
           {!selectedId ? (
-            /* Pantalla de bienvenida — tarjetas de navegación */
+            /* Pantalla de bienvenida — tarjetas compactas estilo mockup */
             <div className="flex items-center justify-center min-h-full p-6">
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-lg"
+                className="w-full max-w-[640px]"
               >
-                <div className="text-center mb-8">
-                  <div className="flex justify-center mb-4">
-                    <div className="w-14 h-14 rounded-2xl bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/20 flex items-center justify-center">
-                      <FlaskConical className="w-7 h-7 text-[var(--accent-hover)]" />
-                    </div>
-                  </div>
-                  <h2 className="text-lg font-bold ren-gradient-text mb-1">Calculadoras clínicas</h2>
-                  <p className="text-xs ren-text-secondary leading-relaxed">
+                <div className="text-center mb-6">
+                  <h2 className="text-lg font-bold ren-gradient-text mb-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Herramientas clínicas</h2>
+                  <p className="text-xs ren-text-secondary leading-relaxed max-w-[420px] mx-auto">
                     Scores médicos basados en evidencia.
                   </p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-2.5" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
                   {calculators.map((calc, i) => (
                     <motion.button
                       key={calc.id}
@@ -303,17 +271,17 @@ export default function CalculatorsPage() {
                         url.searchParams.set('calc', calc.id);
                         window.history.replaceState({}, '', url.toString());
                       }}
-                      className="group flex items-center gap-4 p-4 rounded-xl bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:bg-[var(--accent-color)]/5 transition-all text-left"
+                      className="group flex items-center gap-3.5 p-4 rounded-xl bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:bg-[var(--accent-color)]/5 transition-all text-left"
                     >
-                      <span className="w-10 h-10 rounded-xl bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] flex items-center justify-center text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-hover)] group-hover:border-[var(--accent-color)]/30 transition-all shrink-0">
+                      <span className="w-[42px] h-[42px] rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] flex items-center justify-center text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-hover)] group-hover:border-[var(--accent-color)]/30 transition-all shrink-0">
                         {calcIcon(calc.id)}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold ren-text-primary">{calc.shortName || calc.name}</p>
-                        <p className="text-[10px] ren-text-tertiary mt-0.5">{calc.description}</p>
+                        <p className="text-[13px] font-semibold ren-text-primary">{calc.shortName || calc.name}</p>
+                        <p className="text-[11px] ren-text-tertiary mt-0.5 leading-relaxed line-clamp-2">{calc.description}</p>
                         <p className="text-[10px] font-mono ren-text-tertiary mt-1">{calc.variableCount} variables · v{calc.version}</p>
                       </div>
-                      <ChevronRight size={16} className="ren-text-tertiary group-hover:text-[var(--accent-hover)] group-hover:translate-x-0.5 transition-all shrink-0" />
+                      <svg className="ren-text-tertiary group-hover:text-[var(--accent-hover)] group-hover:translate-x-0.5 transition-all shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                     </motion.button>
                   ))}
                 </div>
