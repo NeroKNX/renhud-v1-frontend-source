@@ -258,7 +258,7 @@ export default function CalculatorsPage() {
                     Scores médicos basados en evidencia.
                   </p>
                 </div>
-                <div className="grid grid-cols-1 gap-2.5" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                <div className="grid grid-cols-1 gap-2.5">
                   {calculators.map((calc, i) => (
                     <motion.button
                       key={calc.id}
