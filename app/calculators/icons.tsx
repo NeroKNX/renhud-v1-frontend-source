@@ -2,54 +2,41 @@
 
 export function ApacheIVIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* arco base */}
-      <path d="M4.5 17.5 A8.5 8.5 0 0 1 19.5 17.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
-      {/* zona baja — opacidad baja */}
-      <path d="M4.5 17.5 A8.5 8.5 0 0 1 7.8 10.2" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
-      {/* zona media */}
-      <path d="M7.8 10.2 A8.5 8.5 0 0 1 12 9" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-      {/* zona crítica — opacidad baja derecha */}
-      <path d="M12 9 A8.5 8.5 0 0 1 19.5 17.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.2" />
-      {/* aguja apuntando a zona de riesgo */}
-      <line x1="12" y1="17.5" x2="16.2" y2="12.1" stroke={color} strokeWidth="1.4" strokeLinecap="round" />
-      {/* pivote */}
-      <circle cx="12" cy="17.5" r="1.2" fill={color} />
-      {/* ticks de escala */}
-      <line x1="5.5" y1="17.5" x2="4" y2="17.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
-      <line x1="18.5" y1="17.5" x2="20" y2="17.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
-      <line x1="12" y1="10" x2="12" y2="8.5" stroke={color} strokeWidth="1.2" strokeLinecap="round" opacity="0.4" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* pantalla */}
+      <rect x="2" y="3" width="20" height="14" rx="2" stroke={color} strokeWidth="1.5" />
+      {/* pie */}
+      <line x1="12" y1="17" x2="12" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      <line x1="9" y1="20" x2="15" y2="20" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      {/* onda ECG */}
+      <polyline
+        points="3.5,12 5.5,12 6.5,8 7.5,14 8.5,10 9.5,13 10.5,6 11.5,15 12.5,12 14.5,12"
+        stroke={color} strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round"
+      />
+      {/* valor numérico sugerido — derecha */}
+      <line x1="16" y1="7"   x2="21" y2="7"  stroke={color} strokeWidth="1"   strokeLinecap="round" opacity="0.5" />
+      <line x1="16" y1="9.5" x2="21" y2="9.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
+      <line x1="16" y1="12"  x2="19" y2="12" stroke={color} strokeWidth="1"   strokeLinecap="round" opacity="0.4" />
     </svg>
   );
 }
 
-export function SofaIcon({ size = 18, color = 'currentColor' }: { size?: number; color?: string }) {
+export function SofaIcon({ size = 18, color = "currentColor" }: { size?: number; color?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* hexágono exterior */}
-      <polygon points="12,3 19.8,7.5 19.8,16.5 12,21 4.2,16.5 4.2,7.5" stroke={color} strokeWidth="1.4" fill="none" strokeLinejoin="round" />
-      {/* radios centro → vértices */}
-      <line x1="12" y1="3" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      <line x1="19.8" y1="7.5" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      <line x1="19.8" y1="16.5" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      <line x1="12" y1="21" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      <line x1="4.2" y1="16.5" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      <line x1="4.2" y1="7.5" x2="12" y2="12" stroke={color} strokeWidth="1" opacity="0.25" />
-      {/* 6 segmentos rellenos — opacidad = "score" de cada órgano */}
-      {/* resp */}
-      <path d="M12,12 L12,3 A9,9 0 0,1 19.8,7.5 Z" fill={color} opacity="0.55" />
-      {/* coag */}
-      <path d="M12,12 L19.8,7.5 A9,9 0 0,1 19.8,16.5 Z" fill={color} opacity="0.35" />
-      {/* hepático */}
-      <path d="M12,12 L19.8,16.5 A9,9 0 0,1 12,21 Z" fill={color} opacity="0.2" />
-      {/* cv */}
-      <path d="M12,12 L12,21 A9,9 0 0,1 4.2,16.5 Z" fill={color} opacity="0.45" />
-      {/* snc */}
-      <path d="M12,12 L4.2,16.5 A9,9 0 0,1 4.2,7.5 Z" fill={color} opacity="0.15" />
-      {/* renal */}
-      <path d="M12,12 L4.2,7.5 A9,9 0 0,1 12,3 Z" fill={color} opacity="0.3" />
-      {/* centro */}
-      <circle cx="12" cy="12" r="2" fill="#0e0f11" stroke={color} strokeWidth="1" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      {/* patas */}
+      <line x1="6" y1="19" x2="5.5" y2="21" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      <line x1="18" y1="19" x2="18.5" y2="21" stroke={color} strokeWidth="1.5" strokeLinecap="round"/>
+      {/* asiento */}
+      <rect x="4" y="14" width="16" height="5" rx="1.5" stroke={color} strokeWidth="1.5"/>
+      {/* respaldo */}
+      <path d="M6 14 L6 9 Q6 8 7 8 L17 8 Q18 8 18 9 L18 14" stroke={color} strokeWidth="1.5" strokeLinejoin="round"/>
+      {/* apoyabrazo izquierdo */}
+      <path d="M4 19 L2.5 19 Q2 19 2 18.5 L2 11 Q2 10 3 10 L6 10" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* apoyabrazo derecho */}
+      <path d="M20 19 L21.5 19 Q22 19 22 18.5 L22 11 Q22 10 21 10 L18 10" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* divisor de cojines */}
+      <line x1="12" y1="14" x2="12" y2="19" stroke={color} strokeWidth="1" strokeLinecap="round" opacity="0.35"/>
     </svg>
   );
 }

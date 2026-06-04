@@ -513,7 +513,7 @@ export default function ApacheIVCalculator() {
       {/* ─── FISIOLOGÍA & LABORATORIOS ─── */}
       <Section title="Fisiología & laboratorios">
 
-        {/* Signos vitales - T primero */}
+        {/* Signos vitales — 2 filas de 2 columnas */}
         <div className="section-subtitle">
           <Activity size={14} style={{ verticalAlign: 'middle', marginRight: 4, color: 'var(--teal, #33ccbb)' }} />
           Signos vitales
@@ -521,6 +521,8 @@ export default function ApacheIVCalculator() {
         <div className="row">
           <NumField label="Temperatura" unit="°C" key_="temp" value={numFields.temp || ''} onChange={v => updateNum('temp', v)} step="0.1" />
           <NumField label="PAM" unit="mmHg" key_="map" value={numFields.map || ''} onChange={v => updateNum('map', v)} />
+        </div>
+        <div className="row">
           <NumField label="Frecuencia cardíaca" unit="/min" key_="hr" value={numFields.hr || ''} onChange={v => updateNum('hr', v)} />
           <NumField label="Frecuencia respiratoria" unit="/min" key_="rr" value={numFields.rr || ''} onChange={v => updateNum('rr', v)} />
         </div>
@@ -530,13 +532,14 @@ export default function ApacheIVCalculator() {
           <Wind size={14} style={{ verticalAlign: 'middle', marginRight: 4, color: 'var(--teal, #33ccbb)' }} />
           Oxigenación / Gasometría
         </div>
-        <div className="row" style={{ marginBottom: 8 }}>
-          <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
+
+        <div className="row" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 8, alignItems: 'end' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
             <ToggleField label="Ventilación mecánica" value={ventilated} onChange={setVentilated} color="var(--teal, #14b8a6)" />
           </div>
-        </div>
-        <div className="row">
           <NumField label="FiO₂" unit="%" key_="fio2" value={numFields.fio2 || ''} onChange={v => updateNum('fio2', v)} placeholder="21 (AA)" missing={missingFields.fio2} />
+        </div>
+        <div className="row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
           <NumField label="PaO₂" unit="mmHg" key_="pao2" value={numFields.pao2 || ''} onChange={v => updateNum('pao2', v)} />
           <NumField label="PaCO₂" unit="mmHg" key_="paco2" value={numFields.paco2 || ''} onChange={v => updateNum('paco2', v)} />
           <NumField label="pH arterial" key_="ph" value={numFields.ph || ''} onChange={v => updateNum('ph', v)} step="0.001" />

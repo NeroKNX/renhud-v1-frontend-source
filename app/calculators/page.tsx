@@ -15,11 +15,11 @@ import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
 
 function calcIcon(id: string) {
   switch (id) {
-    case 'apache-iv': return <ApacheIVIcon size={20} />;
-    case 'sofa': return <SofaIcon size={20} />;
+    case 'apache-iv': return <ApacheIVIcon size={32} />;
+    case 'sofa': return <SofaIcon size={22} />;
     case 'news2': return <AlertTriangle className="w-5 h-5" />;
     case 'nihss': return <Brain className="w-5 h-5" />;
-    default: return <Calculator className="w-5 h-5" />;
+    default: return <Calculator className="w-6 h-6" />;
   }
 }
 
