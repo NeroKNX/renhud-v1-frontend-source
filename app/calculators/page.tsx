@@ -309,7 +309,7 @@ export default function CalculatorsPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h2 className="text-base font-bold ren-text-primary tracking-tight">{calc?.name || selectedId}</h2>
-                            {calc?.version && (
+                            {calc?.version && calc.version.length > 0 && (
                               <span className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-2 py-0.5 rounded">v{calc.version}</span>
                             )}
                           </div>

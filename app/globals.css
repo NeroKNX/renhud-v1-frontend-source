@@ -197,7 +197,7 @@ html {
 
 /* Ren gradient text */
 .ren-gradient-text {
-  background: linear-gradient(135deg, #fafafa 30%, #60a5fa, #a78bfa);
+  background: linear-gradient(135deg, #fafafa 30%, #94a3b8, #a78bfa);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -206,7 +206,7 @@ html {
 }
 
 [data-theme="light"] .ren-gradient-text {
-  background: linear-gradient(135deg, #1e293b 30%, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #1e293b 30%, #64748b, #6d28d9);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
