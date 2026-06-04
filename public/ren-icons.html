@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REN — Iconos custom</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --border: rgba(255,255,255,0.08);
+    --accent: #7b8cff;
+    --text: #e8eaf0;
+    --text-muted: #6b7280;
+    --text-dim: #9ca3af;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+  h2 {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+  .icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: rgba(123,140,255,0.08);
+    border: 1px solid rgba(123,140,255,0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-wrap svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  /* sizes */
+  .sizes {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .sz { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .sz span { font-size: 10px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+
+  .icon-bg-sm {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: rgba(123,140,255,0.08);
+    border: 1px solid rgba(123,140,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-bg-sm svg { width: 16px; height: 16px; }
+
+  .icon-bg-md {
+    width: 42px; height: 42px; border-radius: 11px;
+    background: rgba(123,140,255,0.08);
+    border: 1px solid rgba(123,140,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-bg-md svg { width: 22px; height: 22px; }
+
+  .icon-bg-lg {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: rgba(123,140,255,0.08);
+    border: 1px solid rgba(123,140,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .icon-bg-lg svg { width: 28px; height: 28px; }
+
+  /* code block */
+  .code-section { margin-top: 8px; }
+  .code-title {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+    color: #a5b4fc;
+    white-space: pre;
+  }
+  .tag { color: #7b8cff; }
+  .attr { color: #c4b5fd; }
+  .val { color: #34d399; }
+  .comment { color: #4b5563; }
+
+  hr { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+
+<h2>Preview — tamaños</h2>
+<div style="display:flex; gap:40px; margin-bottom:48px; align-items:flex-end;">
+
+  <!-- APACHE IV sizes -->
+  <div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:12px;letter-spacing:0.06em;">APACHE IV</div>
+    <div class="sizes">
+      <div class="sz">
+<div class="icon-bg-sm">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 7.8 10.2" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            <path d="M7.8 10.2 A8.5 8.5 0 0 1 12 9" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path d="M12 9 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+            <line x1="12" y1="17.5" x2="16.2" y2="12.1" stroke="#7b8cff" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="12" cy="17.5" r="1.2" fill="#7b8cff"/>
+            <line x1="5.5" y1="17.5" x2="4" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="18.5" y1="17.5" x2="20" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="12" y1="10" x2="12" y2="8.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <span>16px</span>
+      </div>
+      <div class="sz">
+        <div class="icon-bg-md">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 7.8 10.2" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            <path d="M7.8 10.2 A8.5 8.5 0 0 1 12 9" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path d="M12 9 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+            <line x1="12" y1="17.5" x2="16.2" y2="12.1" stroke="#7b8cff" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="12" cy="17.5" r="1.2" fill="#7b8cff"/>
+            <line x1="5.5" y1="17.5" x2="4" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="18.5" y1="17.5" x2="20" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="12" y1="10" x2="12" y2="8.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <span>22px</span>
+      </div>
+      <div class="sz">
+        <div class="icon-bg-lg">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M4.5 17.5 A8.5 8.5 0 0 1 7.8 10.2" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.35"/>
+            <path d="M7.8 10.2 A8.5 8.5 0 0 1 12 9" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+            <path d="M12 9 A8.5 8.5 0 0 1 19.5 17.5" stroke="#7b8cff" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+            <line x1="12" y1="17.5" x2="16.2" y2="12.1" stroke="#7b8cff" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="12" cy="17.5" r="1.2" fill="#7b8cff"/>
+            <line x1="5.5" y1="17.5" x2="4" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="18.5" y1="17.5" x2="20" y2="17.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+            <line x1="12" y1="10" x2="12" y2="8.5" stroke="#7b8cff" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <span>28px</span>
+      </div>
+    </div>
+  </div>
+<!-- SOFA sizes -->
+  <div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:#6b7280;margin-bottom:12px;letter-spacing:0.06em;">SOFA</div>
+    <div class="sizes">
+      <div class="sz">
+        <div class="icon-bg-sm">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12,3 19.8,7.5 19.8,16.5 12,21 4.2,16.5 4.2,7.5" stroke="#7b8cff" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+            <line x1="12" y1="3" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="12" y1="21" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <!-- filled segments: resp full, coag 80%, hepatico 40%, cv 60%, snc 30%, renal 70% -->
+            <path d="M12,12 L12,3 A9,9 0 0,1 19.8,7.5 Z" fill="#7b8cff" opacity="0.55"/>
+            <path d="M12,12 L19.8,7.5 A9,9 0 0,1 19.8,16.5 Z" fill="#7b8cff" opacity="0.35"/>
+            <path d="M12,12 L19.8,16.5 A9,9 0 0,1 12,21 Z" fill="#7b8cff" opacity="0.2"/>
+            <path d="M12,12 L12,21 A9,9 0 0,1 4.2,16.5 Z" fill="#7b8cff" opacity="0.45"/>
+            <path d="M12,12 L4.2,16.5 A9,9 0 0,1 4.2,7.5 Z" fill="#7b8cff" opacity="0.15"/>
+            <path d="M12,12 L4.2,7.5 A9,9 0 0,1 12,3 Z" fill="#7b8cff" opacity="0.3"/>
+            <circle cx="12" cy="12" r="2" fill="#0e0f11" stroke="#7b8cff" stroke-width="1"/>
+          </svg>
+        </div>
+        <span>16px</span>
+      </div>
+      <div class="sz">
+        <div class="icon-bg-md">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12,3 19.8,7.5 19.8,16.5 12,21 4.2,16.5 4.2,7.5" stroke="#7b8cff" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+            <line x1="12" y1="3" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="12" y1="21" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <path d="M12,12 L12,3 A9,9 0 0,1 19.8,7.5 Z" fill="#7b8cff" opacity="0.55"/>
+            <path d="M12,12 L19.8,7.5 A9,9 0 0,1 19.8,16.5 Z" fill="#7b8cff" opacity="0.35"/>
+            <path d="M12,12 L19.8,16.5 A9,9 0 0,1 12,21 Z" fill="#7b8cff" opacity="0.2"/>
+            <path d="M12,12 L12,21 A9,9 0 0,1 4.2,16.5 Z" fill="#7b8cff" opacity="0.45"/>
+            <path d="M12,12 L4.2,16.5 A9,9 0 0,1 4.2,7.5 Z" fill="#7b8cff" opacity="0.15"/>
+            <path d="M12,12 L4.2,7.5 A9,9 0 0,1 12,3 Z" fill="#7b8cff" opacity="0.3"/>
+            <circle cx="12" cy="12" r="2" fill="#0e0f11" stroke="#7b8cff" stroke-width="1"/>
+          </svg>
+        </div>
+        <span>22px</span>
+      </div>
+      <div class="sz">
+        <div class="icon-bg-lg">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="12,3 19.8,7.5 19.8,16.5 12,21 4.2,16.5 4.2,7.5" stroke="#7b8cff" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+<line x1="12" y1="3" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="19.8" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="12" y1="21" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="16.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <line x1="4.2" y1="7.5" x2="12" y2="12" stroke="#7b8cff" stroke-width="1" opacity="0.25"/>
+            <path d="M12,12 L12,3 A9,9 0 0,1 19.8,7.5 Z" fill="#7b8cff" opacity="0.55"/>
+            <path d="M12,12 L19.8,7.5 A9,9 0 0,1 19.8,16.5 Z" fill="#7b8cff" opacity="0.35"/>
+            <path d="M12,12 L19.8,16.5 A9,9 0 0,1 12,21 Z" fill="#7b8cff" opacity="0.2"/>
+            <path d="M12,12 L12,21 A9,9 0 0,1 4.2,16.5 Z" fill="#7b8cff" opacity="0.45"/>
+            <path d="M12,12 L4.2,16.5 A9,9 0 0,1 4.2,7.5 Z" fill="#7b8cff" opacity="0.15"/>
+            <path d="M12,12 L4.2,7.5 A9,9 0 0,1 12,3 Z" fill="#7b8cff" opacity="0.3"/>
+            <circle cx="12" cy="12" r="2" fill="#0e0f11" stroke="#7b8cff" stroke-width="1"/>
+          </svg>
+        </div>
+        <span>28px</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<hr>
+
+<!-- JSX CODE -->
+<div class="code-section">
+  <div class="code-title">JSX — listo para pegar</div>
+  <pre><span class="comment">// ApacheIVIcon — gauge semicircular con aguja</span>
+<span class="comment">// Trazo segmentado: zona crítica (opaco) → zona baja (tenue)</span>
+<span class="tag">const</span> ApacheIVIcon = ({ size = 18, color = <span class="val">"currentColor"</span> }) => (
+  &lt;<span class="tag">svg</span>
+    <span class="attr">width</span>=<span class="val">{size}</span>
+    <span class="attr">height</span>=<span class="val">{size}</span>
+    <span class="attr">viewBox</span>=<span class="val">"0 0 24 24"</span>
+    <span class="attr">fill</span>=<span class="val">"none"</span>
+    <span class="attr">xmlns</span>=<span class="val">"http://www.w3.org/2000/svg"</span>
+  &gt;
+    <span class="comment">{/* arco base */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M4.5 17.5 A8.5 8.5 0 0 1 19.5 17.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.5"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> /&gt;
+    <span class="comment">{/* zona baja — opacidad baja */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M4.5 17.5 A8.5 8.5 0 0 1 7.8 10.2"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.5"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.35"</span> /&gt;
+    <span class="comment">{/* zona media */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M7.8 10.2 A8.5 8.5 0 0 1 12 9"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.5"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.6"</span> /&gt;
+    <span class="comment">{/* zona crítica — opacidad baja derecha */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12 9 A8.5 8.5 0 0 1 19.5 17.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.5"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.2"</span> /&gt;
+<span class="comment">{/* aguja apuntando a zona de riesgo */}</span>
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"12"</span> <span class="attr">y1</span>=<span class="val">"17.5"</span> <span class="attr">x2</span>=<span class="val">"16.2"</span> <span class="attr">y2</span>=<span class="val">"12.1"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.4"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> /&gt;
+    <span class="comment">{/* pivote */}</span>
+    &lt;<span class="tag">circle</span> <span class="attr">cx</span>=<span class="val">"12"</span> <span class="attr">cy</span>=<span class="val">"17.5"</span> <span class="attr">r</span>=<span class="val">"1.2"</span> <span class="attr">fill</span>=<span class="val">{color}</span> /&gt;
+    <span class="comment">{/* ticks de escala */}</span>
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"5.5"</span> <span class="attr">y1</span>=<span class="val">"17.5"</span> <span class="attr">x2</span>=<span class="val">"4"</span> <span class="attr">y2</span>=<span class="val">"17.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.2"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.4"</span> /&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"18.5"</span> <span class="attr">y1</span>=<span class="val">"17.5"</span> <span class="attr">x2</span>=<span class="val">"20"</span> <span class="attr">y2</span>=<span class="val">"17.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.2"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.4"</span> /&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"12"</span> <span class="attr">y1</span>=<span class="val">"10"</span> <span class="attr">x2</span>=<span class="val">"12"</span> <span class="attr">y2</span>=<span class="val">"8.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.2"</span> <span class="attr">strokeLinecap</span>=<span class="val">"round"</span> <span class="attr">opacity</span>=<span class="val">"0.4"</span> /&gt;
+  &lt;/<span class="tag">svg</span>&gt;
+);
+
+
+<span class="comment">// SofaIcon — hexágono radar con 6 segmentos (uno por órgano)</span>
+<span class="comment">// Opacidades distintas simulan puntuación diferente por sistema</span>
+<span class="tag">const</span> SofaIcon = ({ size = 18, color = <span class="val">"currentColor"</span> }) => (
+  &lt;<span class="tag">svg</span>
+    <span class="attr">width</span>=<span class="val">{size}</span>
+    <span class="attr">height</span>=<span class="val">{size}</span>
+    <span class="attr">viewBox</span>=<span class="val">"0 0 24 24"</span>
+    <span class="attr">fill</span>=<span class="val">"none"</span>
+    <span class="attr">xmlns</span>=<span class="val">"http://www.w3.org/2000/svg"</span>
+  &gt;
+    <span class="comment">{/* hexágono exterior */}</span>
+    &lt;<span class="tag">polygon</span>
+      <span class="attr">points</span>=<span class="val">"12,3 19.8,7.5 19.8,16.5 12,21 4.2,16.5 4.2,7.5"</span>
+      <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1.4"</span> <span class="attr">fill</span>=<span class="val">"none"</span> <span class="attr">strokeLinejoin</span>=<span class="val">"round"</span>
+/&gt;
+    <span class="comment">{/* radios centro → vértices */}</span>
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"12"</span> <span class="attr">y1</span>=<span class="val">"3"</span>    <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"19.8"</span> <span class="attr">y1</span>=<span class="val">"7.5"</span>  <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"19.8"</span> <span class="attr">y1</span>=<span class="val">"16.5"</span> <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"12"</span>   <span class="attr">y1</span>=<span class="val">"21"</span>   <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"4.2"</span>  <span class="attr">y1</span>=<span class="val">"16.5"</span> <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    &lt;<span class="tag">line</span> <span class="attr">x1</span>=<span class="val">"4.2"</span>  <span class="attr">y1</span>=<span class="val">"7.5"</span>  <span class="attr">x2</span>=<span class="val">"12"</span>   <span class="attr">y2</span>=<span class="val">"12"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> <span class="attr">opacity</span>=<span class="val">"0.25"</span>/&gt;
+    <span class="comment">{/* 6 segmentos rellenos — opacidad = "score" de cada órgano */}</span>
+    <span class="comment">{/* resp */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L12,3 A9,9 0 0,1 19.8,7.5 Z"</span>    <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.55"</span>/&gt;
+    <span class="comment">{/* coag */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L19.8,7.5 A9,9 0 0,1 19.8,16.5 Z"</span>  <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.35"</span>/&gt;
+    <span class="comment">{/* hepático */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L19.8,16.5 A9,9 0 0,1 12,21 Z"</span>    <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.2"</span>/&gt;
+<span class="comment">{/* cv */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L12,21 A9,9 0 0,1 4.2,16.5 Z"</span>    <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.45"</span>/&gt;
+    <span class="comment">{/* snc */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L4.2,16.5 A9,9 0 0,1 4.2,7.5 Z"</span>   <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.15"</span>/&gt;
+    <span class="comment">{/* renal */}</span>
+    &lt;<span class="tag">path</span> <span class="attr">d</span>=<span class="val">"M12,12 L4.2,7.5 A9,9 0 0,1 12,3 Z"</span>      <span class="attr">fill</span>=<span class="val">{color}</span> <span class="attr">opacity</span>=<span class="val">"0.3"</span>/&gt;
+    <span class="comment">{/* centro */}</span>
+    &lt;<span class="tag">circle</span> <span class="attr">cx</span>=<span class="val">"12"</span> <span class="attr">cy</span>=<span class="val">"12"</span> <span class="attr">r</span>=<span class="val">"2"</span>
+      <span class="attr">fill</span>=<span class="val">"#0e0f11"</span> <span class="attr">stroke</span>=<span class="val">{color}</span> <span class="attr">strokeWidth</span>=<span class="val">"1"</span> /&gt;
+  &lt;/<span class="tag">svg</span>&gt;
+);
+</pre>
+</div>
+
+</body>
+</html>
