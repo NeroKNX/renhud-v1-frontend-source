@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Search, Sun, Moon } from 'lucide-react';
 import { ApacheIVIcon, SofaIcon } from './icons';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -28,11 +28,22 @@ const fichasTecnicas: Record<string, {
   proposito: string;
   origen: string;
   interpretacion: { rango: string; significado: string }[];
+  ventanaTerapeutica?: string[];
   limitaciones: string[];
   comoEvaluar?: { item: string; detalle: string; puntuacion: string }[];
+  qsofa?: {
+    proposito: string;
+    origen: string;
+    interpretacion: { rango: string; significado: string }[];
+    limitaciones: string[];
+  };
+  referenciaRapida?: {
+    pesos: { variable: string; pts: string }[];
+    rangosCero: { variable: string; rango: string }[];
+  };
 }> = {
   'apache-iv': {
-    proposito: 'Predecir mortalidad hospitalaria y días de estancia (LOS) en pacientes críticamente enfermos al ingreso a UCI. El score combina el APS (Acute Physiology Score) con edad, diagnóstico de ingreso y condiciones crónicas.',
+    proposito: 'Predecir mortalidad hospitalaria y estancia esperada en UCI a partir de los peores valores fisiológicos de las primeras 24 horas de ingreso. Permite además comparar el desempeño de una unidad evaluando mortalidad predicha vs. mortalidad observada.',
     origen: 'Zimmerman JE et al. Acute Physiology and Chronic Health Evaluation (APACHE) IV. Crit Care Med 2006;34(5):1297-310.',
     interpretacion: [
       { rango: 'Score bruto sin rango fijo', significado: 'APS 0–299 aprox. A mayor APS, mayor mortalidad esperada' },
@@ -44,23 +55,68 @@ const fichasTecnicas: Record<string, {
     limitaciones: [
       'Requiere datos de las primeras 24 horas de ingreso a UCI; no aplica para reingresos con nuevo cálculo.',
       'Los valores fisiológicos deben ser los PEORES de las primeras 24h, no los primeros disponibles.',
+      'Validado en población norteamericana — puede sobreestimar mortalidad en contextos latinoamericanos.',
+      'No predice calidad de vida ni funcionalidad post-UCI.',
+      'No debe usarse como criterio único para limitar el esfuerzo terapéutico.',
     ],
+    referenciaRapida: {
+      pesos: [
+        { variable: 'Glasgow', pts: 'hasta 48 pts si GCS 3' },
+        { variable: 'PAM', pts: 'hasta 20 pts en hipotensión severa' },
+        { variable: 'Frecuencia respiratoria', pts: 'hasta 17 pts en extremos' },
+        { variable: 'PaO₂/FiO₂', pts: 'hasta 15 pts si < 100' },
+        { variable: 'pH arterial', pts: 'hasta 12 pts fuera de rango' },
+        { variable: 'Creatinina + diuresis', pts: 'hasta 10 pts combinados' },
+      ],
+      rangosCero: [
+        { variable: 'Temperatura', rango: '36 – 38.4 °C' },
+        { variable: 'PAM', rango: '70 – 109 mmHg' },
+        { variable: 'FC', rango: '60 – 99 /min' },
+        { variable: 'FR', rango: '12 – 19 /min' },
+        { variable: 'pH', rango: '7.33 – 7.49' },
+        { variable: 'Na⁺', rango: '135 – 144 mEq/L' },
+        { variable: 'Creatinina', rango: '0.5 – 1.4 mg/dL' },
+        { variable: 'Hto', rango: '30 – 45%' },
+        { variable: 'Leucocitos', rango: '3 – 14.9 ×10³/mm³' },
+        { variable: 'Glucosa', rango: '60 – 179 mg/dL' },
+        { variable: 'Albúmina', rango: '2.0 – 3.4 g/dL' },
+        { variable: 'Bilirrubina', rango: '< 2.0 mg/dL' },
+        { variable: 'Glasgow', rango: '15' },
+        { variable: 'PaO₂ (sin VM)', rango: '> 70 mmHg' },
+      ],
+    },
   },
   'sofa': {
-    proposito: 'Cuantificar la disfunción orgánica en UCI. Diagnóstico de sepsis (aumento ≥ 2 puntos sobre basal en paciente con infección sospechada). Útil para seguimiento evolutivo diario.',
-    origen: 'Vincent JL et al. Intensive Care Med 1996;22:707-10. Redefinido para sepsis en: Singer M et al. JAMA 2016 (Sepsis-3).',
+    proposito: 'Cuantificar el grado de disfunción orgánica evaluando 6 sistemas de forma independiente. Permite diagnosticar sepsis (aumento ≥2 puntos sobre basal en paciente con infección sospechada), monitorear tendencia clínica día a día y soportar decisiones de escalada o desescalada terapéutica.',
+    origen: 'Desarrollado por Vincent et al. (1996) en la European Society of Intensive Care Medicine como herramienta de descripción de disfunción orgánica secuencial. Adoptado por Sepsis-3 (2016) como criterio diagnóstico de sepsis.\n\nVincent JL et al. Intensive Care Med. 1996;22:707–710.\nSinger M et al. JAMA. 2016;315(8):801–810.',
     interpretacion: [
-      { rango: '0–6', significado: 'Disfunción leve. Mortalidad ~1–5%.' },
-      { rango: '7–9', significado: 'Disfunción moderada. Mortalidad ~15–20%.' },
-      { rango: '10–12', significado: 'Disfunción severa. Mortalidad ~40–50%.' },
-      { rango: '> 12', significado: 'Falla multiorgánica. Mortalidad > 50–80%.' },
+      { rango: '0–6 puntos', significado: 'Disfunción leve. Mortalidad ~1–5%.' },
+      { rango: '7–9 puntos', significado: 'Disfunción moderada. Mortalidad ~15–20%.' },
+      { rango: '10–12 puntos', significado: 'Disfunción severa. Mortalidad ~40–50%.' },
+      { rango: '> 12 puntos', significado: 'Falla multiorgánica. Mortalidad > 50–80%.' },
     ],
     limitaciones: [
-      'Cardiovascular: la puntuación depende del esquema local de vasopresores (dopamina, epinefrina, norepinefrina). Un mismo paciente puede puntuar distinto según protocolo.',
-      'Basal desconocida: si no hay disfunción orgánica previa conocida, asumir SOFA basal = 0. Esto puede subestimar el delta si el paciente tenía disfunción crónica.',
+      'Cardiovascular: la puntuación depende del esquema local de vasopresores. Un mismo paciente puede puntuar distinto según protocolo institucional.',
+      'Basal desconocida: si no hay disfunción orgánica previa documentada, asumir SOFA basal = 0. Esto puede subestimar el delta si el paciente tenía disfunción crónica.',
       'Delta SOFA: el diagnóstico de sepsis por Sepsis-3 requiere aumento ≥2 puntos sobre basal. En el primer cálculo no hay basal, así que no se puede clasificar como sepsis solo con un SOFA de ingreso.',
-      'SOFA-2 (ESICM, en validación) podría reemplazar al SOFA actual; los puntos de corte pueden cambiar.',
+      'SOFA-2 (ESICM, en validación) podría reemplazar al SOFA actual — los puntos de corte pueden cambiar.',
+      'No fue diseñado para uso fuera de UCI.',
     ],
+    qsofa: {
+      proposito: 'Identificar pacientes fuera de UCI con sospecha de infección y riesgo elevado de deterioro clínico o muerte. Funciona como cribado rápido — no diagnostica sepsis, sino que indica cuándo escalar la evaluación con SOFA completo.',
+      origen: 'Definido en Sepsis-3 (2016) como herramienta de cribado extrahospitalario y de sala general. No reemplaza al SOFA — lo precede.\n\nSinger M et al. JAMA. 2016;315(8):801–810.',
+      interpretacion: [
+        { rango: '0–1 puntos', significado: 'Bajo riesgo. No descarta infección ni sepsis. Continuar evaluación clínica habitual.' },
+        { rango: '≥ 2 puntos', significado: 'Alto riesgo. Mortalidad intrahospitalaria > 10% en pacientes con infección sospechada. Evaluar con SOFA completo y considerar monitoreo estrecho o traslado a UCI.' },
+      ],
+      limitaciones: [
+        'Baja sensibilidad: puede no detectar sepsis en fases tempranas o presentación atípica.',
+        'No aplica en UCI — fue diseñado para entornos de baja vigilancia.',
+        'Un qSOFA < 2 no descarta sepsis si hay alta sospecha clínica.',
+        'No sustituye el juicio clínico ni los criterios SIRS en contextos donde aún se usan.',
+        'Validación limitada en poblaciones latinoamericanas e inmunosuprimidos.',
+      ],
+    },
     comoEvaluar: [
       { item: 'Respiratorio', detalle: 'Usar el PEOR valor PaO₂/FiO₂ del día. Si el paciente está ventilado mecánicamente, aplicar puntajes 3-4 solo cuando está en VM (no aplica en ventilación espontánea con máscara).', puntuacion: '0: ≥400 | 1: 300–399 | 2: 200–299 | 3: 100–199 | 4: <100' },
       { item: 'Coagulación', detalle: 'Usar el recuento de plaquetas más bajo del día.', puntuacion: '0: ≥150 | 1: 100–149 | 2: 50–99 | 3: 20–49 | 4: <20' },
@@ -71,13 +127,13 @@ const fichasTecnicas: Record<string, {
     ],
   },
   'news2': {
-    proposito: 'Detección temprana de deterioro clínico en sala general, urgencias y entornos prehospitalarios. Sistema estandarizado del NHS (Reino Unido).',
-    origen: 'Royal College of Physicians. National Early Warning Score (NEWS) 2. RCP London, 2017. Endosado por NHS England.',
+    proposito: 'Detectar deterioro clínico temprano en sala general, urgencias y entornos prehospitalarios mediante 7 parámetros fisiológicos estandarizados. Define el umbral de respuesta clínica — desde monitoreo rutinario hasta activación de equipo de emergencia o traslado a UCI.',
+    origen: 'Desarrollado por el Royal College of Physicians (RCP) del Reino Unido en 2017 como evolución del NEWS original (2012). Endosado por NHS England como estándar nacional de alerta temprana.\n\nRoyal College of Physicians. National Early Warning Score (NEWS) 2. RCP London, 2017.',
     interpretacion: [
       { rango: '0', significado: 'Sin riesgo. Monitoreo rutinario c/12h.' },
-      { rango: '1–4', significado: 'Bajo riesgo. Evaluar cada 4–6h. Notificar si empeora.' },
-      { rango: '5–6 o cualquier componente = 3', significado: 'Riesgo medio. Evaluación médica urgente.' },
-      { rango: '≥ 7', significado: 'Riesgo alto. Evaluación de emergencia. Considerar UCI.' },
+      { rango: '1–4', significado: 'Bajo riesgo. Evaluar c/4–6h. Notificar si empeora.' },
+      { rango: '5–6 o cualquier componente = 3', significado: 'Riesgo medio. Evaluación médica urgente. Monitoreo c/1h.' },
+      { rango: '≥ 7', significado: 'Riesgo alto. Evaluación de emergencia inmediata. Considerar UCI. Monitoreo continuo.' },
     ],
     limitaciones: [
       'Diseñado para contexto hospitalario británico; validación en poblaciones latinoamericanas limitada.',
@@ -97,15 +153,19 @@ const fichasTecnicas: Record<string, {
     ],
   },
   'nihss': {
-    proposito: 'Cuantificar la severidad neurológica en ACV agudo. Guía decisiones de trombólisis/trombectomía y monitoreo de evolución.',
-    origen: 'Brott T et al. Stroke 1989. Actualización NINDS 2024.',
+    proposito: 'Cuantificar la severidad del déficit neurológico en ACV agudo isquémico. Determina elegibilidad para trombólisis IV y trombectomía mecánica, y documenta evolución neurológica en seguimiento serial.',
+    origen: 'Desarrollado por Brott et al. (1989) en el National Institute of Neurological Disorders and Stroke. Actualizado por NINDS en 2024 como estándar internacional para ensayos clínicos y práctica clínica en stroke agudo.\n\nBrott T et al. Measurements of acute cerebral infarction: a clinical examination scale. Stroke. 1989;20(7):864–870.',
     interpretacion: [
       { rango: '0', significado: 'Sin síntomas neurológicos.' },
-      { rango: '1–4', significado: 'ACV menor. 80% alta a domicilio.' },
-      { rango: '5–15', significado: 'Moderado. Requiere rehabilitación intrahospitalaria.' },
-      { rango: '16–20', significado: 'Moderado-severo.' },
+      { rango: '1–4', significado: 'ACV menor. 80% alta a domicilio. Considerar trombólisis si hay déficit discapacitante.' },
+      { rango: '5–15', significado: 'Moderado. Requiere rehabilitación intrahospitalaria. Candidato a trombólisis y trombectomía.' },
+      { rango: '16–20', significado: 'Moderado-severo. Candidato prioritario a trombectomía si hay oclusión de gran vaso.' },
       { rango: '21–42', significado: 'Severo. Frecuentemente requiere cuidado institucional.' },
-      { rango: '≥ 7', significado: 'Predictor de oclusión de gran vaso (sens 68–81%).' },
+      { rango: '≥ 7', significado: 'Predictor de oclusión de gran vaso (sensibilidad 68–81%). Activar protocolo de trombectomía.' },
+    ],
+    ventanaTerapeutica: [
+      'Trombólisis IV (alteplase/tenecteplase): hasta 4.5h desde inicio de síntomas. NIHSS ≥4 generalmente requerido.',
+      'Trombectomía mecánica: hasta 24h en candidatos seleccionados con penumbra viable.',
     ],
     limitaciones: [
       'Sesgo hemisférico: subestima ACV derecho. A igual NIHSS, el volumen del infarto derecho es ~2× el izquierdo.',
@@ -114,6 +174,7 @@ const fichasTecnicas: Record<string, {
       'Ítems UN (no testeable) no suman puntos pero deben documentarse.',
       'Anotar siempre lo que el paciente HACE, no lo que puede hacer.',
       'Administración: 5–8 minutos. Sin ayuda al paciente. Sin suposiciones.',
+      'No predice pronóstico funcional de forma aislada — combinar con edad, basal funcional y volumen de infarto.',
     ],
     comoEvaluar: [
       { item: '1a. Alerta', detalle: 'Evaluar el nivel de conciencia. Si el paciente no responde completamente, aplicar estímulo verbal y luego doloroso (presión en lecho ungueal o trapecio).', puntuacion: '0: Alerta, responde bien. 1: No alerta pero responde a estímulo menor. 2: Solo responde a estímulos repetidos/dolor. 3: Sin respuesta o reflejos solamente.' },
@@ -309,9 +370,6 @@ export default function CalculatorsPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h2 className="text-base font-bold ren-text-primary tracking-tight">{calc?.name || selectedId}</h2>
-                            {calc?.version && calc.version.length > 0 && (
-                              <span className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-2 py-0.5 rounded">v{calc.version}</span>
-                            )}
                           </div>
                           <p className="text-xs ren-text-secondary mt-0.5 leading-relaxed">{calc?.description}</p>
                           <div className="flex gap-4 mt-1.5">
@@ -335,7 +393,9 @@ export default function CalculatorsPage() {
                           const tabs = [
                             { id: 'proposito', label: 'Propósito', icon: Info },
                             { id: 'interpretacion', label: 'Interpretación', icon: BarChart3 },
+                            ...(f.referenciaRapida ? [{ id: 'referencia-rapida', label: 'Referencia rápida', icon: Zap }] : []),
                             ...(f.comoEvaluar ? [{ id: 'como-evaluar', label: 'Cómo evaluar', icon: BookOpen }] : []),
+                            ...(f.qsofa ? [{ id: 'qsofa', label: 'qSOFA', icon: Search }] : []),
                             { id: 'limitaciones', label: 'Limitaciones', icon: AlertTriangle },
                           ];
                           const activeTabId = tabs[fichaTab]?.id;
@@ -399,6 +459,112 @@ export default function CalculatorsPage() {
                                             <p className="text-[11px] ren-text-secondary leading-relaxed">{i.significado}</p>
                                           </div>
                                         ))}
+                                      </div>
+                                      {f === fichas.news2 && (
+                                        <div className="mt-3 border border-amber-500/30 bg-amber-500/5 rounded-lg p-3">
+                                          <p className="text-[11px] text-amber-300 leading-relaxed">
+                                            <strong>Regla clave:</strong> Cualquier componente individual con puntuación 3 activa respuesta
+                                            urgente independientemente del score total.
+                                          </p>
+                                        </div>
+                                      )}
+                                      {f.ventanaTerapeutica && (
+                                        <div className="mt-3 border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                          <p className="text-[11px] font-semibold ren-text-primary mb-2">Ventana terapéutica</p>
+                                          <ul className="space-y-1.5">
+                                            {f.ventanaTerapeutica.map((v: string, i: number) => (
+                                              <li key={i} className="text-[11px] ren-text-secondary leading-relaxed flex items-start gap-1.5">
+                                                <span className="text-indigo-400 shrink-0 mt-px">▸</span>
+                                                {v}
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      )}
+                                    </motion.div>
+                                  )}
+
+                                  {/* Tab: qSOFA */}
+                                  {activeTabId === 'qsofa' && f.qsofa && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="mb-3">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Propósito</p>
+                                        <p className="text-xs ren-text-secondary leading-relaxed">{f.qsofa.proposito}</p>
+                                      </div>
+                                      <div className="mb-4">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-1">Origen</p>
+                                        <p className="text-[11px] ren-text-tertiary italic leading-relaxed whitespace-pre-line">{f.qsofa.origen}</p>
+                                      </div>
+                                      <div className="mb-4">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">Interpretación</p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                          {f.qsofa.interpretacion.map((i, idx) => (
+                                            <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                              <p className="text-xs font-mono font-semibold ren-text-primary mb-1">{i.rango}</p>
+                                              <p className="text-[11px] ren-text-secondary leading-relaxed">{i.significado}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">Limitaciones</p>
+                                        <ul className="space-y-2">
+                                          {f.qsofa.limitaciones.map((l, idx) => (
+                                            <li key={idx} className="text-[11px] ren-text-tertiary leading-relaxed flex items-start gap-2">
+                                              <span className="w-1 h-1 rounded-full bg-[var(--accent-color)]/60 mt-1.5 shrink-0" />
+                                              {l}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                    </motion.div>
+                                  )}
+
+                                  {/* Tab: Referencia rápida */}
+                                  {activeTabId === 'referencia-rapida' && f.referenciaRapida && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      {/* Variables de mayor peso */}
+                                      <div className="mb-4">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">
+                                          Variables de mayor peso en el APS
+                                        </p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                          {f.referenciaRapida.pesos.map((p, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
+                                            >
+                                              <span className="text-[11px] ren-text-secondary">{p.variable}</span>
+                                              <span className="text-[11px] font-mono font-semibold text-amber-400/90">{p.pts}</span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {/* Rangos que suman 0 */}
+                                      <div>
+                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">
+                                          Rangos que suman 0 puntos (fisiología normal)
+                                        </p>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                          {f.referenciaRapida.rangosCero.map((r, idx) => (
+                                            <div
+                                              key={idx}
+                                              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
+                                            >
+                                              <span className="text-[11px] ren-text-secondary">{r.variable}</span>
+                                              <span className="text-[11px] font-mono text-emerald-400/80">{r.rango}</span>
+                                            </div>
+                                          ))}
+                                        </div>
                                       </div>
                                     </motion.div>
                                   )}
