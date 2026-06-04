@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Wind, Droplets, Heart, Brain, Zap, BarChart3, AlertCircle, Copy, ChevronRight, FileText, FlaskConical, Filter } from 'lucide-react';
+import { Wind, Droplets, Heart, Brain, Zap, BarChart3, AlertCircle, Copy, ChevronRight, FileText, FlaskConical, Filter, Calculator } from 'lucide-react';
 
 // ── Score intensity styling for SOFA buttons ──
 function sofaBtnStyle(score: number, active: boolean) {
@@ -51,6 +51,15 @@ export default function SofaCalculator() {
   const [result, setResult] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Mini calculadoras
+  const [paFiOpen, setPaFiOpen] = useState(false);
+  const [paFiPaO2, setPaFiPaO2] = useState('');
+  const [paFiFiO2, setPaFiFiO2] = useState('');
+  const [gcsOpen, setGcsOpen] = useState(false);
+  const [gcsEye, setGcsEye] = useState('');
+  const [gcsVerbal, setGcsVerbal] = useState('');
+  const [gcsMotor, setGcsMotor] = useState('');
 
   const updateValue = (key: string, value: any) => {
     setFormValues(prev => ({ ...prev, [key]: value }));
@@ -153,15 +162,91 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Wind size={12} /> Respiratorio — PaFi
+            <button onClick={() => setPaFiOpen(!paFiOpen)} className={`ml-auto text-[9px] font-mono px-2 py-1 rounded-lg border transition-all flex items-center gap-1 ${paFiOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
+              <Calculator size={10} />
+              {paFiOpen ? 'Cerrar' : 'Calcular PaFi'}
+            </button>
             {(() => {
               const v = formValues.sofa_paFi;
               if (v == null) return null;
               const m: Record<number,number> = {400:0,350:1,250:2,150:3,50:4};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
+
+        {/* Mini calculadora PaFi */}
+        {paFiOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 p-3 rounded-lg bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
+          >
+            <p className="text-[10px] font-mono uppercase tracking-widest text-cyan-400/80 mb-2">Calcular PaFi desde PaO₂ y FiO₂</p>
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <label className="block text-[10px] font-mono ren-text-secondary mb-1">PaO₂ (mmHg)</label>
+                <input
+                  type="number"
+                  value={paFiPaO2}
+                  onChange={e => setPaFiPaO2(e.target.value)}
+                  placeholder="ej: 85"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-[10px] font-mono ren-text-secondary mb-1">FiO₂ (%)</label>
+                <input
+                  type="number"
+                  value={paFiFiO2}
+                  onChange={e => setPaFiFiO2(e.target.value)}
+                  placeholder="ej: 40"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
+                />
+              </div>
+              <button
+                onClick={() => {
+                  const paO2 = parseFloat(paFiPaO2);
+                  const fio2 = parseFloat(paFiFiO2);
+                  if (paO2 > 0 && fio2 > 0 && fio2 <= 100) {
+                    const paFi = Math.round(paO2 / (fio2 / 100));
+                    let sofaVal: number;
+                    if (paFi >= 400) sofaVal = 400;
+                    else if (paFi >= 300) sofaVal = 350;
+                    else if (paFi >= 200) sofaVal = 250;
+                    else if (paFi >= 100) sofaVal = 150;
+                    else sofaVal = 50;
+                    updateValue('sofa_paFi', sofaVal);
+                    setPaFiOpen(false);
+                  }
+                }}
+                disabled={!paFiPaO2 || !paFiFiO2 || parseFloat(paFiFiO2) > 100}
+                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-br from-cyan-500/20 to-cyan-500/4 text-cyan-400 border border-cyan-500/30 hover:from-cyan-500/30 hover:to-cyan-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(6,182,212,0.10)]"
+              >
+                Estimar
+              </button>
+            </div>
+            {paFiPaO2 && paFiFiO2 && parseFloat(paFiFiO2) <= 100 && parseFloat(paFiPaO2) > 0 && parseFloat(paFiFiO2) > 0 && (() => {
+              const paO2 = parseFloat(paFiPaO2);
+              const fio2 = parseFloat(paFiFiO2);
+              const paFi = Math.round(paO2 / (fio2 / 100));
+              let score: number;
+              if (paFi >= 400) score = 0;
+              else if (paFi >= 300) score = 1;
+              else if (paFi >= 200) score = 2;
+              else if (paFi >= 100) score = 3;
+              else score = 4;
+              return (
+                <div className="mt-2 pt-2 border-t border-[var(--ren-border)]/30">
+                  <p className="text-xs font-mono ren-text-primary">PaFi = <strong className="text-cyan-400">{paFi}</strong> · Score SOFA: <span className={`px-1.5 py-0.5 rounded ${sofaScoreBadge(score)}`}>{score}</span></p>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+
         <div className="grid grid-cols-5 gap-1.5">
           {[
             {l:'≥400',v:400,s:0,k:'pf_0'},
@@ -282,15 +367,115 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Brain size={12} /> Neurológico — Glasgow
+            <button onClick={() => setGcsOpen(!gcsOpen)} className={`text-[9px] font-mono px-2 py-1 rounded-lg border transition-all flex items-center gap-1 ${gcsOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
+              <Calculator size={10} />
+              {gcsOpen ? 'Cerrar' : 'Calcular GCS'}
+            </button>
             {(() => {
               const v = formValues.sofa_gcs;
               if (v == null) return null;
               const m: Record<number,number> = {15:0,13:1,11:2,8:3,5:4};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
+
+        {/* Mini calculadora Glasgow */}
+        {gcsOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 p-3 rounded-lg bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
+          >
+            <p className="text-[10px] font-mono uppercase tracking-widest text-purple-400/80 mb-2">Calcular GCS desde componentes</p>
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <div>
+                <label className="block text-[10px] font-mono ren-text-secondary mb-1">Ocular (1–4)</label>
+                <select
+                  value={gcsEye}
+                  onChange={e => setGcsEye(e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                >
+                  <option value="">—</option>
+                  <option value="4">4 — Espontánea</option>
+                  <option value="3">3 — Al llamado</option>
+                  <option value="2">2 — Al dolor</option>
+                  <option value="1">1 — Ninguna</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono ren-text-secondary mb-1">Verbal (1–5)</label>
+                <select
+                  value={gcsVerbal}
+                  onChange={e => setGcsVerbal(e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                >
+                  <option value="">—</option>
+                  <option value="5">5 — Orientado</option>
+                  <option value="4">4 — Confuso</option>
+                  <option value="3">3 — Palabras sueltas</option>
+                  <option value="2">2 — Sonidos incomp.</option>
+                  <option value="1">1 — Ninguna</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[10px] font-mono ren-text-secondary mb-1">Motora (1–6)</label>
+                <select
+                  value={gcsMotor}
+                  onChange={e => setGcsMotor(e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                >
+                  <option value="">—</option>
+                  <option value="6">6 — Obedece órdenes</option>
+                  <option value="5">5 — Localiza dolor</option>
+                  <option value="4">4 — Retirada al dolor</option>
+                  <option value="3">3 — Flexión anormal</option>
+                  <option value="2">2 — Extensión anormal</option>
+                  <option value="1">1 — Ninguna</option>
+                </select>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                const eye = parseInt(gcsEye);
+                const verb = parseInt(gcsVerbal);
+                const mot = parseInt(gcsMotor);
+                if (eye >= 1 && eye <= 4 && verb >= 1 && verb <= 5 && mot >= 1 && mot <= 6) {
+                  const total = eye + verb + mot;
+                  let sofaVal: number;
+                  if (total >= 15) sofaVal = 15;
+                  else if (total >= 13) sofaVal = 13;
+                  else if (total >= 10) sofaVal = 11;
+                  else if (total >= 6) sofaVal = 8;
+                  else sofaVal = 5;
+                  updateValue('sofa_gcs', sofaVal);
+                  setGcsOpen(false);
+                }
+              }}
+              disabled={!gcsEye || !gcsVerbal || !gcsMotor}
+              className="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-br from-purple-500/20 to-purple-500/4 text-purple-400 border border-purple-500/30 hover:from-purple-500/30 hover:to-purple-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(168,85,247,0.10)]"
+            >
+              Estimar
+            </button>
+            {gcsEye && gcsVerbal && gcsMotor && (() => {
+              const total = parseInt(gcsEye) + parseInt(gcsVerbal) + parseInt(gcsMotor);
+              let score: number;
+              if (total >= 15) score = 0;
+              else if (total >= 13) score = 1;
+              else if (total >= 10) score = 2;
+              else if (total >= 6) score = 3;
+              else score = 4;
+              return (
+                <div className="mt-2 pt-2 border-t border-[var(--ren-border)]/30">
+                  <p className="text-xs font-mono ren-text-primary">GCS = <strong className="text-purple-400">{total}</strong>/15 · Score SOFA: <span className={`px-1.5 py-0.5 rounded ${sofaScoreBadge(score)}`}>{score}</span></p>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+
         <div className="grid grid-cols-5 gap-1.5">
           {[
             {l:'15',v:15,s:0,k:'gcs_0'},
@@ -313,7 +498,7 @@ export default function SofaCalculator() {
       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-            <Filter size={12} /> Renal — Creatinina (mg/dL) o Diuresis
+            <Filter size={12} /> Renal — Creatinina (mg/dL) o Diuresis (24h)
             {(() => {
               const cr = formValues.sofa_creatinine;
               const u = formValues.sofa_urine;
@@ -329,8 +514,8 @@ export default function SofaCalculator() {
             {l:'<1.2', cr:1, urine:1000, s:0, k:'ren_0'},
             {l:'1.2–1.9', cr:1.5, urine:1000, s:1, k:'ren_1'},
             {l:'2.0–3.4', cr:3, urine:1000, s:2, k:'ren_2'},
-            {l:'3.5–4.9 o diur<500', cr:4, urine:400, s:3, k:'ren_3'},
-            {l:'≥5 o diur<200', cr:6, urine:100, s:4, k:'ren_4'},
+            {l:'3.5–4.9 o diur<500/24h', cr:4, urine:400, s:3, k:'ren_3'},
+            {l:'≥5 o diur<200/24h', cr:6, urine:100, s:4, k:'ren_4'},
           ].map(r => {
             const active = formValues.sofa_creatinine === r.cr && formValues.sofa_urine === r.urine;
             return (

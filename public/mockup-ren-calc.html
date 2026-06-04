@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — REN Calculadoras</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-page: #0a0a0c;
+  --bg-card: #111114;
+  --bg-card-hover: #141418;
+  --bg-tertiary: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --border-hover: rgba(255,255,255,0.12);
+  --text-primary: #e8e8ed;
+  --text-secondary: rgba(255,255,255,0.55);
+  --text-tertiary: rgba(255,255,255,0.3);
+  --accent: #818cf8;
+  --accent-hover: #a5b4fc;
+  --accent-glow: rgba(129,140,248,0.12);
+  --gradient: linear-gradient(135deg, #818cf8, #a78bfa);
+  --red: #f87171;
+  --amber: #fbbf24;
+  --green: #4ade80;
+  --blue: #60a5fa;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10,10,12,0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.crow-icon {
+  width: 28px;
+  height: 28px;
+  position: relative;
+}
+.crow-icon svg {
+  width: 100%;
+  height: 100%;
+}
+.header-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Welcome section */
+.welcome {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+.welcome-inner {
+  max-width: 640px;
+  width: 100%;
+}
+.hero-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(129,140,248,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+.hero-icon svg { width: 28px; height: 28px; }
+.hero-title {
+  text-align: center;
+  margin-bottom: 6px;
+}
+.hero-title h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-tagline {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* Grid de tarjetas */
+.calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.calc-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.calc-card:hover {
+  border-color: rgba(129,140,248,0.3);
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+}
+.calc-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+.calc-card:hover .calc-icon {
+  border-color: rgba(129,140,248,0.25);
+}
+.calc-icon svg { width: 20px; height: 20px; }
+.calc-icon .accent { color: var(--accent-hover); }
+.calc-icon .default { color: var(--text-tertiary); }
+.calc-card:hover .calc-icon .default { color: var(--accent-hover); }
+.calc-info { flex: 1; min-width: 0; }
+.calc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.calc-desc {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+.calc-detail {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 4px;
+}
+.calc-card .arrow {
+  color: var(--text-tertiary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.calc-card:hover .arrow {
+  color: var(--accent-hover);
+  transform: translateX(2px);
+}
+/* Footer / shortcut */
+.shortcut-bar {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.shortcut-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  font-size: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-tertiary);
+}
+/* Responsive */
+@media (max-width: 520px) {
+  .calc-grid, .alt-grid { grid-template-columns: 1fr; }
+  header { padding: 10px 14px; }
+  .welcome { padding: 24px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="header-left">
+    <div class="crow-icon">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5C25 5 10 20 10 40c0 15 8 28 20 35l-5 20h15l3-15a35 35 0 0 0 14 0l3 15h15l-5-20c12-7 20-20 20-35 0-20-15-35-40-35z" fill="url(#cg)" opacity="0.9"/>
+        <circle cx="38" cy="34" r="3" fill="#fff"/>
+        <circle cx="62" cy="34" r="3" fill="#fff"/>
+        <path d="M35 48c0 0 6 8 15 8s15-8 15-8" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="cg" x1="10" y1="5" x2="90" y2="95">
+            <stop offset="0%" stop-color="#818cf8"/>
+            <stop offset="100%" stop-color="#a78bfa"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span class="header-title">Calculadoras</span>
+  </div>
+  <div class="header-right">
+    <!-- categorías eliminadas por feedback de Nero -->
+    <div style="width:32px;height:32px;border-radius:999px;background:var(--bg-tertiary);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </div>
+  </div>
+</header>
+
+
+
+<!-- Main content -->
+<div class="welcome">
+  <div class="welcome-inner">
+
+    <!-- Solo layout tarjetas -->
+    <div id="variant-a">
+      <div class="hero-title">
+        <h2>Herramientas clínicas</h2>
+      </div>
+      <p class="hero-tagline">
+        Scores médicos basados en evidencia.
+      </p>
+      <div class="calc-grid">
+        <!-- APACHE IV -->
+        <div class="calc-card">
+          <div class="calc-icon">
+            <svg class="default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          </div>
+          <div class="calc-info">
+            <div class="calc-name">APACHE IV</div>
+            <div class="calc-desc">Mortalidad hospitalaria esperada al ingreso a UCI. Calibra el pronóstico individual contra la mortalidad predicha por fisiología, edad y diagnóstico.</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <!-- SOFA -->
+        <div class="calc-card">
+          <div class="calc-icon">
+            <svg class="default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div class="calc-info">
+            <div class="calc-name">SOFA</div>
+            <div class="calc-desc">Disfunción orgánica secuencial en 6 sistemas. Confirma sepsis, objetiva tendencia clínica y soporta decisiones de escalada o desescalada.</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <!-- NEWS2 -->
+        <div class="calc-card">
+          <div class="calc-icon">
+            <svg class="default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div class="calc-info">
+            <div class="calc-name">NEWS2</div>
+            <div class="calc-desc">Riesgo de deterioro en hospitalización general. Define umbral de monitoreo, activación de respuesta rápida o traslado a UCI.</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+        <!-- NIHSS -->
+        <div class="calc-card">
+          <div class="calc-icon">
+            <svg class="default" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M2 12h6l2-6 2 12 2-6h6"/></svg>
+          </div>
+          <div class="calc-info">
+            <div class="calc-name">NIHSS</div>
+            <div class="calc-desc">Cuantifica déficit neurológico en stroke agudo. Guía decisión de trombólisis y trombectomía — y documenta evolución en seguimiento.</div>
+          </div>
+          <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+</div>
+
+
+
+
+
+</body>
+</html>

@@ -79,9 +79,9 @@ const GCS_SOFA_COLORS = [
 ];
 
 const GCS_GRID_CLASSES: Record<string, string> = {
-  gcsEye: 'grid grid-cols-2 sm:grid-cols-4 gap-1.5',
-  gcsVerbal: 'grid grid-cols-3 gap-1.5',
-  gcsMotor: 'grid grid-cols-3 gap-1.5',
+  gcsEye: 'grid grid-cols-4 gap-1.5',
+  gcsVerbal: 'grid grid-cols-3 sm:grid-cols-5 gap-1.5',
+  gcsMotor: 'grid grid-cols-3 sm:grid-cols-6 gap-1.5',
 };
 
 function gcsToSofaLevel(key: string, score: number): number {
@@ -96,6 +96,15 @@ function gcsToSofaLevel(key: string, score: number): number {
 function gcsSofaStyle(key: string, score: number, active: boolean): string {
   if (!active) return 'bg-[var(--ren-bg-secondary)] ren-text-secondary border-[var(--ren-border)] opacity-75 hover:border-[var(--accent-color)]/70 hover:bg-[var(--ren-bg-secondary)]/80';
   return GCS_SOFA_COLORS[gcsToSofaLevel(key, score)];
+}
+
+function gcsTotalSeverityClass(total: number, na: boolean): string {
+  if (na) return 'var(--text-dim)';
+  if (total === 15) return '#34D399';     // verde — normal
+  if (total >= 13) return '#FBBF24';      // amarillo — leve
+  if (total >= 9)  return '#FB923C';       // naranja — moderado
+  if (total >= 6)  return '#FB7185';       // rosa — severo
+  return '#F87171';                         // rojo — crítico
 }
 
 function severityColor(s: string) {
@@ -180,6 +189,7 @@ export default function ApacheIVCalculator() {
   const [result, setResult] = useState<ApacheIVResult & { breakdown?: Record<string, number> } | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [missingFields, setMissingFields] = useState<Record<string, boolean>>({});
 
   const diagnosisOptions = (schema?.variables?.find(v => v.key === 'diagnosisKey')?.options as DiagnosisOption[]) || [];
   const systemOptions = (schema?.variables?.find(v => v.key === 'diagnosisSystem')?.options as DiagnosisOption[]) || [];
@@ -202,6 +212,12 @@ export default function ApacheIVCalculator() {
 
   const updateNum = useCallback((key: string, val: string) => {
     setNumFields(prev => ({ ...prev, [key]: val }));
+    setMissingFields(prev => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
   }, []);
 
   const toggleComorbidity = useCallback((key: string) => {
@@ -217,7 +233,30 @@ export default function ApacheIVCalculator() {
   const showThrombolysis = diagnosisKey && (diagnosisKey === 'stroke' || diagnosisKey.startsWith('ami_'));
 
   const handleCalculate = async () => {
-    if (!age) { setError('Ingresa la edad'); return; }
+    const missing: Record<string, boolean> = {};
+    if (!age) missing.age = true;
+    if (!numFields.fio2) missing.fio2 = true;
+    if (!numFields.urine24h) missing.urine24h = true;
+    if (!numFields.preICULos) missing.preICULos = true;
+    if (!diagnosisSystem) missing.diagnosisSystem = true;
+    if (!diagnosisKey) missing.diagnosisKey = true;
+
+    if (Object.keys(missing).length > 0) {
+      setMissingFields(missing);
+      const fieldNames: Record<string, string> = {
+        age: 'Edad',
+        fio2: 'FiO₂',
+        urine24h: 'Diuresis 24h',
+        preICULos: 'Estancia pre-UCI',
+        diagnosisSystem: 'Sistema diagnóstico',
+        diagnosisKey: 'Diagnóstico específico',
+      };
+      const list = Object.keys(missing).map(k => fieldNames[k] || k).join(', ');
+      setError(`Campos requeridos faltantes: ${list}`);
+      return;
+    }
+
+    setMissingFields({});
 
     setCalculating(true);
     setError(null);
@@ -301,18 +340,23 @@ export default function ApacheIVCalculator() {
 
       {/* ─── DATOS DEL PACIENTE ─── */}
       <Section title="Datos del paciente">
-        <div className="field" style={{ maxWidth: 200 }}>
+        <div className={`field${missingFields.age ? ' field-missing' : ''}`} style={{ maxWidth: 200 }}>
           <FieldLabel>Edad <Sub>años</Sub></FieldLabel>
           <input
             type="number"
             value={age}
-            onChange={e => setAge(e.target.value)}
+            onChange={e => {
+              setAge(e.target.value);
+              if (e.target.value) setMissingFields(prev => { const n = {...prev}; delete n.age; return n; });
+            }}
             placeholder="0"
-            className="num-input"
+            className={`num-input${missingFields.age ? ' input-missing' : ''}`}
             min={16}
             max={120}
           />
         </div>
+
+        <div className="border-t border-[var(--ren-border)] my-4" />
 
         <FieldLabel style={{ marginBottom: 8 }}>Glasgow <Sub>— toca cada componente</Sub></FieldLabel>
 
@@ -345,7 +389,7 @@ export default function ApacheIVCalculator() {
 
         <div style={{ fontSize: 12, color: 'var(--text-dim)', paddingTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'center' }}>
           <span>
-            GCS total: <strong style={{ color: gcsNa ? 'var(--text-dim)' : 'var(--green)' }}>
+            GCS total: <strong style={{ color: gcsTotalSeverityClass(gcsTotal, gcsNa) }}>
               {gcsNa ? '—' : gcsTotal}
             </strong> / 15
           </span>
@@ -417,7 +461,7 @@ export default function ApacheIVCalculator() {
           </div>
         </div>
         <div className="row">
-          <NumField label="Estancia pre-UCI" unit="días" key_="preICULos" value={numFields.preICULos || ''} onChange={v => updateNum('preICULos', v)} />
+          <NumField label="Estancia pre-UCI" unit="días" key_="preICULos" value={numFields.preICULos || ''} onChange={v => updateNum('preICULos', v)} missing={missingFields.preICULos} />
           <div className="field" style={{ display: 'flex', alignItems: 'flex-end', paddingBottom: 8 }}>
             <ToggleField label="Reingreso UCI" value={readmission} onChange={setReadmission} color="var(--amber, #f59e0b)" />
           </div>
@@ -430,12 +474,12 @@ export default function ApacheIVCalculator() {
       {/* ─── DIAGNÓSTICO DE INGRESO ─── */}
       <Section title="Diagnóstico de ingreso">
         <div className="row">
-          <div className="field">
+          <div className={`field${missingFields.diagnosisSystem ? ' field-missing' : ''}`}>
             <FieldLabel>Sistema</FieldLabel>
             <select
-              className="select-input"
+              className={`select-input${missingFields.diagnosisSystem ? ' input-missing' : ''}`}
               value={diagnosisSystem}
-              onChange={e => { setDiagnosisSystem(e.target.value); setDiagnosisKey(''); }}
+              onChange={e => { setDiagnosisSystem(e.target.value); setDiagnosisKey(''); setMissingFields(prev => { const n = {...prev}; delete n.diagnosisSystem; return n; }); }}
               disabled={!diagnosisGroup}
             >
               <option value="">— Seleccione —</option>
@@ -444,12 +488,12 @@ export default function ApacheIVCalculator() {
               ))}
             </select>
           </div>
-          <div className="field">
+          <div className={`field${missingFields.diagnosisKey ? ' field-missing' : ''}`}>
             <FieldLabel>Diagnóstico específico</FieldLabel>
             <select
-              className="select-input"
+              className={`select-input${missingFields.diagnosisKey ? ' input-missing' : ''}`}
               value={diagnosisKey}
-              onChange={e => setDiagnosisKey(e.target.value)}
+              onChange={e => { setDiagnosisKey(e.target.value); setMissingFields(prev => { const n = {...prev}; delete n.diagnosisKey; return n; }); }}
               disabled={!diagnosisSystem}
             >
               <option value="">— Seleccione —</option>
@@ -470,7 +514,10 @@ export default function ApacheIVCalculator() {
       <Section title="Fisiología & laboratorios">
 
         {/* Signos vitales - T primero */}
-        <div className="section-subtitle">Signos vitales</div>
+        <div className="section-subtitle">
+          <Activity size={14} style={{ verticalAlign: 'middle', marginRight: 4, color: 'var(--teal, #33ccbb)' }} />
+          Signos vitales
+        </div>
         <div className="row">
           <NumField label="Temperatura" unit="°C" key_="temp" value={numFields.temp || ''} onChange={v => updateNum('temp', v)} step="0.1" />
           <NumField label="PAM" unit="mmHg" key_="map" value={numFields.map || ''} onChange={v => updateNum('map', v)} />
@@ -489,7 +536,7 @@ export default function ApacheIVCalculator() {
           </div>
         </div>
         <div className="row">
-          <NumField label="FiO₂" unit="%" key_="fio2" value={numFields.fio2 || ''} onChange={v => updateNum('fio2', v)} placeholder="21 (AA)" />
+          <NumField label="FiO₂" unit="%" key_="fio2" value={numFields.fio2 || ''} onChange={v => updateNum('fio2', v)} placeholder="21 (AA)" missing={missingFields.fio2} />
           <NumField label="PaO₂" unit="mmHg" key_="pao2" value={numFields.pao2 || ''} onChange={v => updateNum('pao2', v)} />
           <NumField label="PaCO₂" unit="mmHg" key_="paco2" value={numFields.paco2 || ''} onChange={v => updateNum('paco2', v)} />
           <NumField label="pH arterial" key_="ph" value={numFields.ph || ''} onChange={v => updateNum('ph', v)} step="0.001" />
@@ -501,15 +548,15 @@ export default function ApacheIVCalculator() {
           Función renal
         </div>
         <div className="row">
-          <NumField label="Na⁺" unit="mEq/L" key_="na" value={numFields.na || ''} onChange={v => updateNum('na', v)} />
-          <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
-        </div>
-        <div className="row" style={{ marginTop: 8 }}>
           <ToggleField label="ERC estadio V / Hemodiálisis" value={erc} onChange={setErc} color="var(--orange, #f97316)" />
         </div>
         <div className="row">
+          <NumField label="Na⁺" unit="mEq/L" key_="na" value={numFields.na || ''} onChange={v => updateNum('na', v)} />
+          <NumField label="Cr" unit="mg/dL" key_="cr" value={numFields.cr || ''} onChange={v => updateNum('cr', v)} />
+        </div>
+        <div className="row">
           <NumField label="BUN" unit="mg/dL" key_="bun" value={numFields.bun || ''} onChange={v => updateNum('bun', v)} />
-          <NumField label="Diuresis 24h" unit="mL" key_="urine24h" value={numFields.urine24h || ''} onChange={v => updateNum('urine24h', v)} />
+          <NumField label="Diuresis 24h" unit="mL" key_="urine24h" value={numFields.urine24h || ''} onChange={v => updateNum('urine24h', v)} missing={missingFields.urine24h} />
         </div>
 
         {/* Hematología */}
@@ -573,76 +620,107 @@ export default function ApacheIVCalculator() {
           >
             {(() => {
               const sevCol = severityColor(result.severity);
-              const scorePct = result.totalScore / 286;
-              const apsPct = result.aps / 239;
-              const mortPct = result.mortalityPct;
               return (
               <>
-              {/* ─── GRID 2x2 ─── */}
-              <div className="rounded-xl border backdrop-blur-sm overflow-hidden" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                <div className="grid grid-cols-2" style={{ gap: 0 }}>
-                  {/* APACHE IV Score */}
-                  <div style={{ padding: '20px 12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                      <BarChart3 size={12} style={{ color: '#9CA3AF' }} />
-                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>APACHE IV Score</span>
+              {/* ─── GRID 2×2 — contenedor unificado ─── */}
+              <div className="rounded-xl overflow-hidden backdrop-blur-sm border border-[var(--ren-border)]" style={{ background: 'var(--ren-bg-secondary)' }}>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                }}>
+                  {/* APACHE IV — top-left */}
+                  <div className="relative border-b border-[var(--ren-border)]/50 border-r border-[var(--ren-border)]/50">
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'radial-gradient(circle at 50% 35%, rgba(250,204,21,0.10) 0%, rgba(250,204,21,0.03) 60%, transparent 100%)',
+                      pointerEvents: 'none',
+                    }} />
+                    <div className="relative z-1 text-center py-4 sm:py-5 px-2 sm:px-3">
+                      <div className="flex items-center justify-center gap-1.5 mb-2">
+                        <BarChart3 size={11} className="text-yellow-400/70" />
+                        <span className="text-[8px] sm:text-[9px] font-semibold tracking-widest uppercase text-yellow-400">APACHE IV Score</span>
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-[28px] sm:text-[40px] font-bold font-mono tabular-nums leading-none" style={{ color: '#FACC15' }}>{result.totalScore}</span>
+                        <span className="text-[10px] sm:text-sm font-mono ren-text-tertiary">/286</span>
+                      </div>
+                      <div style={{ marginTop: 6, width: 24, height: 3, borderRadius: 999, background: '#FACC15', marginLeft: 'auto', marginRight: 'auto' }} />
                     </div>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: sevCol.bar.replace('bg-', '').includes('emerald') ? '#34D399' : sevCol.bar.replace('bg-', '').includes('amber') ? '#FBBF24' : sevCol.bar.replace('bg-', '').includes('orange') ? '#FB923C' : '#F87171' }}>{result.totalScore}</span>
-                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>/286</span>
-                    </div>
-                    <div style={{ marginTop: 6, width: 44, height: 4, borderRadius: 999, background: sevCol.bar.replace('bg-', '').includes('emerald') ? '#34D399' : sevCol.bar.replace('bg-', '').includes('amber') ? '#FBBF24' : sevCol.bar.replace('bg-', '').includes('orange') ? '#FB923C' : '#F87171', margin: '6px auto 0' }} />
                   </div>
-                  {/* APS Score */}
-                  <div style={{ padding: '20px 12px', textAlign: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                      <Heart size={12} style={{ color: '#9CA3AF' }} />
-                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>APS Score</span>
+                  {/* APS — top-right */}
+                  <div className="relative border-b border-[var(--ren-border)]/50">
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'radial-gradient(circle at 50% 35%, rgba(16,185,129,0.10) 0%, rgba(16,185,129,0.03) 60%, transparent 100%)',
+                      pointerEvents: 'none',
+                    }} />
+                    <div className="relative z-1 text-center py-4 sm:py-5 px-2 sm:px-3">
+                      <div className="flex items-center justify-center gap-1.5 mb-2">
+                        <Heart size={11} className="text-emerald-400/70" />
+                        <span className="text-[8px] sm:text-[9px] font-semibold tracking-widest uppercase text-emerald-400">APS Score</span>
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-[28px] sm:text-[40px] font-bold font-mono tabular-nums leading-none" style={{ color: '#10B981' }}>{result.aps}</span>
+                        <span className="text-[10px] sm:text-sm font-mono ren-text-tertiary">/239</span>
+                      </div>
+                      <div style={{ marginTop: 6, width: 24, height: 3, borderRadius: 999, background: '#10B981', marginLeft: 'auto', marginRight: 'auto' }} />
                     </div>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: '#3EFCA5' }}>{result.aps}</span>
-                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>/239</span>
-                    </div>
-                    <div style={{ marginTop: 6, width: 44, height: 4, borderRadius: 999, background: '#3EFCA5', margin: '6px auto 0' }} />
                   </div>
-                  {/* Mortalidad */}
-                  <div style={{ padding: '20px 12px', textAlign: 'center', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                      <HeartPulse size={12} style={{ color: '#9CA3AF' }} />
-                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Mortalidad</span>
+                  {/* Mortalidad — bottom-left */}
+                  <div className="relative border-r border-[var(--ren-border)]/50">
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'radial-gradient(circle at 50% 35%, rgba(239,68,68,0.10) 0%, rgba(239,68,68,0.03) 60%, transparent 100%)',
+                      pointerEvents: 'none',
+                    }} />
+                    <div className="relative z-1 text-center py-4 sm:py-5 px-2 sm:px-3">
+                      <div className="flex items-center justify-center gap-1.5 mb-2">
+                        <HeartPulse size={11} className="text-red-400/70" />
+                        <span className="text-[8px] sm:text-[9px] font-semibold tracking-widest uppercase text-red-400">Mortalidad</span>
+                      </div>
+                      <div className="flex items-baseline justify-center gap-0.5">
+                        <span className="text-[28px] sm:text-[40px] font-bold font-mono tabular-nums leading-none" style={{ color: '#EF4444' }}>{result.mortalityPct}</span>
+                        <span className="text-[10px] sm:text-sm font-mono ren-text-tertiary">%</span>
+                      </div>
                     </div>
-                    <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: mortPct < 10 ? '#34D399' : mortPct < 30 ? '#FBBF24' : '#FE3B3B' }}>{result.mortalityPct}%</span>
-                    <div style={{ marginTop: 6, width: 52, height: 3, borderRadius: 999, background: mortPct < 10 ? '#34D399' : mortPct < 30 ? '#FBBF24' : '#FE3B3B', margin: '6px auto 0' }} />
                   </div>
-                  {/* LOS */}
-                  <div style={{ padding: '20px 12px', textAlign: 'center' }}>
-                    <div className="flex items-center justify-center gap-1.5 mb-1.5">
-                      <Activity size={12} style={{ color: '#9CA3AF' }} />
-                      <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Estancia UCI</span>
-                    </div>
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-[40px] font-bold tabular-nums leading-none" style={{ color: '#A78BFA' }}>{result.losDays}</span>
-                      <span className="text-sm font-mono" style={{ color: '#9CA3AF' }}>días</span>
+                  {/* LOS — bottom-right */}
+                  <div className="relative">
+                    <div style={{
+                      position: 'absolute', inset: 0,
+                      background: 'radial-gradient(circle at 50% 35%, rgba(139,92,246,0.10) 0%, rgba(139,92,246,0.03) 60%, transparent 100%)',
+                      pointerEvents: 'none',
+                    }} />
+                    <div className="relative z-1 text-center py-4 sm:py-5 px-2 sm:px-3">
+                      <div className="flex items-center justify-center gap-1.5 mb-2">
+                        <Activity size={11} className="text-purple-400/70" />
+                        <span className="text-[8px] sm:text-[9px] font-semibold tracking-widest uppercase text-purple-400">Estancia UCI</span>
+                      </div>
+                      <div className="flex items-baseline justify-center gap-1">
+                        <span className="text-[28px] sm:text-[40px] font-bold font-mono tabular-nums leading-none" style={{ color: '#8B5CF6' }}>{result.losDays}</span>
+                        <span className="text-[10px] sm:text-sm font-mono ren-text-tertiary">días</span>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* ─── Severidad + Diagnóstico ─── */}
-              <div className="rounded-xl border backdrop-blur-sm" style={{ background: 'rgba(30,30,30,1)', borderColor: 'rgba(255,255,255,0.06)', padding: '10px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Severidad</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 999, padding: '1px 10px 1px 8px', fontSize: 10, fontWeight: 800, textTransform: 'uppercase', border: '1px solid ' + (sevCol.bar.includes('emerald') ? 'rgba(52,211,153,0.28)' : sevCol.bar.includes('amber') ? 'rgba(251,191,36,0.28)' : sevCol.bar.includes('orange') ? 'rgba(251,146,60,0.28)' : 'rgba(248,113,113,0.28)'), background: sevCol.bar.includes('emerald') ? 'rgba(52,211,153,0.15)' : sevCol.bar.includes('amber') ? 'rgba(251,191,36,0.15)' : sevCol.bar.includes('orange') ? 'rgba(251,146,60,0.15)' : 'rgba(248,113,113,0.15)' }}>
-                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: sevCol.bar.includes('emerald') ? '#166534' : sevCol.bar.includes('amber') ? '#92400E' : sevCol.bar.includes('orange') ? '#9A3412' : '#991B1B' }} />
-                    {result.severity} <span style={{ fontWeight: 600 }}>({result.mortalityPct}%)</span>
+              <div className="rounded-xl border border-[var(--ren-border)] backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <span className="text-[9px] font-semibold tracking-widest uppercase ren-text-tertiary flex-shrink-0">Severidad</span>
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm border ${sevCol.bg} ${sevCol.border} ${sevCol.text}`}>
+                    <span className={`w-[5px] h-[5px] rounded-full flex-shrink-0 ${sevCol.bar}`} />
+                    {result.severity}
+                    <span className="opacity-70">({result.mortalityPct}%)</span>
                   </span>
                 </div>
                 {result.diagnosisLabel && (
-                  <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
-                    <span className="text-[9px] font-semibold tracking-widest uppercase" style={{ color: '#9CA3AF' }}>Diagnóstico</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, borderRadius: 999, padding: '3px 10px', fontSize: 10, fontWeight: 600, background: '#9CA3AF', color: '#0a0a0c', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      <FileText size={11} />
-                      {result.diagnosisLabel}
+                  <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-0 sm:flex-1 sm:justify-end">
+                    <span className="text-[9px] font-semibold tracking-widest uppercase ren-text-tertiary flex-shrink-0">Diagnóstico</span>
+                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm border border-[var(--ren-border)] max-w-full whitespace-nowrap" style={{ background: 'var(--ren-bg-tertiary)', color: 'var(--text-primary)' }}>
+                      <FileText size={11} className="ren-text-tertiary flex-shrink-0" />
+                      <span className="truncate min-w-0">{result.diagnosisLabel}</span>
                     </span>
                   </div>
                 )}
@@ -650,14 +728,14 @@ export default function ApacheIVCalculator() {
 
               {/* ─── System pills ─── */}
               {result.breakdown && (
-                <div className="rounded-xl border backdrop-blur-sm" style={{ background: 'rgba(30,30,30,1)', borderColor: 'rgba(255,255,255,0.06)', padding: '10px 14px' }}>
-                  <div className="text-[9px] font-semibold tracking-widest uppercase mb-2" style={{ color: '#9CA3AF' }}>Score APS por sistema</div>
+                <div className="rounded-xl border border-[var(--ren-border)] backdrop-blur-sm" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
+                  <div className="text-[9px] font-semibold tracking-widest uppercase ren-text-secondary mb-2.5">Score APS por sistema</div>
                   <div className="flex flex-wrap gap-1.5">
                     {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
                       const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
                       const col = systemSeverityPill(pts);
                       return (
-                        <span key={sysKey} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium border ${col.ring}`}>
+                        <span key={sysKey} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold border backdrop-blur-sm ${col.ring}`}>
                           <span className={`w-[5px] h-[5px] rounded-full ${col.dot}`} />
                           {sys.label} <span className="font-bold">{pts}</span>
                         </span>
@@ -668,16 +746,18 @@ export default function ApacheIVCalculator() {
               )}
 
               {/* ─── Botones ─── */}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button onClick={handleCalculate} className="action-btn flex-1" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button onClick={handleCalculate} className="w-full sm:flex-1 py-2.5 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                   <Zap size={12} /> Recalcular
                 </button>
-                <button onClick={copyResult} className="action-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px' }}>
-                  <Copy size={12} /> Copiar
-                </button>
-                <button onClick={() => setResult(null)} className="action-btn" style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 16px' }}>
-                  <Zap size={12} /> Limpiar
-                </button>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button onClick={copyResult} className="flex-1 sm:flex-none py-2.5 px-4 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <Copy size={12} /> Copiar
+                  </button>
+                  <button onClick={() => setResult(null)} className="flex-1 sm:flex-none py-2.5 px-4 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    <Zap size={12} /> Limpiar
+                  </button>
+                </div>
               </div>
               </>
               );
@@ -729,18 +809,18 @@ function Sub({ children }: { children: React.ReactNode }) {
   return <span className="sub">{children}</span>;
 }
 
-function NumField({ label, unit, key_, value, onChange, step, placeholder }: {
-  label: string; unit?: string; key_: string; value: string; onChange: (v: string) => void; step?: string; placeholder?: string;
+function NumField({ label, unit, key_, value, onChange, step, placeholder, missing }: {
+  label: string; unit?: string; key_: string; value: string; onChange: (v: string) => void; step?: string; placeholder?: string; missing?: boolean;
 }) {
   return (
-    <div className="field">
+    <div className={`field${missing ? ' field-missing' : ''}`}>
       <FieldLabel>
         {label}
         {unit && <Sub>{unit}</Sub>}
       </FieldLabel>
       <input
         type="number"
-        className="num-input"
+        className={`num-input${missing ? ' input-missing' : ''}`}
         placeholder={placeholder || '0'}
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -769,3 +849,4 @@ function ToggleField({ label, value, onChange, color }: {
     </span>
   );
 }
+

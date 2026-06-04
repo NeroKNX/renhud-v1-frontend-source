@@ -8,7 +8,7 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
 
   useEffect(() => {
     try {
-      const prefs = JSON.parse(sessionStorage.getItem('ren_preferences') || '{}');
+      const prefs = JSON.parse(localStorage.getItem('ren_preferences') || '{}');
       if (prefs.theme) setThemeState(prefs.theme);
     } catch {}
   }, []);
@@ -21,9 +21,9 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
     if (newTheme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
     try {
-      const prefs = JSON.parse(sessionStorage.getItem('ren_preferences') || '{}');
+      const prefs = JSON.parse(localStorage.getItem('ren_preferences') || '{}');
       prefs.theme = newTheme;
-      sessionStorage.setItem('ren_preferences', JSON.stringify(prefs));
+      localStorage.setItem('ren_preferences', JSON.stringify(prefs));
     } catch {}
   };
 

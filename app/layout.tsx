@@ -26,7 +26,8 @@ export const viewport: Viewport = {
 
 const themeScript = `
   try {
-    var prefs = JSON.parse(sessionStorage.getItem('ren_preferences') || '{}');
+    var raw = localStorage.getItem('ren_preferences') || sessionStorage.getItem('ren_preferences') || '{}';
+    var prefs = JSON.parse(raw);
     var theme = prefs.theme || 'dark';
     document.documentElement.setAttribute('data-theme', theme);
     if (theme !== 'dark') document.documentElement.classList.remove('dark');

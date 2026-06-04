@@ -313,32 +313,25 @@ export default function News2Calculator() {
       <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
-            <Brain size={12} /> Nivel de conciencia (ACVPU)
+            <Brain size={12} /> Nivel de conciencia
             {(() => {
               const v = formValues[NEWS2_KEYS.Conciencia];
               if (v == null) return null;
-              const m: Record<string,number> = {'alert':0,'confusion':3,'voice':3,'pain':3,'unresponsive':3};
-              const s = m[v];
+              const m: Record<string,number> = {'alert':0,'cvpu':3};
+              const s = m[v] ?? 3;
               return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
-        <div className="grid grid-cols-5 gap-1">
-          {[
-            { l: 'Alerta\n(0)', s: 0, v: 'alert' },
-            { l: 'Conf.\nnuevo (3)', s: 3, v: 'confusion' },
-            { l: 'Voz\n(3)', s: 3, v: 'voice' },
-            { l: 'Dolor\n(3)', s: 3, v: 'pain' },
-            { l: 'Inconsc.\n(3)', s: 3, v: 'unresponsive' },
-          ].map(opt => {
-            const active = formValues[NEWS2_KEYS.Conciencia] === opt.v;
-            return (
-              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Conciencia, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
-                {opt.l}
-              </button>
-            );
-          })}
-        </div>
+        <N2Slider
+          options={[
+            { label: 'Alerta (A) — 0', score: 0, value: 'alert' },
+            { label: 'CVPU — 3', score: 3, value: 'cvpu' },
+          ]}
+          value={formValues[NEWS2_KEYS.Conciencia]}
+          onChange={(v) => updateValue(NEWS2_KEYS.Conciencia, v)}
+        />
+        <p className="text-[9px] ren-text-tertiary mt-2 px-1">CVPU: Confusión, Voz, Dolor o Inconsciente — cualquier alteración = 3 pts</p>
       </div>
 
       {/* Temperatura */}

@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/lib/auth-context';
 import SofaCalculator from '@/components/calculators/sofa-calculator';
 import News2Calculator from '@/components/calculators/news2-calculator';
@@ -133,6 +134,45 @@ const fichasTecnicas: Record<string, {
 
 
 
+function CalculatorThemeToggle() {
+  const [theme, setThemeState] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    try {
+      const prefs = JSON.parse(localStorage.getItem('ren_preferences') || '{}');
+      if (prefs.theme) setThemeState(prefs.theme);
+    } catch {}
+  }, []);
+
+  const toggle = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setThemeState(newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+    const mt = document.querySelector('meta[name="theme-color"]'); if(mt) mt.setAttribute('content', newTheme === 'dark' ? '#0a0a0c' : '#f8fafc');
+    if (newTheme === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+    try {
+      const prefs = JSON.parse(localStorage.getItem('ren_preferences') || '{}');
+      prefs.theme = newTheme;
+      localStorage.setItem('ren_preferences', JSON.stringify(prefs));
+    } catch {}
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      className="p-2 rounded-xl transition-all hover:bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/50"
+      title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
+    >
+      {theme === 'dark' ? (
+        <Sun size={18} className="text-[var(--ren-text-secondary)]" />
+      ) : (
+        <Moon size={18} className="text-[var(--ren-text-secondary)]" />
+      )}
+    </button>
+  );
+}
+
 export default function CalculatorsPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
@@ -147,6 +187,15 @@ export default function CalculatorsPage() {
       .then(r => r.json())
       .then(d => setCalculators(d.calculators || []))
       .catch(() => {});
+  }, []);
+
+  // Leer ?calc=xxx de la URL al montar
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const calc = params.get('calc');
+    if (calc && ['sofa', 'news2', 'nihss', 'apache-iv'].includes(calc)) {
+      setSelectedId(calc);
+    }
   }, []);
 
   // Resetear ficha al cambiar de calculadora
@@ -165,16 +214,31 @@ export default function CalculatorsPage() {
             <h1 className="text-base md:text-lg font-mono tracking-tight ren-text-primary flex items-center gap-2">
               Calculadoras <span className="text-[10px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-1.5 py-0.5 rounded border border-[var(--ren-border)]">α</span>
             </h1>
-            <p className="text-[10px] md:text-[11px] ren-text-tertiary font-mono">Herramientas clínicas determinísticas</p>
+            <p className="text-[10px] md:text-[11px] ren-text-tertiary font-mono">Herramientas clínicas</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {!authLoading && !user && (
-            <button onClick={() => router.push('/login')} className="text-[12px] px-3 py-1.5 rounded-lg bg-[var(--accent-color)]/10 text-[var(--accent-color)] border border-[var(--accent-color)]/30 hover:bg-[var(--accent-color)]/20 transition-all font-mono">
+            <button onClick={() => { window.history.replaceState({}, '', '/calculators'); router.push('/login'); }} className="text-[12px] px-3 py-1.5 rounded-lg bg-[var(--accent-color)]/10 text-[var(--accent-color)] border border-[var(--accent-color)]/30 hover:bg-[var(--accent-color)]/20 transition-all font-mono">
               Iniciar sesión
             </button>
           )}
-          <button onClick={() => router.push('/chat')} className="p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors" title="Ir al chat">
+          <CalculatorThemeToggle />
+          <button
+            onClick={() => {
+              if (selectedId) {
+                setSelectedId(null);
+                const url = new URL(window.location.href);
+                url.searchParams.delete('calc');
+                window.history.replaceState({}, '', url.toString());
+              } else {
+                window.history.replaceState({}, '', '/calculators');
+                router.push('/chat');
+              }
+            }}
+            className="p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+            title={selectedId ? 'Volver al menú' : 'Ir al chat'}
+          >
             <ArrowLeft size={18} className="text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
           </button>
         </div>
@@ -187,7 +251,12 @@ export default function CalculatorsPage() {
             {calculators.map(calc => (
               <button
                 key={calc.id}
-                onClick={() => setSelectedId(calc.id)}
+                onClick={() => {
+                  setSelectedId(calc.id);
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('calc', calc.id);
+                  window.history.replaceState({}, '', url.toString());
+                }}
                 className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs whitespace-nowrap transition-all ${
                   selectedId === calc.id
                     ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)]'
@@ -218,7 +287,7 @@ export default function CalculatorsPage() {
                   </div>
                   <h2 className="text-lg font-bold ren-gradient-text mb-1">Calculadoras clínicas</h2>
                   <p className="text-xs ren-text-secondary leading-relaxed">
-                    Scores pronósticos determinísticos. Resultados reproducibles — el modelo nunca interviene.
+                    Scores médicos basados en evidencia.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -228,7 +297,12 @@ export default function CalculatorsPage() {
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06 }}
-                      onClick={() => setSelectedId(calc.id)}
+                      onClick={() => {
+                        setSelectedId(calc.id);
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('calc', calc.id);
+                        window.history.replaceState({}, '', url.toString());
+                      }}
                       className="group flex items-center gap-4 p-4 rounded-xl bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:bg-[var(--accent-color)]/5 transition-all text-left"
                     >
                       <span className="w-10 h-10 rounded-xl bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] flex items-center justify-center text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-hover)] group-hover:border-[var(--accent-color)]/30 transition-all shrink-0">
@@ -255,16 +329,7 @@ export default function CalculatorsPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                >
-                  {/* Volver a calculadoras */}
-                  <button
-                    onClick={() => setSelectedId(null)}
-                    className="flex items-center gap-1.5 text-xs font-mono ren-text-tertiary hover:text-[var(--accent-hover)] transition-colors mb-4"
-                  >
-                    <ArrowLeft size={14} />
-                    Todas las calculadoras
-                  </button>
-
+>
                   {/* Título y descripción */}
                   {(() => {
                     const calc = calculators.find(c => c.id === selectedId);

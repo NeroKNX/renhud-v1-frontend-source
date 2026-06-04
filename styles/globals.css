@@ -181,6 +181,8 @@
   letter-spacing: 0.08em;
   padding: 12px 0 4px 0;
   font-family: monospace;
+  display: flex;
+  align-items: center;
 }
 .apache-iv-root .section-subtitle:first-of-type {
   padding-top: 0;
@@ -356,6 +358,23 @@
   box-shadow: 0 0 12px rgba(124, 92, 255, 0.12);
 }
 .apache-iv-root .num-input::placeholder { color: var(--text-dim); opacity: 0.4; }
+
+.apache-iv-root .input-missing {
+  border-color: #EF4444 !important;
+  box-shadow: 0 0 0 2px rgba(239,68,68,0.2), 0 0 12px rgba(239,68,68,0.15) !important;
+}
+
+.apache-iv-root .field-missing {
+  position: relative;
+}
+.apache-iv-root .field-missing::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  border: 1px dashed rgba(239,68,68,0.25);
+  pointer-events: none;
+}
 
 .apache-iv-root .num-with-badge {
   display: flex;

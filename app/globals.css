@@ -568,6 +568,8 @@ html::after {
   letter-spacing: 0.10em;
   padding: 12px 0 4px 0;
   font-family: monospace;
+  display: flex;
+  align-items: center;
 }
 
 .apache-iv-root .section-subtitle:first-of-type {
@@ -1078,5 +1080,14 @@ html::after {
 
 .apache-iv-root .animate-in {
   animation: fadeSlideUp 0.3s ease-out;
+}
+
+.apache-iv-root .required-star {
+  color: #ef4444;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 0;
+  vertical-align: middle;
+  margin-left: 1px;
 }
 
