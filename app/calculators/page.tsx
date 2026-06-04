@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Layers, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/lib/auth-context';
@@ -15,8 +15,8 @@ import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
 function calcIcon(id: string) {
   switch (id) {
     case 'apache-iv': return <Activity className="w-5 h-5" />;
-    case 'sofa': return <Zap className="w-5 h-5" />;
-    case 'news2': return <Heart className="w-5 h-5" />;
+    case 'sofa': return <Layers className="w-5 h-5" />;
+    case 'news2': return <AlertTriangle className="w-5 h-5" />;
     case 'nihss': return <Brain className="w-5 h-5" />;
     default: return <Calculator className="w-5 h-5" />;
   }
@@ -212,7 +212,7 @@ export default function CalculatorsPage() {
           <CrowIcon size="lg" animate />
           <div>
             <h1 className="text-base md:text-lg font-mono tracking-tight">
-              <span className="ren-gradient-text">Calculadoras</span>
+              <span className="ren-gradient-text">Scores clínicos</span>
             </h1>
           </div>
         </div>
@@ -253,9 +253,8 @@ export default function CalculatorsPage() {
                 className="w-full max-w-[640px]"
               >
                 <div className="text-center mb-6">
-                  <h2 className="text-lg font-bold ren-gradient-text mb-1" style={{ fontFamily: 'JetBrains Mono, monospace' }}>Herramientas clínicas</h2>
                   <p className="text-xs ren-text-secondary leading-relaxed max-w-[420px] mx-auto">
-                    Scores médicos basados en evidencia.
+                    Scores clínicos basados en evidencia. Resultados reproducibles.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 gap-2.5">
@@ -278,8 +277,7 @@ export default function CalculatorsPage() {
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-semibold ren-text-primary">{calc.shortName || calc.name}</p>
-                        <p className="text-[11px] ren-text-tertiary mt-0.5 leading-relaxed line-clamp-2">{calc.description}</p>
-                        <p className="text-[10px] font-mono ren-text-tertiary mt-1">{calc.variableCount} variables · v{calc.version}</p>
+                        <p className="text-[11px] ren-text-tertiary mt-0.5 leading-relaxed">{calc.description}</p>
                       </div>
                       <svg className="ren-text-tertiary group-hover:text-[var(--accent-hover)] group-hover:translate-x-0.5 transition-all shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                     </motion.button>
