@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Activity, Layers, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Beaker, ChevronDown, ChevronRight, Calculator, AlertCircle, Info, FlaskConical, Crosshair, Grid3X3, Heart, Droplets, Thermometer, Wind, Syringe, Pill, Zap, BarChart3, Globe, FileText, Brain, Copy, BookOpen, AlertTriangle, Sun, Moon } from 'lucide-react';
 import { CrowIcon } from '@/components/ui/crow-icon';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/lib/auth-context';
@@ -14,8 +14,8 @@ import ApacheIVCalculator from '@/components/calculators/apache-iv-calculator';
 
 function calcIcon(id: string) {
   switch (id) {
-    case 'apache-iv': return <Activity className="w-5 h-5" />;
-    case 'sofa': return <Layers className="w-5 h-5" />;
+    case 'apache-iv': return <Crosshair className="w-5 h-5" />;
+    case 'sofa': return <Grid3X3 className="w-5 h-5" />;
     case 'news2': return <AlertTriangle className="w-5 h-5" />;
     case 'nihss': return <Brain className="w-5 h-5" />;
     default: return <Calculator className="w-5 h-5" />;
