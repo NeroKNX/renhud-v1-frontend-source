@@ -9,9 +9,9 @@ export function KeyboardShortcutsHelp() {
   const [isTouchDevice, setIsTouchDevice] = useState(true);
 
   useEffect(() => {
-    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const hasKeyboard = !('ontouchstart' in window) || navigator.maxTouchPoints === 0;
-    setIsTouchDevice(!(hasHover || hasKeyboard));
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const noHover = window.matchMedia('(hover: none)').matches;
+    setIsTouchDevice(coarsePointer || noHover);
   }, []);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export function KeyboardShortcutsHelp() {
     <>
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-5 right-5 p-2.5 rounded-full z-40"
+        className="fixed bottom-5 right-5 p-2.5 rounded-[2px] z-40"
         style={{
           backgroundColor: 'var(--ren-bg-tertiary)',
           border: '1px solid var(--ren-border)',

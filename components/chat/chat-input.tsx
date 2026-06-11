@@ -256,12 +256,6 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
           </button>
         </div>
       </form>
-      
-      {!isTouchDevice && (
-        <p className="text-[10px] sm:text-xs text-[var(--ren-text-tertiary)] mt-2 text-center font-mono px-2">
-          Presiona <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Enter</kbd> para enviar, <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Shift + Enter</kbd> para nueva linea
-        </p>
-      )}
     </motion.div>
   );
 }
