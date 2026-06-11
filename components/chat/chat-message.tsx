@@ -163,22 +163,22 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, activeTrick, f
     ? htmlContent + '<span class="ren-streaming-cursor">▊</span>'
     : htmlContent;
 
-  // ── Burbuja pensando (streaming, texto vacío) ──
+  // ── Bloque pensando (streaming, texto vacío) ──
   if (!message && !isUser) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-        className="flex gap-1.5 sm:gap-2 justify-start mb-2 sm:mb-2.5 group"
+        className="flex gap-1.5 sm:gap-2 justify-start mb-3 sm:mb-4 group"
       >
         <CrowIcon size="md" animate />
-        <div className="relative flex flex-col max-w-[88%] sm:max-w-[82%] md:max-w-[68%] min-w-0 items-start">
-          <div className="bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] rounded-2xl rounded-bl-sm px-4 sm:px-4 py-3 sm:py-3.5">
+        <div className="relative flex flex-col max-w-[88%] sm:max-w-[82%] min-w-0 items-start">
+          <div className="ren-block-ai ren-block-thinking px-4 sm:px-5 py-3 sm:py-3.5">
             <div className="flex items-center gap-1.5 h-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--ren-text-tertiary)]/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="ren-thinking-dot w-1.5 h-1.5 rounded-full bg-[var(--accent-color)]" style={{ animationDelay: '0ms' }} />
+              <span className="ren-thinking-dot w-1.5 h-1.5 rounded-full bg-[var(--accent-color)]" style={{ animationDelay: '200ms' }} />
+              <span className="ren-thinking-dot w-1.5 h-1.5 rounded-full bg-[var(--accent-color)]" style={{ animationDelay: '400ms' }} />
             </div>
           </div>
         </div>
@@ -192,28 +192,24 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, activeTrick, f
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-      className={`flex gap-1.5 sm:gap-2 ${isUser ? 'justify-end' : 'justify-start'} mb-2 sm:mb-2.5 group`}
+      className={`flex gap-1.5 sm:gap-2 ${isUser ? 'justify-end' : 'justify-start'} mb-3 sm:mb-4 group`}
     >
       {!isUser && (
         <CrowIcon size="md" animate />
       )}
 
-      <div className={`relative flex flex-col max-w-[88%] sm:max-w-[82%] md:max-w-[68%] min-w-0 ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`relative flex flex-col min-w-0 ${isUser ? 'items-end max-w-[78%] sm:max-w-[65%]' : 'items-start max-w-[90%] sm:max-w-[82%]'}`}>
         <div 
           ref={bubbleRef} 
           onClick={handleBubbleTap}
-          className={`relative px-3 sm:px-3.5 py-1.5 sm:py-2 transition-all min-w-0 ${
-            isUser && activeTrick
-              ? 'bg-[var(--ren-bg-message-user)] text-[var(--ren-text-primary)] rounded-2xl rounded-br-sm border-2'
-              : isUser
-                ? 'bg-[var(--ren-bg-message-user)] text-[var(--ren-text-primary)] rounded-2xl rounded-br-sm ring-1 ring-[var(--accent-color)]/20'
-                : activeTrick
-                  ? 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border-2'
-                  : isDeep
-                    ? 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border-2 border-[var(--accent-color)]/40'
-                    : 'bg-[var(--ren-bg-message-ai)] text-[var(--ren-text-primary)] rounded-2xl rounded-bl-sm border border-[var(--ren-border)]'
+          className={`relative px-3.5 sm:px-5 py-2.5 sm:py-3 transition-all min-w-0 ${
+            isUser
+              ? 'ren-block-user text-[var(--ren-text-primary)]'
+              : 'ren-block-ai text-[var(--ren-text-primary)]'
           }`}
-          style={activeTrick && !isUser ? { borderColor: activeTrick.color + '66' } : isUser && activeTrick ? { borderColor: activeTrick.color + '66' } : undefined}
+          style={activeTrick ? (isUser
+            ? { borderRightColor: activeTrick.color }
+            : { borderLeftColor: activeTrick.color }) : undefined}
         >
           {/* Trick badge */}
           {activeTrick && (
@@ -250,7 +246,7 @@ export function ChatMessage({ message, isUser, timestamp, isDeep, activeTrick, f
 
           <div
             ref={contentRef}
-            className="ren-markdown leading-[1.5] tracking-[0.01em] text-sm md:text-base text-[var(--ren-text-primary)] select-text"
+            className={`ren-markdown tracking-[0.005em] text-sm md:text-[15px] text-[var(--ren-text-primary)] select-text ${isUser ? 'leading-[1.6]' : 'leading-[1.7]'}`}
             style={{ userSelect: 'text', WebkitUserSelect: 'text' }}
             dangerouslySetInnerHTML={{ __html: finalHtml }}
           />

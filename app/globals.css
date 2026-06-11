@@ -14,50 +14,59 @@ html {
 }
 
 :root {
-  /* Ren Theme - Dark Mode (unificado) */
-  --ren-bg-primary: #0a0a0c;
-  --ren-bg-secondary: #131316;
-  --ren-bg-tertiary: #18181b;
-  --ren-overlay: rgba(0,0,0,0.55);
-  --ren-shadow-sidebar: 0 0 50px rgba(0,0,0,0.5);
-  --ren-bg-header: #0a0a0c;
-  --ren-bg-message-user: #2e2e40;
-  --ren-bg-message-ai: #1e1e2a;
-  --ren-text-primary: #e4e4e7;
-  --ren-text-secondary: #a1a1aa;
-  --ren-text-tertiary: #71717a;
-  --ren-border: #1e1e24;
-  --ren-border-subtle: #18181b;
-  --ren-shadow: rgba(0, 0, 0, 0.4);
-  --ren-shadow-accent: rgba(99, 102, 241, 0.15);
-  --accent-color: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-muted: rgba(99, 102, 241, 0.08);
+  /* ─────────────────────────────────────────────
+     REN V2 — "Taller de artesano digital"
+     Luz de lámpara sobre plano de trabajo nocturno
+     ───────────────────────────────────────────── */
+  --ren-bg-primary: #0B0E14;     /* Fondo principal */
+  --ren-bg-secondary: #131820;   /* Superficies: paneles, contenedores */
+  --ren-bg-tertiary: #131820;    /* Input, contenedores secundarios */
+  --ren-overlay: rgba(7,9,13,0.65);
+  --ren-shadow-sidebar: 0 0 50px rgba(0,0,0,0.55);
+  --ren-bg-header: #0B0E14;
+  --ren-bg-message-user: rgba(19,24,32,0.8);   /* Bloque usuario */
+  --ren-bg-message-ai: rgba(19,24,32,0.5);      /* Bloque REN */
+  --ren-text-primary: #E8E0D5;   /* Pergamino */
+  --ren-text-secondary: #8A8378; /* Gris cálido */
+  --ren-text-tertiary: #8A8378;  /* Metadatos, fechas */
+  --ren-border: #1E2530;         /* Separadores, contornos */
+  --ren-border-subtle: #161c25;
+  --ren-shadow: rgba(0, 0, 0, 0.5);
+  --ren-shadow-accent: rgba(212, 168, 83, 0.15);
+
+  /* Acentos */
+  --accent-color: #D4A853;       /* Ámbar cálido — acciones, foco, bordes activos */
+  --accent-hover: #E2BD73;       /* Ámbar claro — hover */
+  --accent-muted: rgba(212, 168, 83, 0.08);
+  --accent-secondary: #5E8B7E;   /* Verde cobre — éxito, valores médicos */
+  --accent-secondary-muted: rgba(94, 139, 126, 0.15);
+  --accent-warning: #C77D4B;     /* Error / advertencia / incógnitas */
+
   --base-font-size: 16px;
-  --text-light: #e4e4e7;
-  --text-muted: #a1a1aa;
-  --text-dim: #71717a;
-  
-  --background: #0a0a0c;
-  --foreground: #e4e4e7;
-  --card: #131316;
-  --card-foreground: #e4e4e7;
-  --popover: #131316;
-  --popover-foreground: #e4e4e7;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #18181b;
-  --secondary-foreground: #e4e4e7;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #1e1e24;
-  --input: #18181b;
-  --ring: #6366f1;
-  --radius: 0.625rem;
+  --text-light: #E8E0D5;
+  --text-muted: #8A8378;
+  --text-dim: #8A8378;
+
+  --background: #0B0E14;
+  --foreground: #E8E0D5;
+  --card: #131820;
+  --card-foreground: #E8E0D5;
+  --popover: #131820;
+  --popover-foreground: #E8E0D5;
+  --primary: #D4A853;
+  --primary-foreground: #0B0E14;
+  --secondary: #131820;
+  --secondary-foreground: #E8E0D5;
+  --muted: #131820;
+  --muted-foreground: #8A8378;
+  --accent: #D4A853;
+  --accent-foreground: #0B0E14;
+  --destructive: #C77D4B;
+  --destructive-foreground: #0B0E14;
+  --border: #1E2530;
+  --input: #131820;
+  --ring: #D4A853;
+  --radius: 0.5rem;
 }
 
 [data-theme="light"] {
@@ -141,8 +150,8 @@ html {
 }
 
 @theme inline {
-  --font-sans: 'Inter', 'Inter Fallback';
-  --font-mono: 'Inter', 'Inter Fallback';
+  --font-sans: var(--font-inter), 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -193,6 +202,59 @@ html {
     background: var(--background);
     font-size: var(--base-font-size);
   }
+}
+
+/* ─────────────────────────────────────────────
+   REN V2 — Textura de taller (luz de lámpara)
+   Gradiente radial sutil + capa de ruido leve
+   ───────────────────────────────────────────── */
+.ren-workshop-surface {
+  position: relative;
+  background-color: var(--ren-bg-primary);
+  background-image:
+    radial-gradient(900px circle at 50% 0%, rgba(212, 168, 83, 0.05), transparent 60%),
+    radial-gradient(1200px circle at 50% 120%, rgba(94, 139, 126, 0.03), transparent 55%);
+}
+.ren-workshop-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Bloque de mensaje REN — borde izquierdo grueso ámbar */
+.ren-block-ai {
+  background: var(--ren-bg-message-ai);
+  border-left: 4px solid var(--accent-color);
+  border-radius: 2px;
+  line-height: 1.7;
+}
+/* Bloque de mensaje Usuario — borde derecho fino verde cobre */
+.ren-block-user {
+  background: var(--ren-bg-message-user);
+  border-right: 2px solid var(--accent-secondary);
+  border-radius: 2px;
+  line-height: 1.6;
+}
+/* Mensaje "pensando" — pulso de opacidad en el borde */
+.ren-block-thinking {
+  opacity: 0.6;
+  animation: renPulseBorder 1.8s ease-in-out infinite;
+}
+@keyframes renPulseBorder {
+  0%, 100% { border-left-color: var(--accent-color); opacity: 0.45; }
+  50%      { border-left-color: var(--accent-hover); opacity: 0.75; }
+}
+/* Puntos de "pensando" */
+@keyframes renThinkingDots {
+  0%, 20%  { opacity: 0.2; }
+  50%      { opacity: 1; }
+  80%, 100%{ opacity: 0.2; }
+}
+.ren-thinking-dot {
+  animation: renThinkingDots 1.4s ease-in-out infinite;
 }
 
 /* Ren gradient text */
@@ -303,64 +365,64 @@ input[type="number"] {
 /* Markdown styles for chat */
 .ren-markdown {
   font-size: inherit;
-  line-height: 1.45;
+  line-height: 1.7;
 }
-.ren-markdown p { margin: 0.2em 0; }
+.ren-markdown p { margin: 0.5em 0; }
 .ren-markdown p:first-child { margin-top: 0; }
 .ren-markdown p:last-child { margin-bottom: 0; }
-.ren-markdown strong { color: #c7d2fe; font-weight: 700; }
-.ren-markdown em { color: #a5b4fc; font-style: italic; }
-.ren-markdown ul, .ren-markdown ol { margin: 0.15em 0; padding-left: 1.2em; }
-.ren-markdown li { margin: 0.1em 0; line-height: 1.4; }
+.ren-markdown strong { color: var(--accent-color); font-weight: 600; }
+.ren-markdown em { color: var(--accent-secondary); font-style: italic; }
+.ren-markdown ul, .ren-markdown ol { margin: 0.4em 0; padding-left: 1.2em; }
+.ren-markdown li { margin: 0.25em 0; line-height: 1.6; }
 .ren-markdown ul li { list-style: none; position: relative; }
 .ren-markdown ul li::before {
   content: "▸";
   position: absolute;
   left: -1.1em;
-  color: #818cf8;
+  color: var(--accent-color);
   font-size: 0.9em;
 }
 .ren-markdown h1, .ren-markdown h2, .ren-markdown h3, .ren-markdown h4 {
-  color: #e0e7ff;
-  font-weight: 700;
-  margin: 0.4em 0 0.2em;
-  line-height: 1.3;
+  color: var(--accent-color);
+  font-weight: 600;
+  margin: 0.6em 0 0.3em;
+  line-height: 1.35;
 }
 .ren-markdown code {
-  background: #1a1d2e;
+  background: rgba(11, 14, 20, 0.6);
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.88em;
-  font-family: ui-monospace, monospace;
-  color: #e2e8f0;
-  border: 1px solid #2d3250;
+  font-family: var(--font-mono);
+  color: var(--accent-secondary);
+  border: 1px solid var(--ren-border);
 }
 .ren-markdown pre {
   background: #0a0d14;
-  border: 1px solid #1e2238;
-  border-radius: 8px;
+  border: 1px solid var(--ren-border);
+  border-radius: 6px;
   padding: 0.6em;
   overflow-x: auto;
-  margin: 0.3em 0;
+  margin: 0.5em 0;
 }
 .ren-markdown pre code {
   background: none;
   border: none;
   padding: 0;
   font-size: 0.85em;
-  color: #cbd5e1;
+  color: var(--ren-text-primary);
   white-space: pre-wrap;
 }
 .ren-markdown blockquote {
-  border-left: 3px solid #818cf8;
+  border-left: 3px solid var(--accent-color);
   padding: 0.15em 0.6em;
-  margin: 0.3em 0;
-  color: #9ca3af;
-  background: rgba(129, 140, 248, 0.04);
-  border-radius: 0 6px 6px 0;
+  margin: 0.5em 0;
+  color: var(--ren-text-secondary);
+  background: rgba(212, 168, 83, 0.05);
+  border-radius: 0 4px 4px 0;
 }
 .ren-markdown a {
-  color: #818cf8;
+  color: var(--accent-color);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

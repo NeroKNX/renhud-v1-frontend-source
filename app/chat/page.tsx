@@ -751,7 +751,7 @@ export default function ChatPage() {
 
   // ──────────────────────────────────────────────
   // Cargar sesión desde URL al montar (soporte para nueva pestaña)
-  // ──────────────────────────────────────────────
+  // ───────────���──────────────────────────────────
   useEffect(() => {
     if (!isInitialLoadDone || !userId || serverSessions.length === 0) return;
     if (currentSessionId) return; // ya hay sesión activa, no sobreescribir
@@ -1148,7 +1148,7 @@ export default function ChatPage() {
           {/* Chat area */}
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 scroll-smooth ren-scrollbar"
+            className="flex-1 overflow-y-auto px-2 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 scroll-smooth ren-scrollbar ren-workshop-surface"
           >
             {!isInitialLoadDone ? (
               <div className="flex items-center justify-center min-h-[60vh]">

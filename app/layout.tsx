@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import { AuthProvider } from '@/lib/auth-context'
 import './globals.css'
 
 const inter = Inter({
   subsets: ["latin"],
+  weight: ['300', '400', '500', '600'],
   variable: '--font-inter',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ['400', '500'],
+  variable: '--font-jetbrains-mono',
 });
 
 export const metadata: Metadata = {
@@ -19,7 +26,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0c',
+  themeColor: '#0B0E14',
   width: 'device-width',
   initialScale: 1,
 }
@@ -33,7 +40,7 @@ const themeScript = `
     if (theme !== 'dark') document.documentElement.classList.remove('dark');
     else document.documentElement.classList.add('dark');
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a0a0c' : '#f8fafc');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0B0E14' : '#f8fafc');
   } catch(e) {}
 `;
 
@@ -47,7 +54,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${inter.variable} font-sans antialiased ren-bg-primary`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased ren-bg-primary`}>
         <AuthProvider>
           {children}
         </AuthProvider>

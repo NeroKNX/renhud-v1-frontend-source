@@ -150,7 +150,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2 sm:gap-3 w-full max-w-[720px] mx-auto">
         <div className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 overflow-x-auto scrollbar-none">
           <div className="flex items-center gap-1.5 sm:gap-2 group relative flex-shrink-0">
             <motion.button
@@ -209,11 +209,11 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
           )}
         </div>
 
-        <div className={`flex items-end gap-1.5 sm:gap-2 bg-[var(--ren-bg-tertiary)] border rounded-lg px-2.5 sm:px-4 py-2 sm:py-2.5 transition-all ${
+        <div className={`flex items-end gap-1.5 sm:gap-2 bg-[var(--ren-bg-secondary)] border rounded-lg px-2.5 sm:px-4 py-2 sm:py-2.5 transition-all ${
           isAdvancedMode
-            ? 'border-[var(--accent-color)] shadow-[0_0_20px_rgba(79,70,229,0.25)] ring-2 ring-[var(--accent-color)]/20'
+            ? 'border-[var(--accent-color)] shadow-[0_0_20px_rgba(212,168,83,0.25)] ring-2 ring-[var(--accent-color)]/20'
             : isFocused
-              ? 'border-[var(--accent-color)] shadow-[0_0_15px_rgba(79,70,229,0.15)]'
+              ? 'border-[var(--accent-color)] shadow-[0_0_0_2px_rgba(212,168,83,0.15)]'
               : 'border-[var(--ren-border)]'
         }`}>
           <input
@@ -242,17 +242,17 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             disabled={disabled}
-            placeholder="Escribe un mensaje..."
+            placeholder="Escribe en el plano..."
             rows={1}
-            className="flex-1 bg-transparent outline-none text-sm sm:text-base text-[var(--ren-text-primary)] placeholder:text-[var(--ren-text-tertiary)] resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
+            className="flex-1 bg-transparent outline-none text-sm sm:text-base text-[var(--ren-text-primary)] placeholder:text-[var(--ren-text-tertiary)] placeholder:italic resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
           />
           <button
             type="submit"
             disabled={(!message.trim() && attachedFiles.length === 0) || disabled}
-            className="text-[var(--accent-color)] hover:text-[var(--accent-color)] hover:scale-110 disabled:text-[var(--ren-text-tertiary)] disabled:cursor-not-allowed transition-all pb-0.5 flex-shrink-0"
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-[var(--accent-color)] text-[var(--ren-bg-primary)] hover:scale-105 hover:shadow-[0_0_12px_rgba(212,168,83,0.3)] disabled:bg-[var(--ren-bg-tertiary)] disabled:text-[var(--ren-text-tertiary)] disabled:border disabled:border-[var(--ren-border)] disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed transition-all"
             aria-label="Enviar mensaje"
           >
-            <Send size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <Send size={16} />
           </button>
         </div>
       </form>
