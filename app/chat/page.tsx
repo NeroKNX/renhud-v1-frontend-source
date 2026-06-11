@@ -16,7 +16,6 @@ import { InsightRail } from '@/components/chat/insight-rail';
 import { SettingsPanel } from '@/components/chat/settings-panel';
 import { TricksPanel, type TrickPrompt } from '@/components/chat/tricks-panel';
 import { ProfilePanel } from '@/components/chat/profile-panel';
-import { KeyboardShortcutsHelp } from '@/components/chat/keyboard-shortcuts-help';
 import { useAuth } from '@/lib/auth-context';
 import { EmptyState } from '@/components/chat/empty-state';
 import { SessionManager, type Message, type ChatSession, type TrickInfo } from '@/lib/session-manager';
@@ -751,7 +750,7 @@ export default function ChatPage() {
     }
   }, [currentSessionId]);
 
-  // ──────────────────────────────────────────────
+  // ───────────────────────────────────────���──────
   // Cargar sesión desde URL al montar (soporte para nueva pestaña)
   // ─────────���─�����──────────────────────────────────
   useEffect(() => {
@@ -1301,9 +1300,6 @@ export default function ChatPage() {
         userId={userId}
         userName={userName}
       />
-
-      {/* Keyboard shortcuts help */}
-      <KeyboardShortcutsHelp />
     </>
   );
 }
