@@ -100,30 +100,33 @@ export default function SofaCalculator() {
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest flex items-center gap-1.5 text-amber-400">
             <Zap size={12} /> qSOFA — Cribado rápido
-            <span className="text-[9px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-1.5 py-0.5 rounded border border-[var(--ren-border)] ml-1">Sepsis-3</span>
+            <span className="text-[9px] font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] px-1.5 py-0.5 rounded-[2px] border border-[var(--ren-border)] ml-1">Sepsis-3</span>
           </h3>
-          <p className="text-[10px] ren-text-tertiary mt-0.5 ml-[1.125rem]">Alerta temprana · FR ≥ 22 · PAS ≤ 100 · GCS {'<'} 15</p>
+          <p className="text-[10px] ren-text-tertiary mt-0.5 ml-[1.125rem]">FR ≥ 22 rpm · PAS ≤ 100 mmHg · GCS {'<'} 15</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <div>
-            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">Frec. respiratoria ≥22 rpm</label>
-            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+        <div className="grid grid-cols-3 gap-2">
+          {/* FR ≥ 22 */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-mono text-amber-400/80 px-0.5 leading-tight">FR ≥ 22 rpm</label>
+            <div className="flex flex-1 rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">PAS ≤100 mmHg</label>
-            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+          {/* PAS ≤ 100 */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-mono text-amber-400/80 px-0.5 leading-tight">PAS ≤ 100 mmHg</label>
+            <div className="flex flex-1 rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
-          <div>
-            <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">GCS {'<'} 15</label>
-            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+          {/* GCS < 15 */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-[10px] font-mono text-amber-400/80 px-0.5 leading-tight">GCS {'<'} 15</label>
+            <div className="flex flex-1 rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 py-2.5 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
         </div>

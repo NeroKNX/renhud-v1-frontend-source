@@ -223,7 +223,7 @@ function CalculatorThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="p-2 rounded-xl transition-all hover:bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/50"
+            className="p-2 rounded-[2px] transition-all hover:bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/50"
       title={theme === 'dark' ? 'Tema claro' : 'Tema oscuro'}
     >
       {theme === 'dark' ? (
@@ -301,7 +301,7 @@ export default function CalculatorsPage() {
                 router.push('/');
               }
             }}
-            className="p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-colors"
             title={selectedId ? 'Volver al menú' : 'Ir al chat'}
           >
             <ArrowLeft size={18} className="text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
@@ -444,7 +444,7 @@ export default function CalculatorsPage() {
                               initial={{ opacity: 0, height: 0 }}
                               animate={{ opacity: 1, height: 'auto' }}
                               exit={{ opacity: 0, height: 0 }}
-                              className="mt-3 rounded-xl border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)] overflow-hidden"
+                              className="mt-3 rounded-[2px] border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)] overflow-hidden"
                             >
                               <div className="p-4">
                                 {/* Tabs — pills horizontales */}
@@ -453,7 +453,7 @@ export default function CalculatorsPage() {
                                     <button
                                       key={tab.id}
                                       onClick={() => setFichaTab(idx)}
-                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all ${
+                                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-xs whitespace-nowrap transition-all ${
                                         fichaTab === idx
                                           ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)]'
                                           : 'bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] ren-text-secondary hover:text-[var(--accent-hover)]'
@@ -494,14 +494,14 @@ export default function CalculatorsPage() {
                                     >
                                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         {f.interpretacion.map((i, idx) => (
-                                          <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                          <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-[2px] p-3">
                                             <p className="text-xs font-mono font-semibold ren-text-primary mb-1">{i.rango}</p>
                                             <p className="text-[11px] ren-text-secondary leading-relaxed">{i.significado}</p>
                                           </div>
                                         ))}
                                       </div>
                                       {f === fichasTecnicas.news2 && (
-                                        <div className="mt-3 border border-amber-500/30 bg-amber-500/5 rounded-lg p-3">
+                                        <div className="mt-3 border border-amber-500/30 bg-amber-500/5 rounded-[2px] p-3">
                                           <p className="text-[11px] text-amber-300 leading-relaxed">
                                             <strong>Regla clave:</strong> Cualquier componente individual con puntuación 3 activa respuesta
                                             urgente independientemente del score total.
@@ -509,7 +509,7 @@ export default function CalculatorsPage() {
                                         </div>
                                       )}
                                       {f.ventanaTerapeutica && (
-                                        <div className="mt-3 border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                        <div className="mt-3 border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-[2px] p-3">
                                           <p className="text-[11px] font-semibold ren-text-primary mb-2">Ventana terapéutica</p>
                                           <ul className="space-y-1.5">
                                             {f.ventanaTerapeutica.map((v: string, i: number) => (
@@ -543,7 +543,7 @@ export default function CalculatorsPage() {
                                         <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">Interpretación</p>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                           {f.qsofa.interpretacion.map((i, idx) => (
-                                            <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-lg p-3">
+                                            <div key={idx} className="border border-[var(--ren-border)] bg-[var(--ren-bg-tertiary)] rounded-[2px] p-3">
                                               <p className="text-xs font-mono font-semibold ren-text-primary mb-1">{i.rango}</p>
                                               <p className="text-[11px] ren-text-secondary leading-relaxed">{i.significado}</p>
                                             </div>
@@ -580,31 +580,31 @@ export default function CalculatorsPage() {
                                           {f.referenciaRapida.pesos.map((p, idx) => (
                                             <div
                                               key={idx}
-                                              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
+                                              className="flex items-center justify-between px-3 py-2 rounded-[2px] bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
                                             >
                                               <span className="text-[11px] ren-text-secondary">{p.variable}</span>
-                                              <span className="text-[11px] font-mono font-semibold text-amber-400/90">{p.pts}</span>
+                                              <span className="text-[11px] font-mono text-emerald-400/80">{p.rango}</span>
                                             </div>
                                           ))}
                                         </div>
                                       </div>
-
-                                      {/* Rangos que suman 0 */}
-                                      <div>
-                                        <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--accent-color)] mb-2">
-                                          Rangos que suman 0 puntos (fisiología normal)
-                                        </p>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                                          {f.referenciaRapida.rangosCero.map((r, idx) => (
-                                            <div
-                                              key={idx}
-                                              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
+                                    </motion.div>
+                                  )}
+                                  {activeTabId === 'complicaciones' && f.complicaciones && (
+                                    <motion.div
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      <div className="space-y-2">
+                                        {f.complicaciones.map((c: any, idx: number) => (
+                                          <div key={idx}
+                                              className="flex items-center justify-between px-3 py-2 rounded-[2px] bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]"
                                             >
-                                              <span className="text-[11px] ren-text-secondary">{r.variable}</span>
-                                              <span className="text-[11px] font-mono text-emerald-400/80">{r.rango}</span>
+                                              <span className="text-[11px] ren-text-secondary">{c.variable}</span>
+                                              <span className="text-[11px] font-mono text-emerald-400/80">{c.rango}</span>
                                             </div>
                                           ))}
-                                        </div>
                                       </div>
                                     </motion.div>
                                   )}
