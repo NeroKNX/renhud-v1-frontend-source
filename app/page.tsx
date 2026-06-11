@@ -109,31 +109,44 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.3 }}
-                className="mt-7 sm:mt-9 flex flex-wrap items-center gap-3"
+                className="mt-7 sm:mt-9 flex flex-col items-start gap-4"
               >
                 {isAuthenticated ? (
                   <>
-                    <button onClick={() => router.push('/chat')} className="ren-btn-sharp px-6 py-3 text-[14px]">
-                      Ir al chat →
-                    </button>
-                    <button
-                      onClick={async () => { await logout(); router.push('/'); }}
-                      className="ren-btn-outline px-6 py-3 text-[14px]"
-                    >
-                      Cerrar sesión
-                    </button>
-                    <span className="ren-spec-label flex items-center gap-1.5 pl-1">
-                      <span className="text-[var(--accent-color)]">●</span>
-                      {user?.name || user?.username}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button onClick={() => router.push('/chat')} className="ren-btn-sharp px-6 py-3 text-[14px]">
+                        Ir al chat →
+                      </button>
+                      <button
+                        onClick={async () => { await logout(); router.push('/'); }}
+                        className="ren-btn-outline px-6 py-3 text-[14px]"
+                      >
+                        Cerrar sesión
+                      </button>
+                      <span className="ren-spec-label flex items-center gap-1.5 pl-1">
+                        <span className="text-[var(--accent-color)]">●</span>
+                        {user?.name || user?.username}
+                      </span>
+                    </div>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => router.push('/register')} className="ren-btn-sharp px-6 py-3 text-[14px]">
-                      Crear cuenta →
-                    </button>
-                    <button onClick={enterGuest} className="ren-btn-outline px-6 py-3 text-[14px]">
-                      Continuar como invitado
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button onClick={() => router.push('/register')} className="ren-btn-sharp px-6 py-3 text-[14px]">
+                        Crear cuenta →
+                      </button>
+                      <button onClick={() => router.push('/login')} className="ren-btn-outline px-6 py-3 text-[14px]">
+                        Iniciar sesión
+                      </button>
+                    </div>
+                    <button
+                      onClick={enterGuest}
+                      className="group inline-flex items-center gap-2 text-[13px] text-[var(--ren-text-secondary)] hover:text-[var(--accent-color)] transition-colors pl-0.5"
+                    >
+                      <span className="underline underline-offset-4 decoration-[var(--ren-border)] group-hover:decoration-[var(--accent-color)] transition-colors">
+                        Continuar como invitado
+                      </span>
+                      <span className="transition-transform group-hover:translate-x-0.5">→</span>
                     </button>
                   </>
                 )}
