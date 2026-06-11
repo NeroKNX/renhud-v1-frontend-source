@@ -11,6 +11,8 @@ import { ChatInput } from '@/components/chat/chat-input';
 import { WelcomeLanding } from '@/components/chat/welcome-landing';
 
 import { HistorySidebar } from '@/components/chat/history-sidebar';
+import { SessionRail } from '@/components/chat/session-rail';
+import { InsightRail } from '@/components/chat/insight-rail';
 import { SettingsPanel } from '@/components/chat/settings-panel';
 import { TricksPanel, type TrickPrompt } from '@/components/chat/tricks-panel';
 import { ProfilePanel } from '@/components/chat/profile-panel';
@@ -751,7 +753,7 @@ export default function ChatPage() {
 
   // ──────────────────────────────────────────────
   // Cargar sesión desde URL al montar (soporte para nueva pestaña)
-  // ───────────�����──────────────────────────────────
+  // ─────────���─�����──────────────────────────────────
   useEffect(() => {
     if (!isInitialLoadDone || !userId || serverSessions.length === 0) return;
     if (currentSessionId) return; // ya hay sesión activa, no sobreescribir
@@ -922,39 +924,40 @@ export default function ChatPage() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-        className="min-h-dvh flex flex-col overflow-hidden"
+        className="h-dvh flex overflow-hidden"
         style={{ overscrollBehaviorX: 'none' }}
       >
-        <div className="w-full max-w-[860px] mx-auto flex flex-col h-dvh max-h-dvh">
+        {/* Rail izquierdo — sesiones (desktop) */}
+        <SessionRail
+          sessions={serverSessions}
+          currentSessionId={currentSessionId}
+          onSelectSession={handleSelectSession}
+          onNewSession={createNewSession}
+          isGuest={isGuest}
+          userName={userName}
+        />
+
+        {/* Columna central — conversación */}
+        <div className="flex-1 min-w-0 flex flex-col h-dvh max-h-dvh">
           {/* Header */}
           <motion.header
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.25, 0.1, 0.25, 1] }}
-            className="px-2 sm:px-4 md:px-6 py-3 md:py-4 border-b border-[var(--ren-border)] flex items-center justify-between gap-2 sm:gap-4 ren-bg-header"
+            className="px-2 sm:px-4 md:px-6 h-14 border-b border-[var(--ren-border)] flex items-center justify-between gap-2 sm:gap-4 ren-bg-header shrink-0"
             style={{ position: 'relative', zIndex: 10 }}
           >
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <CrowIcon size="lg" animate />
+              <span className="lg:hidden"><CrowIcon size="md" animate /></span>
 
-              <div className="min-w-0">
-                <h1 className="text-base sm:text-lg md:text-xl font-mono tracking-tight ren-text-primary flex items-center gap-2">
-                  Ren
-                  <span className={"inline-block w-1.5 h-1.5 rounded-full " + (isConnected ? "bg-green-500" : "bg-red-500")} title={isConnected ? 'Conectado' : 'Sin conexión'} />
-                </h1>
-                <div className="flex items-center gap-2">
-                  {isGuest ? (
-                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 bg-amber-500/10 text-amber-400/90 border border-amber-500/30 rounded font-mono">
-                      <User size={9} className="sm:w-[10px] sm:h-[10px]" />
-                      <span className="hidden xs:inline">Invitado</span>
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 bg-[var(--accent-color)]/10 text-[var(--accent-color)]/90 border border-[var(--accent-color)]/30 rounded font-mono truncate max-w-[100px] sm:max-w-none">
-                      <User size={9} className="sm:w-[10px] sm:h-[10px] flex-shrink-0" />
-                      {userName}
-                    </span>
-                  )}
-                </div>
+              <div className="min-w-0 flex items-center gap-2.5">
+                <span className="font-mono text-sm tracking-[0.2em] text-[var(--ren-text-primary)]">REN</span>
+                <span className={"inline-block w-1.5 h-1.5 rounded-full " + (isConnected ? "bg-[var(--accent-secondary)]" : "bg-[var(--accent-warning)]")} title={isConnected ? 'Conectado' : 'Sin conexión'} />
+                {isGuest ? (
+                  <span className="hidden sm:inline ren-spec-label">SESIÓN · INVITADO</span>
+                ) : (
+                  <span className="hidden sm:inline ren-spec-label truncate max-w-[140px]">{userName.toUpperCase()}</span>
+                )}
               </div>
             </div>
 
@@ -962,16 +965,16 @@ export default function ChatPage() {
               {/* Salir — siempre visible */}
               <button
                 onClick={() => router.push('/')}
-                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-colors"
                 title="Salir"
               >
                 <ArrowLeft size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
               </button>
 
-              {/* Calculadoras — solo visible en desktop */}
+              {/* Calculadoras — visible en tablet, oculto en desktop (vive en rail) */}
               <button
                 onClick={() => router.push('/calculators')}
-                className="hidden md:inline-flex p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
+                className="hidden md:inline-flex lg:hidden p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-colors"
                 title="Calculadoras clínicas"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]">
@@ -979,26 +982,26 @@ export default function ChatPage() {
                 </svg>
               </button>
 
-              {/* Siempre visibles: Historial, Nueva sesión, Favorito */}
+              {/* Historial, Nueva, Favorito — ocultos en desktop (viven en rail) */}
               <button onClick={() => setIsHistoryOpen(true)}
-                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors" title="Historial (Ctrl+H)">
+                className="lg:hidden p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-colors" title="Historial (Ctrl+H)">
                 <History size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
               </button>
               <button onClick={() => createNewSession()}
-                className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors" title="Nueva sesión (Ctrl+K)">
+                className="lg:hidden p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-colors" title="Nueva sesión (Ctrl+K)">
                 <Plus size={16} className="sm:w-[18px] sm:h-[18px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)]" />
               </button>
               <button onClick={handleToggleFavorite} disabled={messages.length === 0}
-                className={`p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isFavorite ? 'text-yellow-400' : 'text-[var(--ren-text-tertiary)]'}`}
+                className={`p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed ${isFavorite ? 'text-[var(--accent-color)]' : 'text-[var(--ren-text-tertiary)]'}`}
                 title={isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}>
                 <Star size={18} className={isFavorite ? 'fill-current' : ''} />
               </button>
 
               {/* Separador */}
-              <div className="hidden sm:block w-px h-5 bg-[var(--ren-border)] mx-0.5" />
+              <div className="hidden sm:block lg:hidden w-px h-5 bg-[var(--ren-border)] mx-0.5" />
 
-              {/* Desktop: botones visibles directamente */}
-              <div className="hidden md:flex items-center gap-0.5">
+              {/* Tablet: botones visibles directamente (ocultos en desktop) */}
+              <div className="hidden md:flex lg:hidden items-center gap-0.5">
                 {!isGuest && (
                   <button onClick={() => setIsProfileOpen(true)}
                     className="p-1.5 sm:p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
@@ -1242,6 +1245,23 @@ export default function ChatPage() {
             }}
           />
         </div>
+
+        {/* Rail derecho — panel cognitivo (desktop XL) */}
+        <InsightRail
+          messageCount={messages.length}
+          sessionCount={serverSessions.length}
+          tricks={tricks}
+          isFavorite={isFavorite}
+          isConnected={isConnected}
+          isGuest={isGuest}
+          userId={userId}
+          onOpenTricks={() => setIsTricksOpen(true)}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onExport={exportCurrentSession}
+          onNavigate={(path) => router.push(path)}
+          canExport={messages.length > 0}
+        />
       </motion.div>
 
       {/* History Sidebar — recibe sesiones del estado de React (desde API) */}

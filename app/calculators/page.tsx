@@ -277,13 +277,13 @@ export default function CalculatorsPage() {
   return (
     <div className="h-dvh flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="px-4 md:px-6 py-3 border-b border-[var(--ren-border)] flex items-center justify-between ren-bg-header shrink-0" style={{ position: 'relative', zIndex: 10 }}>
+      <header className="px-4 md:px-6 h-14 border-b border-[var(--ren-border)] flex items-center justify-between ren-bg-header shrink-0" style={{ position: 'relative', zIndex: 10 }}>
         <div className="flex items-center gap-3">
-          <CrowIcon size="lg" animate />
-          <div>
-            <h1 className="text-base md:text-lg font-mono tracking-tight">
-              <span className="ren-gradient-text">Scores clínicos</span>
-            </h1>
+          <CrowIcon size="md" animate />
+          <div className="flex items-center gap-2.5">
+            <span className="font-mono text-sm tracking-[0.2em] text-[var(--ren-text-primary)]">REN</span>
+            <span className="text-[var(--ren-border)]">/</span>
+            <span className="ren-spec-label">SCORES CLÍNICOS</span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -315,19 +315,24 @@ export default function CalculatorsPage() {
         {/* Contenido principal */}
         <main className="flex-1 overflow-y-auto ren-scrollbar">
           {!selectedId ? (
-            /* Pantalla de bienvenida — tarjetas compactas estilo mockup */
+            /* Pantalla de bienvenida — tarjetas afiladas blueprint */
             <div className="flex items-center justify-center min-h-full p-6">
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-[640px]"
+                className="w-full max-w-[680px]"
               >
-                <div className="text-center mb-6">
-                  <p className="text-xs ren-text-secondary leading-relaxed max-w-[420px] mx-auto">
-                    Scores clínicos basados en evidencia. Resultados reproducibles.
+                <div className="mb-8">
+                  <p className="ren-spec-label mb-3">[ INSTRUMENTOS · UCI ]</p>
+                  <h2 className="ren-display text-[clamp(32px,5vw,48px)] text-[var(--ren-text-primary)] mb-3">
+                    Scores<br /><span className="thin">clínicos.</span>
+                  </h2>
+                  <p className="text-sm ren-text-secondary leading-relaxed max-w-[440px]">
+                    Basados en evidencia. Resultados reproducibles, trazables y listos para documentar.
                   </p>
                 </div>
-                <div className="grid grid-cols-1 gap-2.5">
+                <div className="ren-rule mb-6" />
+                <div className="grid grid-cols-1 gap-px bg-[var(--ren-border)] border border-[var(--ren-border)]">
                   {calculators.map((calc, i) => (
                     <motion.button
                       key={calc.id}
@@ -340,16 +345,17 @@ export default function CalculatorsPage() {
                         url.searchParams.set('calc', calc.id);
                         window.history.replaceState({}, '', url.toString());
                       }}
-                      className="group flex items-center gap-3.5 p-4 rounded-xl bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:bg-[var(--accent-color)]/5 transition-all text-left"
+                      className="group flex items-center gap-4 p-4 bg-[var(--ren-bg-primary)] hover:bg-[var(--accent-muted)] transition-all text-left relative"
                     >
-                      <span className="w-[42px] h-[42px] rounded-lg bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] flex items-center justify-center text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-hover)] group-hover:border-[var(--accent-color)]/30 transition-all shrink-0">
+                      <span className="font-mono text-[11px] text-[var(--accent-color)] opacity-70 shrink-0 w-6">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="w-[42px] h-[42px] rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] flex items-center justify-center text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-hover)] group-hover:border-[var(--accent-color)]/40 transition-all shrink-0">
                         {calcIcon(calc.id)}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-semibold ren-text-primary">{calc.shortName || calc.name}</p>
+                        <p className="text-sm font-semibold ren-text-primary tracking-tight">{calc.shortName || calc.name}</p>
                         <p className="text-[11px] ren-text-tertiary mt-0.5 leading-relaxed">{calc.description}</p>
                       </div>
-                      <svg className="ren-text-tertiary group-hover:text-[var(--accent-hover)] group-hover:translate-x-0.5 transition-all shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                      <ChevronRight size={16} className="ren-text-tertiary group-hover:text-[var(--accent-hover)] group-hover:translate-x-0.5 transition-all shrink-0" />
                     </motion.button>
                   ))}
                 </div>
@@ -385,10 +391,10 @@ export default function CalculatorsPage() {
                               url.searchParams.set('calc', id);
                               window.history.replaceState({}, '', url.toString());
                             }}
-                            className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
+                            className={`px-2.5 py-1 rounded-[2px] text-[11px] font-mono transition-all ${
                               active
-                                ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)] font-semibold'
-                                : 'bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] ren-text-secondary hover:text-[var(--accent-hover)] hover:border-[var(--accent-color)]/30'
+                                ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/40 text-[var(--accent-color)] font-semibold'
+                                : 'bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-secondary hover:text-[var(--accent-hover)] hover:border-[var(--accent-color)]/40'
                             }`}
                           >
                             {c?.shortName || c?.name || id}
@@ -398,7 +404,7 @@ export default function CalculatorsPage() {
                     </div>
                     <div className="mb-5">
                       <div className="flex items-start gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-[2px] bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/40 flex items-center justify-center shrink-0">
                           {calcIcon(selectedId)}
                         </div>
                         <div className="min-w-0 flex-1">
