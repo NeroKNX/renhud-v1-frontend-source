@@ -29,9 +29,9 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
   const [isTouchDevice, setIsTouchDevice] = useState(true);
 
   useEffect(() => {
-    const hasHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-    const hasKeyboard = !('ontouchstart' in window) || navigator.maxTouchPoints === 0;
-    setIsTouchDevice(!(hasHover || hasKeyboard));
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const noHover = window.matchMedia('(hover: none)').matches;
+    setIsTouchDevice(coarsePointer || noHover);
   }, []);
   
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -209,11 +209,11 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
           )}
         </div>
 
-        <div className={`flex items-end gap-1.5 sm:gap-2 bg-[var(--ren-bg-secondary)] border rounded-[2px] px-2.5 sm:px-4 py-2 sm:py-2.5 transition-all ${
+        <div className={`flex items-end gap-2 bg-[var(--ren-bg-secondary)] border rounded-[2px] pl-2.5 sm:pl-3 pr-2 py-2 transition-all ${
           isAdvancedMode
-            ? 'border-[var(--accent-color)] shadow-[0_0_20px_rgba(212,168,83,0.25)] ring-2 ring-[var(--accent-color)]/20'
+            ? 'border-[var(--accent-color)] shadow-[0_0_20px_rgba(212,168,83,0.25)]'
             : isFocused
-              ? 'border-[var(--accent-color)] shadow-[0_0_0_2px_rgba(212,168,83,0.15)]'
+              ? 'border-[var(--accent-color)] shadow-[0_0_0_1px_var(--accent-color)]'
               : 'border-[var(--ren-border)]'
         }`}>
           <input
@@ -228,11 +228,11 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={disabled}
-            className="text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)] hover:scale-110 transition-all pb-0.5 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-[2px] text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)] hover:bg-[var(--ren-bg-tertiary)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="Adjuntar archivo"
             title="Adjuntar imagen, PDF, audio o video (max 50MB)"
           >
-            <Paperclip size={16} className="sm:w-[18px] sm:h-[18px]" />
+            <Paperclip size={17} />
           </button>
           <textarea
             ref={textareaRef}
@@ -242,14 +242,14 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             disabled={disabled}
-            placeholder="Escribe en el plano..."
+            placeholder="Escribe tu mensaje..."
             rows={1}
-            className="flex-1 bg-transparent outline-none text-sm sm:text-base text-[var(--ren-text-primary)] placeholder:text-[var(--ren-text-tertiary)] placeholder:italic resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0"
+            className="flex-1 bg-transparent outline-none text-sm sm:text-base leading-relaxed text-[var(--ren-text-primary)] placeholder:text-[var(--ren-text-tertiary)] resize-none disabled:opacity-50 disabled:cursor-not-allowed min-w-0 self-center py-1.5"
           />
           <button
             type="submit"
             disabled={(!message.trim() && attachedFiles.length === 0) || disabled}
-            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-[2px] bg-[var(--accent-color)] text-[var(--ren-bg-primary)] hover:scale-105 hover:shadow-[0_0_12px_rgba(212,168,83,0.3)] disabled:bg-[var(--ren-bg-tertiary)] disabled:text-[var(--ren-text-tertiary)] disabled:border disabled:border-[var(--ren-border)] disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-[2px] bg-[var(--accent-color)] text-[var(--ren-bg-primary)] hover:bg-[var(--accent-hover)] disabled:bg-transparent disabled:text-[var(--ren-text-tertiary)] disabled:cursor-not-allowed transition-colors"
             aria-label="Enviar mensaje"
           >
             <Send size={16} />
@@ -259,8 +259,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
       
       {!isTouchDevice && (
         <p className="text-[10px] sm:text-xs text-[var(--ren-text-tertiary)] mt-2 text-center font-mono px-2">
-          <span className="hidden sm:inline">Presiona <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Enter</kbd> para enviar, <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Shift + Enter</kbd> para nueva linea</span>
-          <span className="sm:hidden">Enter: enviar | Shift+Enter: nueva linea</span>
+          Presiona <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Enter</kbd> para enviar, <kbd className="px-1.5 py-0.5 bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] rounded text-[var(--ren-text-tertiary)]">Shift + Enter</kbd> para nueva linea
         </p>
       )}
     </motion.div>
