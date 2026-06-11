@@ -196,6 +196,26 @@ export default function LandingPage() {
             )}
           </motion.div>
 
+          {/* Invitado — debajo de los botones */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3, delay: 0.55 }}
+            className="-mt-4 mb-5"
+          >
+            <span
+              onClick={() => {
+                const guestId = 'guest_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+                sessionStorage.setItem('ren_guest', JSON.stringify({ name: 'Invitado', user_id: guestId }));
+                window.dispatchEvent(new CustomEvent('ren:guest-created'));
+                router.push('/chat');
+              }}
+              className="cursor-pointer text-[13px] ren-text-tertiary hover:ren-text-primary transition-colors underline underline-offset-4 decoration-dotted decoration-1 hover:decoration-solid"
+            >
+              Continuar como invitado
+            </span>
+          </motion.div>
+
           {/* Calculadoras CTA */}
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -225,6 +245,8 @@ export default function LandingPage() {
               </span>
             </button>
           </motion.div>
+
+
 
           {/* Pills — entrada escalonada */}
           <motion.div

@@ -290,7 +290,7 @@ export default function CalculatorsPage() {
                 window.history.replaceState({}, '', url.toString());
               } else {
                 window.history.replaceState({}, '', '/calculators');
-                router.push('/chat');
+                router.push('/');
               }
             }}
             className="p-2 hover:bg-[var(--ren-bg-tertiary)] border border-transparent hover:border-[var(--ren-border)] rounded-lg transition-colors"
@@ -362,6 +362,32 @@ export default function CalculatorsPage() {
                   {(() => {
                     const calc = calculators.find(c => c.id === selectedId);
                     return (
+                    <>
+                    {/* ── Navegación rápida entre calculadoras — pills sutiles ── */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      {['apache-iv', 'sofa', 'news2', 'nihss'].map((id) => {
+                        const c = calculators.find(c => c.id === id);
+                        const active = selectedId === id;
+                        return (
+                          <button
+                            key={id}
+                            onClick={() => {
+                              setSelectedId(id);
+                              const url = new URL(window.location.href);
+                              url.searchParams.set('calc', id);
+                              window.history.replaceState({}, '', url.toString());
+                            }}
+                            className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition-all ${
+                              active
+                                ? 'bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 text-[var(--accent-color)] font-semibold'
+                                : 'bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] ren-text-secondary hover:text-[var(--accent-hover)] hover:border-[var(--accent-color)]/30'
+                            }`}
+                          >
+                            {c?.shortName || c?.name || id}
+                          </button>
+                        );
+                      })}
+                    </div>
                     <div className="mb-5">
                       <div className="flex items-start gap-3">
                         <div className="w-9 h-9 rounded-lg bg-[var(--accent-color)]/10 border border-[var(--accent-color)]/25 flex items-center justify-center shrink-0">
@@ -460,7 +486,7 @@ export default function CalculatorsPage() {
                                           </div>
                                         ))}
                                       </div>
-                                      {f === fichas.news2 && (
+                                      {f === fichasTecnicas.news2 && (
                                         <div className="mt-3 border border-amber-500/30 bg-amber-500/5 rounded-lg p-3">
                                           <p className="text-[11px] text-amber-300 leading-relaxed">
                                             <strong>Regla clave:</strong> Cualquier componente individual con puntuación 3 activa respuesta
@@ -618,8 +644,11 @@ export default function CalculatorsPage() {
                       </div>
                     </div>
                   </div>
+                  </>
                   );
                 })()}
+
+
 
                   {selectedId === 'sofa' && <SofaCalculator />}
                   {selectedId === 'news2' && <News2Calculator />}

@@ -48,6 +48,7 @@ export default function LoginPage() {
   const goGuest = () => {
     const guestId = 'guest_' + Math.random().toString(36).slice(2, 10);
     sessionStorage.setItem('ren_guest', JSON.stringify({ user_id: guestId, isGuest: true, name: 'Invitado' }));
+    window.dispatchEvent(new CustomEvent('ren:guest-created'));
     router.push('/chat');
   };
 

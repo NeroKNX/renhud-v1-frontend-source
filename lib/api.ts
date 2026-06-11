@@ -45,7 +45,10 @@ export async function forgotPassword(username: string, recoveryCode: string, new
 /** Verificar sesión activa desde cookie HttpOnly */
 export async function checkAuth(): Promise<{ user_id: string; username: string; role: string } | null> {
   try {
-    const res = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(`${API_BASE}/auth/me`, { credentials: 'include', signal: controller.signal });
+    clearTimeout(timeout);
     if (!res.ok) return null;
     return await res.json();
   } catch { return null; }

@@ -23,35 +23,74 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isGuest, setIsGuest_] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // Inicialización síncrona: detectar guest en sessionStorage ANTES del primer render
+  // Esto evita el bug donde checkAuth() se ejecuta antes de que el guest exista
+  const [initialGuest] = useState<{ name?: string; user_id: string } | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const g = sessionStorage.getItem('ren_guest');
+        if (g) return JSON.parse(g);
+      } catch {}
+    }
+    return null;
+  });
 
-  const checkAuth = useCallback(async () => {
+  const [user, setUser] = useState<AuthUser | null>(
+    initialGuest ? { name: initialGuest.name || 'Invitado', user_id: initialGuest.user_id } : null
+  );
+  const [isGuest, setIsGuest_] = useState<boolean>(!!initialGuest);
+  const [isLoading, setIsLoading] = useState(!initialGuest);
+
+    const checkAuth = useCallback(async () => {
     setIsLoading(true);
-    try {
-      const data = await api.checkAuth();
-      if (data) {
-        setUser({ name: data.username, user_id: data.user_id, username: data.username, role: data.role });
-        setIsGuest_(false);
-        return;
-      }
-    } catch {}
-    // Fallback: guest
+    
+    // 1. Check guest FIRST — sin server call, instantáneo
     try {
       const guestStr = sessionStorage.getItem('ren_guest');
       if (guestStr) {
         const guest = JSON.parse(guestStr);
         setUser({ name: guest.name || 'Invitado', user_id: guest.user_id });
         setIsGuest_(true);
+        setIsLoading(false);
         return;
       }
     } catch {}
+
+    // 2. No guest — intentar auth vía servidor
+    try {
+      const data = await api.checkAuth();
+      if (data) {
+        setUser({ name: data.username, user_id: data.user_id, username: data.username, role: data.role });
+        setIsGuest_(false);
+        setIsLoading(false);
+        return;
+      }
+    } catch {}
+
+    // 3. Sin sesión de ningún tipo
     setUser(null);
     setIsGuest_(false);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => { checkAuth(); }, [checkAuth]);
+
+  // Escuchar creación de guest desde landing/login (cuando AuthProvider ya está montado)
+  useEffect(() => {
+    const handler = () => {
+      try {
+        const g = sessionStorage.getItem('ren_guest');
+        if (g) {
+          const guest = JSON.parse(g);
+          setUser({ name: guest.name || 'Invitado', user_id: guest.user_id });
+          setIsGuest_(true);
+          setIsLoading(false);
+        }
+      } catch {}
+    };
+    window.addEventListener('ren:guest-created', handler);
+    return () => window.removeEventListener('ren:guest-created', handler);
+  }, []);
 
   const login = async (username: string, password: string) => {
     await api.login(username.toLowerCase().trim(), password);
