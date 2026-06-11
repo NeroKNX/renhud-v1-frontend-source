@@ -70,48 +70,51 @@ html {
 }
 
 [data-theme="light"] {
-  /* Ren Theme - Light Mode */
-  --ren-bg-primary: #f8fafc;
-  --ren-bg-secondary: #ffffff;
-  --ren-bg-tertiary: #f1f5f9;
-  --ren-overlay: rgba(0,0,0,0.15);
-  --ren-shadow-sidebar: 0 0 40px rgba(0,0,0,0.12);
-  --ren-bg-header: #ffffff;
-  --ren-bg-message-user: #dde4ff;
-  --ren-bg-message-ai: #ffffff;
-  --ren-text-primary: #1e293b;
-  --ren-text-secondary: #475569;
-  --ren-text-tertiary: #94a3b8;
-  --ren-border: #e2e8f0;
-  --ren-border-subtle: #f1f5f9;
-  --ren-shadow: rgba(0, 0, 0, 0.08);
-  --ren-shadow-accent: rgba(79, 70, 229, 0.15);
-  --accent-color: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-muted: rgba(79, 70, 229, 0.08);
-  --text-light: #1e293b;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  
-  --background: #f8fafc;
-  --foreground: #1e293b;
-  --card: #ffffff;
-  --card-foreground: #1e293b;
-  --popover: #ffffff;
-  --popover-foreground: #1e293b;
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #4f46e5;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e2e8f0;
-  --input: #ffffff;
-  --ring: #4f46e5;
+  /* REN V2 — Light Mode (papel de taller, tinta cálida) */
+  --ren-bg-primary: #F5F1E8;
+  --ren-bg-secondary: #FFFDF8;
+  --ren-bg-tertiary: #EFE9DC;
+  --ren-overlay: rgba(40,34,24,0.18);
+  --ren-shadow-sidebar: 0 0 40px rgba(60,50,30,0.12);
+  --ren-bg-header: #FFFDF8;
+  --ren-bg-message-user: rgba(212,168,83,0.12);
+  --ren-bg-message-ai: #FFFDF8;
+  --ren-text-primary: #2A2620;
+  --ren-text-secondary: #6B6354;
+  --ren-text-tertiary: #9A9180;
+  --ren-border: #E0D8C6;
+  --ren-border-subtle: #EDE6D6;
+  --ren-shadow: rgba(60, 50, 30, 0.08);
+  --ren-shadow-accent: rgba(184, 134, 47, 0.18);
+  --accent-color: #B8862F;
+  --accent-hover: #9E7220;
+  --accent-muted: rgba(184, 134, 47, 0.08);
+  --accent-secondary: #4F7A6D;
+  --accent-secondary-muted: rgba(79, 122, 109, 0.15);
+  --accent-warning: #B5673A;
+  --text-light: #2A2620;
+  --text-muted: #6B6354;
+  --text-dim: #9A9180;
+
+  --background: #F5F1E8;
+  --foreground: #2A2620;
+  --card: #FFFDF8;
+  --card-foreground: #2A2620;
+  --popover: #FFFDF8;
+  --popover-foreground: #2A2620;
+  --primary: #B8862F;
+  --primary-foreground: #FFFDF8;
+  --secondary: #EFE9DC;
+  --secondary-foreground: #2A2620;
+  --muted: #EFE9DC;
+  --muted-foreground: #6B6354;
+  --accent: #B8862F;
+  --accent-foreground: #FFFDF8;
+  --destructive: #B5673A;
+  --destructive-foreground: #FFFDF8;
+  --border: #E0D8C6;
+  --input: #FFFDF8;
+  --ring: #B8862F;
 }
 
 .dark {
@@ -259,7 +262,7 @@ html {
 
 /* Ren gradient text */
 .ren-gradient-text {
-  background: linear-gradient(135deg, #fafafa 30%, #94a3b8, #a78bfa);
+  background: linear-gradient(135deg, #E8E0D5 30%, #D4A853, #E2BD73);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -268,7 +271,7 @@ html {
 }
 
 [data-theme="light"] .ren-gradient-text {
-  background: linear-gradient(135deg, #1e293b 30%, #64748b, #6d28d9);
+  background: linear-gradient(135deg, #2a2620 30%, #6b6354, #b8862f);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -428,31 +431,31 @@ input[type="number"] {
 }
 
 /* Light mode markdown overrides */
-[data-theme="light"] .ren-markdown strong { color: #4338ca; }
-[data-theme="light"] .ren-markdown em { color: #4f46e5; }
-[data-theme="light"] .ren-markdown ul li::before { color: #4f46e5; }
+[data-theme="light"] .ren-markdown strong { color: #9E7220; }
+[data-theme="light"] .ren-markdown em { color: #4F7A6D; }
+[data-theme="light"] .ren-markdown ul li::before { color: #B8862F; }
 [data-theme="light"] .ren-markdown h1,
 [data-theme="light"] .ren-markdown h2,
 [data-theme="light"] .ren-markdown h3,
-[data-theme="light"] .ren-markdown h4 { color: #1e293b; }
+[data-theme="light"] .ren-markdown h4 { color: #9E7220; }
 [data-theme="light"] .ren-markdown code {
-  background: #f1f5f9;
-  color: #334155;
-  border-color: #e2e8f0;
+  background: #EFE9DC;
+  color: #4F7A6D;
+  border-color: #E0D8C6;
 }
 [data-theme="light"] .ren-markdown pre {
-  background: #f8fafc;
-  border-color: #e2e8f0;
+  background: #F5F1E8;
+  border-color: #E0D8C6;
 }
 [data-theme="light"] .ren-markdown pre code {
-  color: #475569;
+  color: #2A2620;
 }
 [data-theme="light"] .ren-markdown blockquote {
-  border-left-color: #4f46e5;
-  color: #64748b;
-  background: rgba(79, 70, 229, 0.04);
+  border-left-color: #B8862F;
+  color: #6B6354;
+  background: rgba(184, 134, 47, 0.06);
 }
-[data-theme="light"] .ren-markdown a { color: #4f46e5; }
+[data-theme="light"] .ren-markdown a { color: #B8862F; }
 
 /* Ren pills */
 .ren-pill {
@@ -470,8 +473,8 @@ input[type="number"] {
   cursor: default;
 }
 .ren-pill:hover {
-  background: rgba(99,102,241,0.08);
-  border-color: rgba(99,102,241,0.25);
+  background: rgba(212,168,83,0.08);
+  border-color: rgba(212,168,83,0.25);
   transform: translateY(-1px);
 }
 
@@ -481,13 +484,13 @@ input[type="number"] {
   color: #475569;
 }
 [data-theme="light"] .ren-pill:hover {
-  background: rgba(79,70,229,0.08);
-  border-color: rgba(79,70,229,0.25);
+  background: rgba(184,134,47,0.08);
+  border-color: rgba(184,134,47,0.25);
 }
 
 /* Grid background — dot pattern on html so it sits BEHIND body content */
 html {
-  background: #0a0a0c;
+  background: #0B0E14;
 }
 html::before {
   content: '';
@@ -496,7 +499,7 @@ html::before {
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(circle, rgba(255,255,255,0.18) 2px, transparent 2px);
+    radial-gradient(circle, rgba(212,168,83,0.10) 2px, transparent 2px);
   background-size: 50px 50px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 45%, black 30%, transparent 72%);
   -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 45%, black 30%, transparent 72%);
@@ -507,7 +510,7 @@ html::before {
 @media (min-width: 1024px) {
   html::before {
     background-image:
-      radial-gradient(circle, rgba(255,255,255,0.22) 2.5px, transparent 2.5px);
+      radial-gradient(circle, rgba(212,168,83,0.12) 2.5px, transparent 2.5px);
     background-size: 42px 42px;
     mask-image: radial-gradient(ellipse 85% 60% at 50% 45%, black 35%, transparent 68%);
     -webkit-mask-image: radial-gradient(ellipse 85% 60% at 50% 45%, black 35%, transparent 68%);
@@ -554,11 +557,11 @@ html::after {
   transition: all 0.2s ease;
 }
 .ren-btn-glow:hover {
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 0 20px rgba(212, 168, 83, 0.35);
 }
 
 [data-theme="light"] .ren-btn-glow:hover {
-  box-shadow: 0 0 20px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 0 20px rgba(184, 134, 47, 0.25);
 }
 
 /* Animations */

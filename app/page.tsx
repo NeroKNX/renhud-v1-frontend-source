@@ -84,7 +84,7 @@ export default function LandingPage() {
               className="absolute inset-0 rounded-full hidden lg:block"
               style={{
                 background:
-                  'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 65%)',
+                  'radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 65%)',
                 filter: 'blur(48px)',
                 transform: 'scale(1.8)',
               }}
@@ -96,7 +96,7 @@ export default function LandingPage() {
               className="absolute inset-0 rounded-full"
               style={{
                 background:
-                  'radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%)',
+                  'radial-gradient(circle, rgba(212,168,83,0.25) 0%, transparent 70%)',
                 filter: 'blur(24px)',
               }}
               animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.85, 0.5] }}
@@ -162,7 +162,7 @@ export default function LandingPage() {
               <>
                 <button
                   onClick={() => router.push('/chat')}
-                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[13px] font-semibold transition-all"
+                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] text-[13px] font-semibold transition-all"
                 >
                   Ir al chat →
                 </button>
@@ -182,7 +182,7 @@ export default function LandingPage() {
               <>
                 <button
                   onClick={() => router.push('/register')}
-                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[13px] font-semibold transition-all"
+                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] text-[13px] font-semibold transition-all"
                 >
                   Crear cuenta →
                 </button>
@@ -227,8 +227,8 @@ export default function LandingPage() {
               onClick={() => router.push('/calculators')}
               className="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono"
               style={{
-                background: 'rgba(99,102,241,0.06)',
-                border: '1px solid rgba(99,102,241,0.2)',
+                background: 'rgba(212,168,83,0.06)',
+                border: '1px solid rgba(212,168,83,0.2)',
                 color: 'var(--ren-text-secondary)',
               }}
             >
