@@ -45,19 +45,12 @@ export default function LandingPage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <span className="ren-spec-label hidden md:inline">v2 · alpha</span>
             <ThemeToggle />
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <button
                 onClick={() => router.push('/chat')}
                 className="ren-btn-sharp px-4 py-2 text-[13px]"
               >
                 Ir al chat
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push('/login')}
-                className="ren-btn-outline px-4 py-2 text-[13px]"
-              >
-                Iniciar sesión
               </button>
             )}
           </div>
