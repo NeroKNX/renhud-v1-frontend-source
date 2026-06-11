@@ -24,13 +24,13 @@ const SCORE_COLORS = ['#059669', '#d97706', '#ea580c', '#dc2626', '#b91c1c'];
 // ── Glass + Glow badge for NIHSS (0–4 scale) ──
 function nihssScoreBadge(score: number): string {
   const map: Record<number, string> = {
-    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
-    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
-    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
-    3: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-sm',
-    4: 'bg-gradient-to-br from-red-600/22 to-red-600/6 text-red-300 border-red-600/45 shadow-[0_0_14px_rgba(220,38,38,0.18)] backdrop-blur-sm',
+    0: 'bg-emerald-500/12 text-emerald-400 border-emerald-500/40',
+    1: 'bg-amber-500/12 text-amber-400 border-amber-500/40',
+    2: 'bg-orange-500/12 text-orange-400 border-orange-500/40',
+    3: 'bg-rose-500/12 text-rose-400 border-rose-500/40',
+    4: 'bg-red-600/12 text-red-300 border-red-600/45',
   };
-  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
+  return map[score] || 'bg-gray-500/12 text-gray-400 border-gray-500/30';
 }
 
 // Map value to score for each subitem
@@ -289,12 +289,12 @@ export default function NihssCalculator() {
   const severityColor = (s: string) => {
     const sv = s?.toLowerCase() || '';
     if (sv.includes('leve') || sv.includes('bajo') || sv.includes('sin stroke'))
-      return { bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4', text: 'text-emerald-400', border: 'border-emerald-500/40', glow: 'shadow-[0_0_10px_rgba(52,211,153,0.12)]' };
+      return { bg: 'bg-emerald-500/12', text: 'text-emerald-400', border: 'border-emerald-500/40', glow: '' };
     if (sv.includes('moderado'))
-      return { bg: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4', text: 'text-orange-400', border: 'border-orange-500/40', glow: 'shadow-[0_0_10px_rgba(251,146,60,0.12)]' };
+      return { bg: 'bg-orange-500/12', text: 'text-orange-400', border: 'border-orange-500/40', glow: '' };
     if (sv.includes('severo'))
-      return { bg: 'bg-gradient-to-br from-red-600/22 to-red-600/6', text: 'text-red-300', border: 'border-red-600/45', glow: 'shadow-[0_0_14px_rgba(220,38,38,0.18)]' };
-    return { bg: 'bg-gradient-to-br from-gray-500/10 to-gray-500/4', text: 'text-gray-400', border: 'border-gray-500/30', glow: '' };
+      return { bg: 'bg-red-600/12', text: 'text-red-300', border: 'border-red-600/45', glow: '' };
+    return { bg: 'bg-gray-500/12', text: 'text-gray-400', border: 'border-gray-500/30', glow: '' };
   };
 
   const sevClass = result ? severityColor(result.nihss_severity || '') : null;
@@ -303,12 +303,12 @@ export default function NihssCalculator() {
     <div>
       {/* Counters badge - live estimate */}
       {estimatedTotal !== null && (
-        <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-br from-[var(--accent-color)]/8 to-transparent border border-[var(--accent-color)]/20 backdrop-blur-sm">
+        <div className="mb-5 flex items-center gap-2 px-3 py-2 rounded-[2px] bg-gradient-to-br from-[var(--accent-color)]/8 to-transparent border border-[var(--accent-color)]/20">
           <Brain size={14} className="text-[var(--accent-color)]" />
           <span className="text-xs font-mono ren-text-secondary">Subtotal estimado:</span>
           <span className="text-sm font-bold ren-text-primary tabular-nums">{estimatedTotal}<span className="text-[10px] font-mono ren-text-tertiary">/42</span></span>
           {estimatedTotal >= 7 && (
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border border-amber-500/30 shadow-[0_0_8px_rgba(251,191,36,0.10)] backdrop-blur-sm ml-auto flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-amber-500/12 text-amber-400 border border-amber-500/30 ml-auto flex items-center gap-1"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable</span>
           )}
         </div>
       )}
@@ -320,12 +320,12 @@ export default function NihssCalculator() {
           ? (SCORE_MAP[item.key]?.[String(currentVal)] ?? null)
           : null;
         return (
-          <div key={item.key} className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+          <div key={item.key} className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
             <div className="mb-4">
               <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
                 <Brain size={12} /> {item.label}
                 {currentScore !== null && (
-                  <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${nihssScoreBadge(currentScore)}`}>
+                  <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${nihssScoreBadge(currentScore)}`}>
                     {currentScore} pt{currentScore !== 1 ? 's' : ''}
                   </span>
                 )}
@@ -352,7 +352,7 @@ export default function NihssCalculator() {
                   <button
                     key={opt.value}
                     onClick={() => updateValue(item.key, opt.value)}
-                    className={`relative py-2 px-1.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight text-center ${nihBtnStyle(opt.score, active)} ${opt.score >= 4 && active ? 'animate-pulse' : ''}`}
+                    className={`relative py-2 px-1.5 rounded-[2px] text-[10px] font-semibold transition-all border leading-tight text-center ${nihBtnStyle(opt.score, active)} ${opt.score >= 4 && active ? 'animate-pulse' : ''}`}
                   >
                     <span className="block">{opt.label}</span>
                   </button>
@@ -368,15 +368,11 @@ export default function NihssCalculator() {
         <button
           onClick={handleCalculate}
           disabled={isCalculating}
-          className="w-full md:w-auto md:min-w-[280px] py-3 px-8 rounded-xl font-semibold text-sm transition-all disabled:opacity-60"
-          style={{
-            background: 'linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%)',
-            color: 'white',
-          }}
+          className="ren-btn-sharp w-full md:w-auto md:min-w-[280px] py-3 px-8 text-sm disabled:opacity-60"
         >
           {isCalculating ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
               Calculando...
             </span>
           ) : (
@@ -389,7 +385,7 @@ export default function NihssCalculator() {
       </div>
 
       {error && (
-        <div className="mb-4 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
+        <div className="mb-4 p-2 rounded-[2px] bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
           <AlertCircle size={12} />
           {error}
         </div>
@@ -403,15 +399,15 @@ export default function NihssCalculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            <div className={`rounded-xl border ${sevClass?.border} ${sevClass?.bg} ${sevClass?.glow || ''} backdrop-blur-sm overflow-hidden`}>
+            <div className={`rounded-[2px] border ${sevClass?.border} ${sevClass?.bg} ${sevClass?.glow || ''} overflow-hidden`}>
               <div className="p-5">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.nihss_total}/42</span>
-                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${sevClass?.bg} ${sevClass?.text} border ${sevClass?.border} backdrop-blur-sm`}>
+                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-[2px] ${sevClass?.bg} ${sevClass?.text} border ${sevClass?.border}`}>
                     {r.nihss_severity}
                   </span>
                   {(r.nihss_total ?? 0) >= 7 && (
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border border-amber-500/30 shadow-[0_0_8px_rgba(251,191,36,0.10)] backdrop-blur-sm">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-amber-500/12 text-amber-400 border border-amber-500/30">
                       <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="inline-block mr-1"><path d="M12 4a4 4 0 0 1 3.5 2M9 3a4 4 0 0 0-3.5 2M12 8a2 2 0 0 1 2 2c0 1.1-.9 2-2 2m0-4a2 2 0 0 0-2 2c0 1.1.9 2 2 2m0 4v4m-4-6a4 4 0 0 0 4 4m0 0a4 4 0 0 0 4-4"/><path d="M12 22c-4 0-6-2-6-6 0-1.5.5-3 2-4 0 0 2-1 4-1s4 1 4 1c1.5 1 2 2.5 2 4 0 4-2 6-6 6z"/></svg> Ocl. gran vaso probable
                     </span>
                   )}
@@ -434,7 +430,7 @@ export default function NihssCalculator() {
                     { l: 'Disartria', v: r.nihss_detail?.dysarthria },
                     { l: 'Neglig.', v: r.nihss_detail?.extinction },
                   ].map(item => (
-                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? nihssScoreBadge(Math.min(Number(item.v), 4)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                    <div key={item.l} className={`rounded-[2px] p-1.5 text-center border ${item.v != null ? nihssScoreBadge(Math.min(Number(item.v), 4)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
                       <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
                       <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
                     </div>
@@ -444,9 +440,9 @@ export default function NihssCalculator() {
             </div>
 
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-              <button onClick={() => copyText(`NIHSS | Score: ${r.nihss_total}/42 | Severidad: ${r.nihss_severity}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
+              <button onClick={handleCalculate} className="flex-1 py-2 rounded-[2px] text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
+              <button onClick={() => copyText(`NIHSS | Score: ${r.nihss_total}/42 | Severidad: ${r.nihss_severity}`)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
+              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
             </div>
           </motion.div>
         )}

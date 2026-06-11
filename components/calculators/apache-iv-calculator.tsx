@@ -326,11 +326,11 @@ export default function ApacheIVCalculator() {
     return (
       <div className="animate-pulse space-y-5 py-4">
         <div className="h-4 bg-[var(--ren-bg-tertiary)] rounded w-1/4 mb-4" />
-        <div className="h-10 bg-[var(--ren-bg-tertiary)] rounded-lg w-1/3" />
-        <div className="h-16 bg-[var(--ren-bg-tertiary)] rounded-lg" />
-        <div className="h-8 bg-[var(--ren-bg-tertiary)] rounded-lg w-1/2" />
-        <div className="h-24 bg-[var(--ren-bg-tertiary)] rounded-lg" />
-        <div className="h-16 bg-[var(--ren-bg-tertiary)] rounded-lg" />
+        <div className="h-10 bg-[var(--ren-bg-tertiary)] rounded-[2px] w-1/3" />
+        <div className="h-16 bg-[var(--ren-bg-tertiary)] rounded-[2px]" />
+        <div className="h-8 bg-[var(--ren-bg-tertiary)] rounded-[2px] w-1/2" />
+        <div className="h-24 bg-[var(--ren-bg-tertiary)] rounded-[2px]" />
+        <div className="h-16 bg-[var(--ren-bg-tertiary)] rounded-[2px]" />
       </div>
     );
   }
@@ -374,7 +374,7 @@ export default function ApacheIVCalculator() {
                       <button
                         key={score}
                         onClick={() => selectGcs(comp.key, score)}
-                        className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${gcsSofaStyle(comp.key, score, selected)}`}
+                        className={`relative py-2.5 rounded-[2px] text-xs font-semibold transition-all border ${gcsSofaStyle(comp.key, score, selected)}`}
                         disabled={gcsNa}
                       >
                         {score} {comp.labels[i]}
@@ -626,7 +626,7 @@ export default function ApacheIVCalculator() {
               return (
               <>
               {/* ─── GRID 2×2 — contenedor unificado ─── */}
-              <div className="rounded-xl overflow-hidden backdrop-blur-sm border border-[var(--ren-border)]" style={{ background: 'var(--ren-bg-secondary)' }}>
+              <div className="rounded-[2px] overflow-hidden border border-[var(--ren-border)]" style={{ background: 'var(--ren-bg-secondary)' }}>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -709,11 +709,11 @@ export default function ApacheIVCalculator() {
               </div>
 
               {/* ─── Severidad + Diagnóstico ─── */}
-              <div className="rounded-xl border border-[var(--ren-border)] backdrop-blur-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
+              <div className="rounded-[2px] border border-[var(--ren-border)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
                 <div className="flex items-center gap-2.5 w-full sm:w-auto">
                   <span className="text-[9px] font-semibold tracking-widest uppercase ren-text-tertiary flex-shrink-0">Severidad</span>
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm border ${sevCol.bg} ${sevCol.border} ${sevCol.text}`}>
-                    <span className={`w-[5px] h-[5px] rounded-full flex-shrink-0 ${sevCol.bar}`} />
+                  <span className={`inline-flex items-center gap-1.5 rounded-[2px] px-2.5 py-1 text-[10px] font-semibold border ${sevCol.bg} ${sevCol.border} ${sevCol.text}`}>
+                    <span className={`w-[5px] h-[5px] rounded-[2px] flex-shrink-0 ${sevCol.bar}`} />
                     {result.severity}
                     <span className="opacity-70">({result.mortalityPct}%)</span>
                   </span>
@@ -721,7 +721,7 @@ export default function ApacheIVCalculator() {
                 {result.diagnosisLabel && (
                   <div className="flex items-center gap-2 w-full sm:w-auto sm:min-w-0 sm:flex-1 sm:justify-end">
                     <span className="text-[9px] font-semibold tracking-widest uppercase ren-text-tertiary flex-shrink-0">Diagnóstico</span>
-                    <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium backdrop-blur-sm border border-[var(--ren-border)] max-w-full whitespace-nowrap" style={{ background: 'var(--ren-bg-tertiary)', color: 'var(--text-primary)' }}>
+                    <span className="inline-flex items-center gap-1.5 rounded-[2px] px-2.5 py-1 text-[10px] font-medium border border-[var(--ren-border)] max-w-full whitespace-nowrap" style={{ background: 'var(--ren-bg-tertiary)', color: 'var(--text-primary)' }}>
                       <FileText size={11} className="ren-text-tertiary flex-shrink-0" />
                       <span className="truncate min-w-0">{result.diagnosisLabel}</span>
                     </span>
@@ -731,15 +731,15 @@ export default function ApacheIVCalculator() {
 
               {/* ─── System pills ─── */}
               {result.breakdown && (
-                <div className="rounded-xl border border-[var(--ren-border)] backdrop-blur-sm" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
+                <div className="rounded-[2px] border border-[var(--ren-border)]" style={{ background: 'var(--ren-bg-secondary)', padding: '12px 16px' }}>
                   <div className="text-[9px] font-semibold tracking-widest uppercase ren-text-secondary mb-2.5">Score APS por sistema</div>
                   <div className="flex flex-wrap gap-1.5">
                     {Object.entries(SYSTEM_GROUP).map(([sysKey, sys]) => {
                       const pts = sys.keys.reduce((sum, k) => sum + ((result.breakdown?.[k] as number) || 0), 0);
                       const col = systemSeverityPill(pts);
                       return (
-                        <span key={sysKey} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold border backdrop-blur-sm ${col.ring}`}>
-                          <span className={`w-[5px] h-[5px] rounded-full ${col.dot}`} />
+                        <span key={sysKey} className={`inline-flex items-center gap-1.5 rounded-[2px] px-2.5 py-1 text-[10px] font-semibold border ${col.ring}`}>
+                          <span className={`w-[5px] h-[5px] rounded-[2px] ${col.dot}`} />
                           {sys.label} <span className="font-bold">{pts}</span>
                         </span>
                       );
@@ -750,14 +750,14 @@ export default function ApacheIVCalculator() {
 
               {/* ─── Botones ─── */}
               <div className="flex flex-col sm:flex-row gap-2">
-                <button onClick={handleCalculate} className="w-full sm:flex-1 py-2.5 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                <button onClick={handleCalculate} className="w-full sm:flex-1 py-2.5 rounded-[2px] text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                   <Zap size={12} /> Recalcular
                 </button>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <button onClick={copyResult} className="flex-1 sm:flex-none py-2.5 px-4 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                  <button onClick={copyResult} className="flex-1 sm:flex-none py-2.5 px-4 rounded-[2px] text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                     <Copy size={12} /> Copiar
                   </button>
-                  <button onClick={() => setResult(null)} className="flex-1 sm:flex-none py-2.5 px-4 rounded-lg text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                  <button onClick={() => setResult(null)} className="flex-1 sm:flex-none py-2.5 px-4 rounded-[2px] text-[11px] font-semibold ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                     <Zap size={12} /> Limpiar
                   </button>
                 </div>

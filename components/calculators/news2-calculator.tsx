@@ -31,12 +31,12 @@ const NEWS2_KEYS = {
 // ── Glass + Glow badge for NEWS2 (0–3 scale) ──
 function newsScoreBadge(score: number): string {
   const map: Record<number, string> = {
-    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
-    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
-    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
-    3: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-rose-500/40 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-sm',
+    0: 'bg-emerald-500/12 text-emerald-400 border-emerald-500/40',
+    1: 'bg-amber-500/12 text-amber-400 border-amber-500/40',
+    2: 'bg-orange-500/12 text-orange-400 border-orange-500/40',
+    3: 'bg-rose-500/12 text-rose-400 border-rose-500/40',
   };
-  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
+  return map[score] || 'bg-gray-500/12 text-gray-400 border-gray-500/30';
 }
 
 function N2Slider({ options, value, onChange }: {
@@ -45,7 +45,7 @@ function N2Slider({ options, value, onChange }: {
   onChange: (v: any) => void;
 }) {
   return (
-    <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
+    <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
       {options.map((opt, i) => (
         <button
           key={i}
@@ -104,9 +104,9 @@ export default function News2Calculator() {
   const r = result as Record<string, any> | null;
   const news2RiskClass = (level: string): { bg: string; text: string; border: string } => {
     const map: Record<string, { bg: string; text: string; border: string }> = {
-      'high':   { bg: 'bg-gradient-to-br from-rose-500/20 to-rose-500/4', text: 'text-rose-300', border: 'border-rose-500/40' },
-      'medium': { bg: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4', text: 'text-orange-300', border: 'border-orange-500/40' },
-      'low':    { bg: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4', text: 'text-emerald-300', border: 'border-emerald-500/40' },
+      'high':   { bg: 'bg-rose-500/12', text: 'text-rose-300', border: 'border-rose-500/40' },
+      'medium': { bg: 'bg-orange-500/12', text: 'text-orange-300', border: 'border-orange-500/40' },
+      'low':    { bg: 'bg-emerald-500/12', text: 'text-emerald-300', border: 'border-emerald-500/40' },
     };
     return map[level] || map.low;
   };
@@ -115,7 +115,7 @@ export default function News2Calculator() {
   return (
     <div>
       {/* FR */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Wind size={12} /> Frecuencia respiratoria
@@ -124,7 +124,7 @@ export default function News2Calculator() {
               if (v == null) return null;
               const m: Record<number,number> = {6:3,10:1,15:0,22:2,25:3};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -142,7 +142,7 @@ export default function News2Calculator() {
       </div>
 
       {/* SpO2 + Escala */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             Saturación de oxígeno (SpO₂)
@@ -153,19 +153,19 @@ export default function News2Calculator() {
               const escala1Map: Record<number,number> = {98:0,94:1,92:2,88:3};
               const m = formValues[NEWS2_KEYS.Escala2] ? escala2Map : escala1Map;
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
           <div>
             <label className="block text-[10px] font-mono ren-text-tertiary mb-1.5 px-1">Escala de SpO₂</label>
-            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
+            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
               <button
                 onClick={() => updateValue(NEWS2_KEYS.Escala2, false)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.Escala2] === false
-                    ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm'
+                    ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -175,7 +175,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.Escala2, true)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.Escala2] === true
-                    ? 'bg-gradient-to-br from-rose-500/20 to-rose-500/4 text-rose-400 border-l border-rose-500/30 shadow-[0_0_8px_rgba(244,63,94,0.12)] backdrop-blur-sm'
+                    ? 'bg-rose-500/12 text-rose-400 border-l border-rose-500/30'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -190,12 +190,12 @@ export default function News2Calculator() {
           </div>
           <div>
             <label className="block text-[10px] font-mono ren-text-tertiary mb-1.5 px-1">Oxígeno suplementario</label>
-            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
+            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
               <button
                 onClick={() => updateValue(NEWS2_KEYS.O2, false)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.O2] === false
-                    ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm'
+                    ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -205,7 +205,7 @@ export default function News2Calculator() {
                 onClick={() => updateValue(NEWS2_KEYS.O2, true)}
                 className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${
                   formValues[NEWS2_KEYS.O2] === true
-                    ? 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-l border-orange-500/30 shadow-[0_0_8px_rgba(251,146,60,0.12)] backdrop-blur-sm'
+                    ? 'bg-orange-500/12 text-orange-400 border-l border-orange-500/30'
                     : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'
                 }`}
               >
@@ -229,7 +229,7 @@ export default function News2Calculator() {
             ].map(opt => {
               const active = formValues[NEWS2_KEYS.SpO2] === opt.v;
               return (
-                <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.SpO2, opt.v)} className={`relative py-2 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
+                <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.SpO2, opt.v)} className={`relative py-2 rounded-[2px] text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
                   {opt.l}
                 </button>
               );
@@ -250,7 +250,7 @@ export default function News2Calculator() {
       </div>
 
       {/* PAS */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Presión arterial sistólica
@@ -259,7 +259,7 @@ export default function News2Calculator() {
               if (v == null) return null;
               const m: Record<number,number> = {230:3,150:0,105:1,95:2,85:3};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -277,7 +277,7 @@ export default function News2Calculator() {
       </div>
 
       {/* FC */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Frecuencia cardíaca
@@ -286,7 +286,7 @@ export default function News2Calculator() {
               if (v == null) return null;
               const m: Record<number,number> = {35:3,45:1,75:0,100:1,120:2,135:3};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -301,7 +301,7 @@ export default function News2Calculator() {
           ].map(opt => {
             const active = formValues[NEWS2_KEYS.FC] === opt.v;
             return (
-              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.FC, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight ${newsBtnStyle(opt.s, active)}`}>
+              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.FC, opt.v)} className={`relative py-2.5 rounded-[2px] text-[10px] font-semibold transition-all border leading-tight ${newsBtnStyle(opt.s, active)}`}>
                 {opt.l}
               </button>
             );
@@ -310,7 +310,7 @@ export default function News2Calculator() {
       </div>
 
       {/* Conciencia */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Brain size={12} /> Nivel de conciencia
@@ -319,7 +319,7 @@ export default function News2Calculator() {
               if (v == null) return null;
               const m: Record<string,number> = {'alert':0,'cvpu':3};
               const s = m[v] ?? 3;
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -335,7 +335,7 @@ export default function News2Calculator() {
       </div>
 
       {/* Temperatura */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-3">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Thermometer size={12} /> Temperatura (°C)
@@ -344,7 +344,7 @@ export default function News2Calculator() {
               if (v == null) return null;
               const m: Record<number,number> = {34:3,35.5:1,37:0,38.5:1,40:2};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${newsScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -358,7 +358,7 @@ export default function News2Calculator() {
           ].map(opt => {
             const active = formValues[NEWS2_KEYS.Temp] === opt.v;
             return (
-              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Temp, opt.v)} className={`relative py-2.5 rounded-lg text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
+              <button key={opt.v} onClick={() => updateValue(NEWS2_KEYS.Temp, opt.v)} className={`relative py-2.5 rounded-[2px] text-[10px] font-semibold transition-all border leading-tight whitespace-pre-line ${newsBtnStyle(opt.s, active)}`}>
                 {opt.l}
               </button>
             );
@@ -371,15 +371,11 @@ export default function News2Calculator() {
         <button
           onClick={handleCalculate}
           disabled={isCalculating}
-          className="w-full md:w-auto md:min-w-[280px] py-3 px-8 rounded-xl font-semibold text-sm transition-all disabled:opacity-60"
-          style={{
-            background: 'linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%)',
-            color: 'white',
-          }}
+          className="ren-btn-sharp w-full md:w-auto md:min-w-[280px] py-3 px-8 text-sm disabled:opacity-60"
         >
           {isCalculating ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
               Calculando...
             </span>
           ) : (
@@ -392,7 +388,7 @@ export default function News2Calculator() {
       </div>
 
       {error && (
-        <div className="mb-4 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
+        <div className="mb-4 p-2 rounded-[2px] bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
           <AlertCircle size={12} />
           {error}
         </div>
@@ -406,11 +402,11 @@ export default function News2Calculator() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
-            <div className={`rounded-xl border backdrop-blur-sm ${riskClass.border} ${riskClass.bg} overflow-hidden`}>
+            <div className={`rounded-[2px] border ${riskClass.border} ${riskClass.bg} overflow-hidden`}>
               <div className="p-5">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-3xl font-bold ren-text-primary tabular-nums">{r.total_score}/20</span>
-                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full ${riskClass.bg} ${riskClass.text} border ${riskClass.border} backdrop-blur-sm`}>
+                  <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-[2px] ${riskClass.bg} ${riskClass.text} border ${riskClass.border}`}>
                     {r.color} {r.clinical_risk}
                   </span>
                 </div>
@@ -425,7 +421,7 @@ export default function News2Calculator() {
                     { l: 'T°', v: r.temp_score },
                     { l: 'Escala SpO₂', v: r.spo2_scale_used },
                   ].map(item => (
-                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? newsScoreBadge(Math.min(Number(item.v), 3)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                    <div key={item.l} className={`rounded-[2px] p-1.5 text-center border ${item.v != null ? newsScoreBadge(Math.min(Number(item.v), 3)) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
                       <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
                       <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
                     </div>
@@ -439,9 +435,9 @@ export default function News2Calculator() {
             </div>
 
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-              <button onClick={() => copyText(`NEWS2 | Score: ${r.total_score}/20 | Riesgo: ${r.clinical_risk} | ${r.clinical_response}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
+              <button onClick={handleCalculate} className="flex-1 py-2 rounded-[2px] text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
+              <button onClick={() => copyText(`NEWS2 | Score: ${r.total_score}/20 | Riesgo: ${r.clinical_risk} | ${r.clinical_response}`)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
+              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
             </div>
           </motion.div>
         )}

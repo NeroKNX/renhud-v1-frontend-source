@@ -26,13 +26,13 @@ function sofaPulse(score: number) {
 // ── Glass + Glow badge (Opción A) ──
 function sofaScoreBadge(score: number): string {
   const map: Record<number, string> = {
-    0: 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(52,211,153,0.12)] backdrop-blur-sm',
-    1: 'bg-gradient-to-br from-amber-500/20 to-amber-500/4 text-amber-400 border-amber-500/40 shadow-[0_0_10px_rgba(251,191,36,0.12)] backdrop-blur-sm',
-    2: 'bg-gradient-to-br from-orange-500/20 to-orange-500/4 text-orange-400 border-orange-500/40 shadow-[0_0_10px_rgba(251,146,60,0.12)] backdrop-blur-sm',
-    3: 'bg-gradient-to-br from-pink-400/20 to-pink-400/4 text-pink-300 border-pink-400/40 shadow-[0_0_10px_rgba(244,114,182,0.12)] backdrop-blur-sm',
-    4: 'bg-gradient-to-br from-red-600/22 to-red-600/6 text-red-300 border-red-600/45 shadow-[0_0_14px_rgba(220,38,38,0.18)] backdrop-blur-sm',
+    0: 'bg-emerald-500/12 text-emerald-400 border-emerald-500/40',
+    1: 'bg-amber-500/12 text-amber-400 border-amber-500/40',
+    2: 'bg-orange-500/12 text-orange-400 border-orange-500/40',
+    3: 'bg-pink-400/12 text-pink-300 border-pink-400/40',
+    4: 'bg-red-600/12 text-red-300 border-red-600/45',
   };
-  return map[score] || 'bg-gradient-to-br from-gray-500/10 to-gray-500/4 text-gray-400 border-gray-500/30 backdrop-blur-sm';
+  return map[score] || 'bg-gray-500/12 text-gray-400 border-gray-500/30';
 }
 
 function severityColor(severity: string) {
@@ -96,7 +96,7 @@ export default function SofaCalculator() {
   return (
     <div>
       {/* ── qSOFA inline ── */}
-      <div className="mb-8 rounded-xl border-l-4 border-l-amber-500/50 border border-[var(--accent-color)]/20 bg-gradient-to-r from-amber-500/[0.04] to-transparent p-4 backdrop-blur-sm">
+      <div className="mb-8 rounded-[2px] border-l-4 border-l-amber-500/50 border border-[var(--accent-color)]/20 bg-amber-500/12 p-4">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest flex items-center gap-1.5 text-amber-400">
             <Zap size={12} /> qSOFA — Cribado rápido
@@ -107,23 +107,23 @@ export default function SofaCalculator() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">Frec. respiratoria ≥22 rpm</label>
-            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_rr', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_rr', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_rr === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">PAS ≤100 mmHg</label>
-            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_sbp', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_sbp', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_sbp === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
           <div>
             <label className="block text-xs font-mono text-amber-400/80 mb-1.5 px-1">GCS {'<'} 15</label>
-            <div className="flex rounded-lg border border-[var(--ren-border)] overflow-hidden">
-              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-r border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
-              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-l border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.12)] backdrop-blur-sm' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
+            <div className="flex rounded-[2px] border border-[var(--ren-border)] overflow-hidden">
+              <button onClick={() => updateValue('qsofa_gcs', 0)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 0 ? 'bg-emerald-500/12 text-emerald-400 border-r border-emerald-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>No</button>
+              <button onClick={() => updateValue('qsofa_gcs', 1)} className={`flex-1 px-3 py-2 text-xs font-semibold transition-all ${formValues.qsofa_gcs === 1 ? 'bg-red-500/12 text-red-400 border-l border-red-500/30' : 'bg-[var(--ren-bg-secondary)] ren-text-secondary hover:bg-[var(--ren-bg-tertiary)]'}`}>Sí</button>
             </div>
           </div>
         </div>
@@ -133,13 +133,13 @@ export default function SofaCalculator() {
           const qTotal = Number(formValues.qsofa_rr) + Number(formValues.qsofa_sbp) + Number(formValues.qsofa_gcs);
           const qPos = qTotal >= 2;
           return (
-            <div className={`mt-3 rounded-xl border overflow-hidden ${qPos ? 'border-red-500/25 bg-red-500/5' : 'border-emerald-500/25 bg-emerald-500/5'}`}>
+            <div className={`mt-3 rounded-[2px] border overflow-hidden ${qPos ? 'border-red-500/25 bg-red-500/5' : 'border-emerald-500/25 bg-emerald-500/5'}`}>
               <div className="p-3 flex items-center gap-3">
                 <span className="text-xl font-bold ren-text-primary tabular-nums">{qTotal}/3</span>
                 {qPos ? (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-red-500/20 to-red-500/4 text-red-400 border-red-500/30 shadow-[0_0_8px_rgba(239,68,68,0.10)] backdrop-blur-sm">⚠ Alto riesgo — evaluar SOFA</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-red-500/12 text-red-400 border-red-500/30">⚠ Alto riesgo — evaluar SOFA</span>
                 ) : (
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-br from-emerald-500/20 to-emerald-500/4 text-emerald-400 border-emerald-500/30 shadow-[0_0_8px_rgba(52,211,153,0.10)] backdrop-blur-sm">Bajo riesgo</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-[2px] bg-emerald-500/12 text-emerald-400 border-emerald-500/30">Bajo riesgo</span>
                 )}
               </div>
             </div>
@@ -158,11 +158,11 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Respiratorio */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Wind size={12} /> Respiratorio — PaFi
-            <button onClick={() => setPaFiOpen(!paFiOpen)} className={`ml-auto text-[9px] font-mono px-2 py-1 rounded-lg border transition-all flex items-center gap-1 ${paFiOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
+            <button onClick={() => setPaFiOpen(!paFiOpen)} className={`ml-auto text-[9px] font-mono px-2 py-1 rounded-[2px] border transition-all flex items-center gap-1 ${paFiOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
               <Calculator size={10} />
               {paFiOpen ? 'Cerrar' : 'Calcular PaFi'}
             </button>
@@ -171,7 +171,7 @@ export default function SofaCalculator() {
               if (v == null) return null;
               const m: Record<number,number> = {400:0,350:1,250:2,150:3,50:4};
               const s = m[v];
-              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -182,7 +182,7 @@ export default function SofaCalculator() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-4 p-3 rounded-lg bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
+            className="mb-4 p-3 rounded-[2px] bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
           >
             <p className="text-[10px] font-mono uppercase tracking-widest text-cyan-400/80 mb-2">Calcular PaFi desde PaO₂ y FiO₂</p>
             <div className="flex gap-2 items-end">
@@ -193,7 +193,7 @@ export default function SofaCalculator() {
                   value={paFiPaO2}
                   onChange={e => setPaFiPaO2(e.target.value)}
                   placeholder="ej: 85"
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
                 />
               </div>
               <div className="flex-1">
@@ -203,7 +203,7 @@ export default function SofaCalculator() {
                   value={paFiFiO2}
                   onChange={e => setPaFiFiO2(e.target.value)}
                   placeholder="ej: 40"
-                  className="w-full px-2.5 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
+                  className="w-full px-2.5 py-1.5 text-xs rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-cyan-500/50"
                 />
               </div>
               <button
@@ -223,7 +223,7 @@ export default function SofaCalculator() {
                   }
                 }}
                 disabled={!paFiPaO2 || !paFiFiO2 || parseFloat(paFiFiO2) > 100}
-                className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-br from-cyan-500/20 to-cyan-500/4 text-cyan-400 border border-cyan-500/30 hover:from-cyan-500/30 hover:to-cyan-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(6,182,212,0.10)]"
+                className="px-4 py-1.5 rounded-[2px] text-xs font-semibold bg-cyan-500/12 text-cyan-400 border border-cyan-500/30 hover:from-cyan-500/30 hover:to-cyan-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Estimar
               </button>
@@ -257,7 +257,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_paFi === r.v;
             return (
-              <button key={r.k} onClick={() => updateValue('sofa_paFi', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => updateValue('sofa_paFi', r.v)} className={`relative py-2.5 rounded-[2px] text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -266,7 +266,7 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Coagulación */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Droplets size={12} /> Coagulación — Plaquetas (×10³/µL)
@@ -275,7 +275,7 @@ export default function SofaCalculator() {
               if (v == null) return null;
               const m: Record<number,number> = {150:0,100:1,50:2,20:3,5:4};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -289,7 +289,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_platelets === r.v;
             return (
-              <button key={r.k} onClick={() => updateValue('sofa_platelets', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => updateValue('sofa_platelets', r.v)} className={`relative py-2.5 rounded-[2px] text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -298,7 +298,7 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Hepático */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <FlaskConical size={12} /> Hepático — Bilirrubina (mg/dL)
@@ -307,7 +307,7 @@ export default function SofaCalculator() {
               if (v == null) return null;
               const m: Record<number,number> = {1:0,1.5:1,3:2,8:3,13:4};
               const s = m[v];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -321,7 +321,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_bilirubin === r.v;
             return (
-              <button key={r.k} onClick={() => updateValue('sofa_bilirubin', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => updateValue('sofa_bilirubin', r.v)} className={`relative py-2.5 rounded-[2px] text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -330,7 +330,7 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Cardiovascular */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Heart size={12} /> Cardiovascular — PAM + Vasopresores
@@ -340,7 +340,7 @@ export default function SofaCalculator() {
               if (m == null || d == null) return null;
               const cv: Record<string,number> = {'80_none':0,'60_none':1,'70_low':2,'70_mid':3,'70_high':4};
               const s = cv[`${m}_${d}`];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -354,7 +354,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_map === r.map && formValues.sofa_dopamine === r.dopa;
             return (
-              <button key={r.k} onClick={() => { updateValue('sofa_map', r.map); updateValue('sofa_dopamine', r.dopa); }} className={`relative py-2.5 px-3 rounded-lg text-xs font-semibold transition-all border text-left ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => { updateValue('sofa_map', r.map); updateValue('sofa_dopamine', r.dopa); }} className={`relative py-2.5 px-3 rounded-[2px] text-xs font-semibold transition-all border text-left ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -363,11 +363,11 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Neurológico */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Brain size={12} /> Neurológico — Glasgow
-            <button onClick={() => setGcsOpen(!gcsOpen)} className={`text-[9px] font-mono px-2 py-1 rounded-lg border transition-all flex items-center gap-1 ${gcsOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
+            <button onClick={() => setGcsOpen(!gcsOpen)} className={`text-[9px] font-mono px-2 py-1 rounded-[2px] border transition-all flex items-center gap-1 ${gcsOpen ? 'bg-[var(--accent-color)]/10 border-[var(--accent-color)]/25 text-[var(--accent-color)]' : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] ren-text-tertiary hover:text-[var(--accent-hover)]'}`}>
               <Calculator size={10} />
               {gcsOpen ? 'Cerrar' : 'Calcular GCS'}
             </button>
@@ -376,7 +376,7 @@ export default function SofaCalculator() {
               if (v == null) return null;
               const m: Record<number,number> = {15:0,13:1,11:2,8:3,5:4};
               const s = m[v];
-              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -387,7 +387,7 @@ export default function SofaCalculator() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-4 p-3 rounded-lg bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
+            className="mb-4 p-3 rounded-[2px] bg-[var(--ren-bg-tertiary)]/50 border border-[var(--accent-color)]/20"
           >
             <p className="text-[10px] font-mono uppercase tracking-widest text-purple-400/80 mb-2">Calcular GCS desde componentes</p>
             <div className="grid grid-cols-3 gap-2 mb-2">
@@ -396,7 +396,7 @@ export default function SofaCalculator() {
                 <select
                   value={gcsEye}
                   onChange={e => setGcsEye(e.target.value)}
-                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                  className="w-full px-2 py-1.5 text-xs rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
                 >
                   <option value="">—</option>
                   <option value="4">4 — Espontánea</option>
@@ -410,7 +410,7 @@ export default function SofaCalculator() {
                 <select
                   value={gcsVerbal}
                   onChange={e => setGcsVerbal(e.target.value)}
-                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                  className="w-full px-2 py-1.5 text-xs rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
                 >
                   <option value="">—</option>
                   <option value="5">5 — Orientado</option>
@@ -425,7 +425,7 @@ export default function SofaCalculator() {
                 <select
                   value={gcsMotor}
                   onChange={e => setGcsMotor(e.target.value)}
-                  className="w-full px-2 py-1.5 text-xs rounded-lg bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
+                  className="w-full px-2 py-1.5 text-xs rounded-[2px] bg-[var(--ren-bg-secondary)] border border-[var(--ren-border)] ren-text-primary font-mono focus:outline-none focus:border-purple-500/50"
                 >
                   <option value="">—</option>
                   <option value="6">6 — Obedece órdenes</option>
@@ -455,7 +455,7 @@ export default function SofaCalculator() {
                 }
               }}
               disabled={!gcsEye || !gcsVerbal || !gcsMotor}
-              className="w-full px-3 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-br from-purple-500/20 to-purple-500/4 text-purple-400 border border-purple-500/30 hover:from-purple-500/30 hover:to-purple-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_8px_rgba(168,85,247,0.10)]"
+              className="w-full px-3 py-1.5 rounded-[2px] text-xs font-semibold bg-purple-500/12 text-purple-400 border border-purple-500/30 hover:from-purple-500/30 hover:to-purple-500/8 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Estimar
             </button>
@@ -486,7 +486,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_gcs === r.v;
             return (
-              <button key={r.k} onClick={() => updateValue('sofa_gcs', r.v)} className={`relative py-2.5 rounded-lg text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => updateValue('sofa_gcs', r.v)} className={`relative py-2.5 rounded-[2px] text-xs font-semibold transition-all border ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -495,7 +495,7 @@ export default function SofaCalculator() {
       </div>
 
       {/* SOFA: Renal */}
-      <div className="mb-6 p-3 rounded-lg bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
+      <div className="mb-6 p-3 rounded-[2px] bg-[var(--ren-bg-secondary)]/30 border border-[var(--ren-border)]/40">
         <div className="mb-4">
           <h3 className="text-[11px] font-mono uppercase tracking-widest ren-text-tertiary flex items-center gap-1.5">
             <Filter size={12} /> Renal — Creatinina (mg/dL) o Diuresis (24h)
@@ -505,7 +505,7 @@ export default function SofaCalculator() {
               if (cr == null || u == null) return null;
               const ren: Record<string,number> = {'1_1000':0,'1.5_1000':1,'3_1000':2,'4_400':3,'6_100':4};
               const s = ren[`${cr}_${u}`];
-              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-full border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
+              return s != null ? <span className={`ml-auto text-[10px] font-mono px-1.5 py-0.5 rounded-[2px] border ${sofaScoreBadge(s)}`}>{s} pt{s!==1?'s':''}</span> : null;
             })()}
           </h3>
         </div>
@@ -519,7 +519,7 @@ export default function SofaCalculator() {
           ].map(r => {
             const active = formValues.sofa_creatinine === r.cr && formValues.sofa_urine === r.urine;
             return (
-              <button key={r.k} onClick={() => { updateValue('sofa_creatinine', r.cr); updateValue('sofa_urine', r.urine); }} className={`relative py-2.5 px-2 rounded-lg text-xs font-semibold transition-all border leading-tight ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
+              <button key={r.k} onClick={() => { updateValue('sofa_creatinine', r.cr); updateValue('sofa_urine', r.urine); }} className={`relative py-2.5 px-2 rounded-[2px] text-xs font-semibold transition-all border leading-tight ${sofaBtnStyle(r.s, active)} ${sofaPulse(r.s) && active ? 'animate-pulse' : ''}`}>
                 {r.l}
               </button>
             );
@@ -532,15 +532,11 @@ export default function SofaCalculator() {
         <button
           onClick={handleCalculate}
           disabled={isCalculating}
-          className="w-full md:w-auto md:min-w-[280px] py-3 px-8 rounded-xl font-semibold text-sm transition-all disabled:opacity-60"
-          style={{
-            background: 'linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%)',
-            color: 'white',
-          }}
+          className="ren-btn-sharp w-full md:w-auto md:min-w-[280px] py-3 px-8 text-sm disabled:opacity-60"
         >
           {isCalculating ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-current/30 border-t-current rounded-full animate-spin" />
               Calculando...
             </span>
           ) : (
@@ -553,7 +549,7 @@ export default function SofaCalculator() {
       </div>
 
       {error && (
-        <div className="mb-4 p-2 rounded-lg bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
+        <div className="mb-4 p-2 rounded-[2px] bg-red-500/10 border border-red-500/25 text-red-400 text-[11px] font-mono flex items-center gap-1.5">
           <AlertCircle size={12} />
           {error}
         </div>
@@ -568,7 +564,7 @@ export default function SofaCalculator() {
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
           >
             {/* SOFA score */}
-            <div className={`rounded-xl border backdrop-blur-sm ${severityClass?.border} ${severityClass?.bg} overflow-hidden`}>
+            <div className={`rounded-[2px] border ${severityClass?.border} ${severityClass?.bg} overflow-hidden`}>
               <div className="p-4">
                 <p className="text-[10px] font-mono uppercase tracking-widest ren-text-tertiary mb-3">SOFA — Disfunción orgánica</p>
                 <div className="grid grid-cols-6 gap-1.5 mb-4">
@@ -576,7 +572,7 @@ export default function SofaCalculator() {
                     {l:'Resp',v:r.sofa_resp},{l:'Coag',v:r.sofa_coag},{l:'Hep',v:r.sofa_hepatic},
                     {l:'CV',v:r.sofa_cv},{l:'SNC',v:r.sofa_cns},{l:'Renal',v:r.sofa_renal},
                   ].map(item => (
-                    <div key={item.l} className={`rounded-lg p-1.5 text-center border backdrop-blur-sm ${item.v != null ? sofaScoreBadge(item.v) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
+                    <div key={item.l} className={`rounded-[2px] p-1.5 text-center border ${item.v != null ? sofaScoreBadge(item.v) : 'bg-[var(--ren-bg-tertiary)] border-[var(--ren-border)] text-gray-400'}`}>
                       <p className="text-[7px] font-mono opacity-70 leading-tight">{item.l}</p>
                       <p className="text-xs font-bold tabular-nums">{item.v ?? '-'}</p>
                     </div>
@@ -589,7 +585,7 @@ export default function SofaCalculator() {
                   </div>
                   <div>
                     <p className="text-[9px] font-mono ren-text-tertiary uppercase tracking-widest">Severidad</p>
-                    <span className={`text-[11px] font-mono px-2 py-0.5 rounded-full ${severityClass?.bg} ${severityClass?.text} border ${severityClass?.border} backdrop-blur-sm inline-block mt-0.5`}>{r.sofa_severity}</span>
+                    <span className={`text-[11px] font-mono px-2 py-0.5 rounded-[2px] ${severityClass?.bg} ${severityClass?.text} border ${severityClass?.border} inline-block mt-0.5`}>{r.sofa_severity}</span>
                   </div>
                 </div>
                 <div className="mt-2 pt-2 border-t border-[var(--ren-border)]/40">
@@ -601,9 +597,9 @@ export default function SofaCalculator() {
             </div>
 
             <div className="flex gap-2 mt-3 flex-wrap">
-              <button onClick={handleCalculate} className="flex-1 py-2 rounded-lg text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
-              <button onClick={() => copyText(`SOFA | qSOFA: ${(() => { const q = (Number(formValues.qsofa_rr)||0)+(Number(formValues.qsofa_sbp)||0)+(Number(formValues.qsofa_gcs)||0); return q+'/3'; })()} | SOFA total: ${r.sofa_total}/24 | Severidad: ${r.sofa_severity} | Mortalidad: ${r.sofa_mortality_estimate}`)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
-              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-lg text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
+              <button onClick={handleCalculate} className="flex-1 py-2 rounded-[2px] text-xs font-mono ren-text-secondary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all">Recalcular</button>
+              <button onClick={() => copyText(`SOFA | qSOFA: ${(() => { const q = (Number(formValues.qsofa_rr)||0)+(Number(formValues.qsofa_sbp)||0)+(Number(formValues.qsofa_gcs)||0); return q+'/3'; })()} | SOFA total: ${r.sofa_total}/24 | Severidad: ${r.sofa_severity} | Mortalidad: ${r.sofa_mortality_estimate}`)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:border-[var(--accent-color)]/40 hover:text-[var(--accent-hover)] transition-all flex items-center gap-1.5"><Copy size={12} /> Copiar</button>
+              <button onClick={() => setResult(null)} className="py-2 px-4 rounded-[2px] text-xs font-mono ren-text-tertiary bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)] hover:bg-[var(--ren-bg-secondary)] transition-all">Limpiar</button>
             </div>
           </motion.div>
         )}
