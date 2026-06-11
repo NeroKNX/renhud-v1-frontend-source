@@ -2,7 +2,7 @@ export type ModelType = 'flash' | 'deep';
 
 export const modelColors: Record<ModelType, string> = {
   flash: 'text-emerald-400',
-  deep: 'text-[#4f46e5]',
+  deep: 'text-[var(--accent-color)]',
 };
 
 export const modelLabels: Record<ModelType, string> = {

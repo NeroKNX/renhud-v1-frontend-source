@@ -210,7 +210,7 @@ function CalculatorThemeToggle() {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setThemeState(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
-    const mt = document.querySelector('meta[name="theme-color"]'); if(mt) mt.setAttribute('content', newTheme === 'dark' ? '#0a0a0c' : '#f8fafc');
+    const mt = document.querySelector('meta[name="theme-color"]'); if(mt) mt.setAttribute('content', newTheme === 'dark' ? '#0B0E14' : '#F5F1E8');
     if (newTheme === 'dark') document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
     try {

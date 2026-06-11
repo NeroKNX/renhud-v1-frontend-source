@@ -691,7 +691,7 @@ export default function ApacheIVCalculator() {
                   <div className="relative">
                     <div style={{
                       position: 'absolute', inset: 0,
-                      background: 'radial-gradient(circle at 50% 35%, rgba(139,92,246,0.10) 0%, rgba(139,92,246,0.03) 60%, transparent 100%)',
+                      background: 'radial-gradient(circle at 50% 35%, rgba(212,168,83,0.10) 0%, rgba(212,168,83,0.03) 60%, transparent 100%)',
                       pointerEvents: 'none',
                     }} />
                     <div className="relative z-1 text-center py-4 sm:py-5 px-2 sm:px-3">

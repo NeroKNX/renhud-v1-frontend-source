@@ -742,7 +742,7 @@ export default function ChatPage() {
 
   // ──────────────────────────────────────────────
   // Sincronizar URL con la sesión activa
-  // ──────────────────────────────────────────────
+  // ─────────────────────────────────────────���────
   useEffect(() => {
     if (currentSessionId && window.location.search !== `?session=${currentSessionId}`) {
       window.history.replaceState(null, '', `/chat?session=${currentSessionId}`);
@@ -751,7 +751,7 @@ export default function ChatPage() {
 
   // ──────────────────────────────────────────────
   // Cargar sesión desde URL al montar (soporte para nueva pestaña)
-  // ───────────���──────────────────────────────────
+  // ───────────�����──────────────────────────────────
   useEffect(() => {
     if (!isInitialLoadDone || !userId || serverSessions.length === 0) return;
     if (currentSessionId) return; // ya hay sesión activa, no sobreescribir
@@ -1111,7 +1111,7 @@ export default function ChatPage() {
             <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50" style={{ animation: 'slideDown 0.3s ease' }}>
               <div className="px-5 py-3 rounded-xl shadow-2xl border backdrop-blur-sm"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.08) 100%)',
+                  background: 'linear-gradient(135deg, rgba(212,168,83,0.14) 0%, rgba(94,139,126,0.08) 100%)',
                   borderColor: 'var(--accent-color)',
                 }}
               >
@@ -1131,7 +1131,7 @@ export default function ChatPage() {
           )}
 
           {isGuest && (
-            <div className="px-4 md:px-6 py-2.5 border-b border-[var(--accent-color)]/20" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(99,102,241,0.04) 50%, rgba(99,102,241,0.08) 100%)' }}>
+            <div className="px-4 md:px-6 py-2.5 border-b border-[var(--accent-color)]/20" style={{ background: 'linear-gradient(135deg, rgba(212,168,83,0.08) 0%, rgba(212,168,83,0.04) 50%, rgba(212,168,83,0.08) 100%)' }}>
               <p className="text-xs font-mono text-center text-[var(--ren-text-secondary)]">
                 💡{' '}
                 <button

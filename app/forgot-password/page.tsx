@@ -119,7 +119,7 @@ export default function ForgotPasswordPage() {
             transition={{ duration: 0.8, ease: 'easeOut' }}
             className="absolute -inset-20 lg:-inset-32 rounded-full pointer-events-none"
             style={{
-              background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 70%)',
               filter: 'blur(40px)',
             }}
           />
@@ -159,7 +159,7 @@ export default function ForgotPasswordPage() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push('/login')}
-                className="w-full py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white rounded-lg transition-all shadow-[0_0_20px_var(--ren-shadow-accent)]"
+                className="w-full py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] font-semibold rounded-lg transition-all shadow-[0_0_20px_var(--ren-shadow-accent)]"
               >
                 Iniciar sesión
               </motion.button>
@@ -177,7 +177,7 @@ export default function ForgotPasswordPage() {
                 <motion.div
                   className="absolute inset-0 rounded-full"
                   style={{
-                    background: 'radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle, rgba(212,168,83,0.18) 0%, transparent 70%)',
                     filter: 'blur(20px)',
                     transform: 'scale(1.5)',
                   }}
@@ -278,7 +278,7 @@ export default function ForgotPasswordPage() {
                   whileTap={{ scale: 0.98 }}
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white rounded-lg transition-all shadow-[0_0_20px_var(--ren-shadow-accent)] hover:shadow-[0_0_30px_var(--ren-shadow-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] font-semibold rounded-lg transition-all shadow-[0_0_20px_var(--ren-shadow-accent)] hover:shadow-[0_0_30px_var(--ren-shadow-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}
                 </motion.button>

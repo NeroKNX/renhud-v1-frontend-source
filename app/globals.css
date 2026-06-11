@@ -210,7 +210,7 @@ html {
 /* ─────────────────────────────────────────────
    REN V2 — Textura de taller (luz de lámpara)
    Gradiente radial sutil + capa de ruido leve
-   ───────────────────────────────────────────── */
+   ──────────────────────��────────────────────── */
 .ren-workshop-surface {
   position: relative;
   background-color: var(--ren-bg-primary);
@@ -991,7 +991,7 @@ html::after {
 }
 
 .apache-iv-root .result-meta .value.los {
-  color: var(--accent-hover, #818cf8);
+  color: var(--accent-hover, #E2BD73);
 }
 
 /* Severity bar */

@@ -36,7 +36,7 @@ export function WelcomeLanding({
       transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
       className="flex flex-col items-center justify-center min-h-[60vh] px-4 py-12 text-center select-none"
       style={{
-        background: 'radial-gradient(ellipse at 50% 28%, rgba(99,102,241,0.08) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse at 50% 28%, rgba(212,168,83,0.07) 0%, transparent 60%)',
       }}
     >
       {/* Sigil + animated glow */}
@@ -94,8 +94,8 @@ export function WelcomeLanding({
           style={{
             background: 'linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%)',
             borderColor: 'transparent',
-            color: '#ffffff',
-            boxShadow: '0 4px 20px rgba(99,102,241,0.3)',
+            color: 'var(--ren-bg-primary)',
+            boxShadow: '0 4px 20px rgba(212,168,83,0.3)',
           }}
         >
           ✦ Nueva conversación

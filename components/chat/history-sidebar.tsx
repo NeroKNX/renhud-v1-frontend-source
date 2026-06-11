@@ -301,7 +301,7 @@ export function HistorySidebar({ isOpen, onClose, currentSessionId, refreshTrigg
                               layout
                               className={`group relative p-3 rounded-lg border transition-all cursor-pointer ${
                                 selectedIds.has(session.id)
-                                  ? 'bg-[var(--accent-color)]/15 border-[var(--accent-color)]/60 shadow-[0_0_10px_rgba(99,102,241,0.2)]'
+                                  ? 'bg-[var(--accent-color)]/15 border-[var(--accent-color)]/60 shadow-[0_0_10px_rgba(212,168,83,0.2)]'
                                   : session.isFavorite
                                     ? currentSessionId === session.id
                                       ? 'bg-gradient-to-br from-yellow-500/10 to-[var(--ren-bg-tertiary)] border-yellow-500/50 shadow-[0_0_15px_rgba(234,179,8,0.15)]'
