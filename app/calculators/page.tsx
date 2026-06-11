@@ -243,12 +243,20 @@ export default function CalculatorsPage() {
   const [fichaOpen, setFichaOpen] = useState(false);
   const [fichaTab, setFichaTab] = useState(0);
 
+  // Lista estática de calculadoras — funciona sin backend
+  const STATIC_CALCULATORS = [
+    { id: 'apache-iv', name: 'APACHE IV', shortName: 'APACHE IV', description: 'Predicción de mortalidad y estancia en UCI a partir de los peores valores fisiológicos en las primeras 24h de ingreso.' },
+    { id: 'sofa', name: 'SOFA', shortName: 'SOFA', description: 'Cuantificación de disfunción orgánica secuencial. Diagnóstico de sepsis (aumento ≥2 puntos sobre basal).' },
+    { id: 'news2', name: 'NEWS 2', shortName: 'NEWS 2', description: 'Detección temprana de deterioro clínico en sala general, urgencias y entornos prehospitalarios.' },
+    { id: 'nihss', name: 'NIHSS', shortName: 'NIHSS', description: 'Cuantificación de severidad neurológica en ACV isquémico agudo. Elegibilidad para trombólisis y trombectomía.' },
+  ];
+
   // Cargar lista de calculadoras
   useEffect(() => {
     fetch('/api/calculators')
       .then(r => r.json())
       .then(d => setCalculators(d.calculators || []))
-      .catch(() => {});
+      .catch(() => setCalculators(STATIC_CALCULATORS));
   }, []);
 
   // Leer ?calc=xxx de la URL al montar
