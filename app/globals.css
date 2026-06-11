@@ -207,6 +207,120 @@ html {
   }
 }
 
+/* ═════════════════════════════════════════════
+   REN V2 — Lenguaje "Blueprint Editorial"
+   ═════════════════════════════════════════════ */
+
+.ren-blueprint-grid {
+  background-color: var(--ren-bg-primary);
+  background-image:
+    linear-gradient(to right, var(--ren-border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--ren-border) 1px, transparent 1px);
+  background-size: 64px 64px;
+  background-position: center center;
+}
+.ren-blueprint-grid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 75% 65% at 50% 42%, transparent 28%, var(--ren-bg-primary) 80%);
+}
+
+.ren-corner-mark {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--accent-color);
+  opacity: 0.55;
+}
+.ren-corner-mark.tl { border-left: 1px solid; border-top: 1px solid; }
+.ren-corner-mark.tr { border-right: 1px solid; border-top: 1px solid; }
+.ren-corner-mark.bl { border-left: 1px solid; border-bottom: 1px solid; }
+.ren-corner-mark.br { border-right: 1px solid; border-bottom: 1px solid; }
+
+.ren-spec-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ren-text-tertiary);
+}
+
+.ren-btn-sharp {
+  border-radius: 2px;
+  background: var(--accent-color);
+  color: var(--ren-bg-primary);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.ren-btn-sharp:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 0 1px var(--accent-color), 0 8px 24px rgba(212,168,83,0.18);
+}
+.ren-btn-sharp:active { transform: translateY(1px); }
+
+.ren-btn-outline {
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ren-text-primary);
+  border: 1px solid var(--ren-border);
+  font-weight: 600;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+.ren-btn-outline:hover {
+  border-color: var(--accent-color);
+  background: var(--accent-muted);
+}
+
+.ren-spec-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 2px;
+  border: 1px solid var(--ren-border);
+  background: var(--ren-bg-secondary);
+  padding: 9px 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ren-text-secondary);
+  transition: border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+.ren-spec-chip:hover {
+  border-color: var(--accent-color);
+  color: var(--ren-text-primary);
+  transform: translateY(-1px);
+}
+.ren-spec-chip .idx {
+  color: var(--accent-color);
+  opacity: 0.8;
+}
+
+.ren-rule {
+  height: 1px;
+  background: var(--ren-border);
+  position: relative;
+}
+.ren-rule::before {
+  content: "";
+  position: absolute;
+  left: 0; top: -2px;
+  width: 32px; height: 5px;
+  background: var(--accent-color);
+}
+
+.ren-display {
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+.ren-display .thin {
+  font-weight: 200;
+  color: var(--ren-text-secondary);
+}
+
 /* ─────────────────────────────────────────────
    REN V2 — Textura de taller (luz de lámpara)
    Gradiente radial sutil + capa de ruido leve

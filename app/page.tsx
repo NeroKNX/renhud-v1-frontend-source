@@ -6,279 +6,210 @@ import { CrowIcon } from '@/components/ui/crow-icon';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { useAuth } from '@/lib/auth-context';
 
-const pills = [
-  { icon: '🧠', label: 'Razonamiento estructural' },
-  { icon: '📋', label: 'Documentación clínica' },
-  { icon: '💾', label: 'Memoria contextual' },
-  { icon: '🔗', label: 'Integración de datos' },
-  { icon: '🔍', label: 'Análisis crítico' },
+const capabilities = [
+  { id: '01', label: 'Razonamiento estructural' },
+  { id: '02', label: 'Documentación clínica' },
+  { id: '03', label: 'Memoria contextual' },
+  { id: '04', label: 'Integración de datos' },
+  { id: '05', label: 'Análisis crítico' },
 ];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.08 },
-  },
-};
-
-const pillVariants = {
-  hidden: { opacity: 0, y: 6, scale: 0.95 },
-  show: { opacity: 1, y: 0, scale: 1 },
-};
 
 export default function LandingPage() {
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const enterGuest = () => {
+    const guestId = 'guest_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    sessionStorage.setItem('ren_guest', JSON.stringify({ name: 'Invitado', user_id: guestId }));
+    window.dispatchEvent(new CustomEvent('ren:guest-created'));
+    router.push('/chat');
+  };
 
   return (
-    <div className="h-dvh flex flex-col overflow-hidden">
-      {/* Theme Toggle */}
-      <div className="fixed top-4 right-4 z-50">
-        <ThemeToggle />
-      </div>
+    <div className="relative min-h-dvh flex flex-col bg-[var(--ren-bg-primary)] overflow-x-hidden">
+      {/* Rejilla blueprint de fondo */}
+      <div className="ren-blueprint-grid absolute inset-0 z-0" aria-hidden />
 
-      {/* Ambient particles — only visible on desktop */}
-      <div className="hidden lg:block absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full bg-[var(--accent-color)]"
-            style={{
-              width: Math.random() * 2 + 1,
-              height: Math.random() * 2 + 1,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              opacity: 0.15,
-            }}
-            animate={{
-              y: [0, -Math.random() * 30 - 10, 0],
-              opacity: [0.08, 0.25, 0.08],
-            }}
-            transition={{
-              duration: Math.random() * 6 + 4,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: Math.random() * 3,
-            }}
-          />
-        ))}
-      </div>
+      {/* ───────── Header / barra técnica ───────── */}
+      <header className="relative z-20 border-b border-[var(--ren-border)]">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center">
+              <CrowIcon size="sm" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-[15px] font-semibold tracking-[0.18em] text-[var(--ren-text-primary)]">REN</span>
+              <span className="ren-spec-label hidden sm:inline">/ asistente clínico</span>
+            </div>
+          </div>
 
-      <main className="flex-1 flex items-center justify-center px-6 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-[460px] w-full"
-        >
-          {/* Cuervo con aura glow */}
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="flex justify-center mb-5 relative"
-          >
-            {/* Aura grande externa — más difusa, solo escritorio */}
-            <motion.div
-              className="absolute inset-0 rounded-full hidden lg:block"
-              style={{
-                background:
-                  'radial-gradient(circle, rgba(212,168,83,0.12) 0%, transparent 65%)',
-                filter: 'blur(48px)',
-                transform: 'scale(1.8)',
-              }}
-              animate={{ scale: [1.7, 2.1, 1.7], opacity: [0.4, 0.7, 0.4] }}
-              transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            {/* Aura que respira con el cuervo */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background:
-                  'radial-gradient(circle, rgba(212,168,83,0.25) 0%, transparent 70%)',
-                filter: 'blur(24px)',
-              }}
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.85, 0.5] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <CrowIcon size="2xl" animate />
-          </motion.div>
-
-          {/* Título */}
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-[clamp(48px,14vw,80px)] font-bold leading-none tracking-[-3px] mb-1 ren-gradient-text"
-          >
-            REN
-          </motion.h1>
-
-          {/* Subtítulo */}
-          <motion.p
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="text-base italic ren-text-secondary/70 mb-3"
-          >
-            Brillo en el caos.
-          </motion.p>
-
-          {/* Línea divisoria */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.28 }}
-            className="w-14 h-px bg-gradient-to-r from-transparent via-[var(--accent-color)]/25 to-transparent mx-auto mb-[14px]"
-          />
-
-          {/* Texto */}
-          <motion.p
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }}
-            className="text-sm ren-text-secondary mb-[14px] max-w-[320px] mx-auto"
-          >
-            Le doy estructura a la información que nadie más ordena.
-          </motion.p>
-
-          {/* Línea divisoria */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.35 }}
-            className="w-14 h-px bg-gradient-to-r from-transparent via-[var(--accent-color)]/15 to-transparent mx-auto mb-6"
-          />
-
-          {/* Botones — cambian según sesión */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-            className="flex gap-2.5 justify-center flex-wrap mb-7"
-          >
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="ren-spec-label hidden md:inline">v2 · alpha</span>
+            <ThemeToggle />
             {isAuthenticated ? (
-              <>
-                <button
-                  onClick={() => router.push('/chat')}
-                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] text-[13px] font-semibold transition-all"
-                >
-                  Ir al chat →
-                </button>
-                <button
-                  onClick={async () => { await logout(); router.push('/'); }}
-                  className="px-[22px] py-[10px] rounded-xl bg-transparent ren-text-primary text-[13px] font-semibold border border-[var(--ren-border)] hover:bg-[var(--ren-bg-tertiary)] hover:text-red-400 hover:border-red-400/50 transition-all"
-                >
-                  Cerrar sesión
-                </button>
-                <span
-                  className="px-[22px] py-[10px] rounded-xl bg-transparent ren-text-primary/60 text-[13px] font-mono border border-[var(--ren-border)] flex items-center gap-1.5"
-                >
-                  🜁 {user?.name || user?.username}
-                </span>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => router.push('/register')}
-                  className="ren-btn-glow px-[22px] py-[10px] rounded-xl bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-[var(--ren-bg-primary)] text-[13px] font-semibold transition-all"
-                >
-                  Crear cuenta →
-                </button>
-                <button
-                  onClick={() => router.push('/login')}
-                  className="px-[22px] py-[10px] rounded-xl bg-transparent ren-text-primary text-[13px] font-semibold border border-[var(--ren-border)] hover:bg-[var(--ren-bg-tertiary)] hover:border-[var(--accent-color)]/50 transition-all"
-                >
-                  Iniciar sesión
-                </button>
-              </>
-            )}
-          </motion.div>
-
-          {/* Invitado — debajo de los botones */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.55 }}
-            className="-mt-4 mb-5"
-          >
-            <span
-              onClick={() => {
-                const guestId = 'guest_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-                sessionStorage.setItem('ren_guest', JSON.stringify({ name: 'Invitado', user_id: guestId }));
-                window.dispatchEvent(new CustomEvent('ren:guest-created'));
-                router.push('/chat');
-              }}
-              className="cursor-pointer text-[13px] ren-text-tertiary hover:ren-text-primary transition-colors underline underline-offset-4 decoration-dotted decoration-1 hover:decoration-solid"
-            >
-              Continuar como invitado
-            </span>
-          </motion.div>
-
-          {/* Calculadoras CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.6 }}
-            className="mb-5"
-          >
-            <button
-              onClick={() => router.push('/calculators')}
-              className="group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono"
-              style={{
-                background: 'rgba(212,168,83,0.06)',
-                border: '1px solid rgba(212,168,83,0.2)',
-                color: 'var(--ren-text-secondary)',
-              }}
-            >
-              <span className="w-5 h-5 rounded-md bg-[var(--accent-color)]/10 flex items-center justify-center text-[11px] group-hover:bg-[var(--accent-color)]/20 transition-all">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-                </svg>
-              </span>
-              <span className="group-hover:text-[var(--accent-hover)] transition-colors">
-                Calculadoras clínicas
-              </span>
-              <span className="text-[10px] opacity-40 group-hover:opacity-80 transition-opacity">
-                nuevo
-              </span>
-            </button>
-          </motion.div>
-
-
-
-          {/* Pills — entrada escalonada */}
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="show"
-            className="flex flex-wrap gap-2 justify-center mb-7"
-          >
-            {pills.map((pill) => (
-              <motion.span
-                key={pill.label}
-                variants={pillVariants}
-                className="ren-pill"
+              <button
+                onClick={() => router.push('/chat')}
+                className="ren-btn-sharp px-4 py-2 text-[13px]"
               >
-                <span className="text-[13px]">{pill.icon}</span>
-                {pill.label}
-              </motion.span>
-            ))}
-          </motion.div>
+                Ir al chat
+              </button>
+            ) : (
+              <button
+                onClick={() => router.push('/login')}
+                className="ren-btn-outline px-4 py-2 text-[13px]"
+              >
+                Iniciar sesión
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
 
-          {/* Footer — sin link a chat */}
-          <motion.footer
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.7 }}
-            className="text-[11px] ren-text-tertiary space-x-3"
-          >
-            <span className="opacity-50">🜁</span>
-            <span>REN · alpha</span>
-          </motion.footer>
-        </motion.div>
+      {/* ───────── Hero ───────── */}
+      <main className="relative z-10 flex-1">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-8 pt-16 sm:pt-24 lg:pt-28 pb-20">
+            {/* Columna izquierda: titular + acciones */}
+            <div className="lg:col-span-7 xl:col-span-8">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center gap-3 mb-7"
+              >
+                <span className="ren-spec-label">Brillo en el caos</span>
+                <span className="h-px w-12 bg-[var(--ren-border)]" />
+                <span className="ren-spec-label text-[var(--accent-color)]">UCI · tiempo real</span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.05 }}
+                className="ren-display text-[var(--ren-text-primary)] text-[clamp(52px,11vw,128px)]"
+              >
+                <span className="block">Estructura</span>
+                <span className="block">
+                  para el <span className="text-[var(--accent-color)]">caos</span>
+                </span>
+                <span className="block thin text-[clamp(34px,7vw,80px)]">clínico.</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-8 max-w-[480px] text-[15px] leading-[1.7] text-[var(--ren-text-secondary)]"
+              >
+                REN le da forma a la información que nadie más ordena: razona,
+                documenta y sostiene el contexto de cada paciente crítico.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="mt-10 flex flex-wrap items-center gap-3"
+              >
+                {isAuthenticated ? (
+                  <>
+                    <button onClick={() => router.push('/chat')} className="ren-btn-sharp px-6 py-3 text-[14px]">
+                      Ir al chat →
+                    </button>
+                    <button
+                      onClick={async () => { await logout(); router.push('/'); }}
+                      className="ren-btn-outline px-6 py-3 text-[14px]"
+                    >
+                      Cerrar sesión
+                    </button>
+                    <span className="ren-spec-label flex items-center gap-1.5 pl-1">
+                      <span className="text-[var(--accent-color)]">●</span>
+                      {user?.name || user?.username}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => router.push('/register')} className="ren-btn-sharp px-6 py-3 text-[14px]">
+                      Crear cuenta →
+                    </button>
+                    <button onClick={enterGuest} className="ren-btn-outline px-6 py-3 text-[14px]">
+                      Continuar como invitado
+                    </button>
+                  </>
+                )}
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.45 }}
+                className="mt-10"
+              >
+                <button
+                  onClick={() => router.push('/calculators')}
+                  className="group inline-flex items-center gap-3 ren-btn-outline px-4 py-2.5"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                  </svg>
+                  <span className="text-[13px] font-medium">Calculadoras clínicas</span>
+                  <span className="ren-spec-label text-[var(--accent-color)]">nuevo</span>
+                </button>
+              </motion.div>
+            </div>
+
+            {/* Columna derecha: panel de especificaciones */}
+            <div className="lg:col-span-5 xl:col-span-4">
+              <motion.div
+                initial={{ opacity: 0, x: 16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative border border-[var(--ren-border)] bg-[var(--ren-bg-secondary)]/60 backdrop-blur-sm"
+              >
+                <span className="ren-corner-mark tl -top-px -left-px" />
+                <span className="ren-corner-mark tr -top-px -right-px" />
+                <span className="ren-corner-mark bl -bottom-px -left-px" />
+                <span className="ren-corner-mark br -bottom-px -right-px" />
+
+                <div className="flex items-center justify-between px-5 h-12 border-b border-[var(--ren-border)]">
+                  <span className="ren-spec-label">Capacidades</span>
+                  <span className="ren-spec-label">05 / 05</span>
+                </div>
+
+                <ul>
+                  {capabilities.map((cap) => (
+                    <li
+                      key={cap.id}
+                      className="group flex items-center gap-4 px-5 py-4 border-b border-[var(--ren-border)] last:border-b-0 transition-colors hover:bg-[var(--accent-muted)]"
+                    >
+                      <span className="font-mono text-[12px] text-[var(--accent-color)]/80 w-6">{cap.id}</span>
+                      <span className="text-[14px] text-[var(--ren-text-primary)]">{cap.label}</span>
+                      <span className="ml-auto text-[var(--ren-text-tertiary)] group-hover:text-[var(--accent-color)] transition-colors">→</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="px-5 py-4 border-t border-[var(--ren-border)] flex items-center gap-3">
+                  <div className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[var(--accent-secondary)] opacity-60 animate-ping" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--accent-secondary)]" />
+                  </div>
+                  <span className="ren-spec-label">Sistema operativo</span>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
       </main>
+
+      {/* ───────── Footer técnico ───────── */}
+      <footer className="relative z-10 border-t border-[var(--ren-border)]">
+        <div className="mx-auto max-w-[1240px] px-5 sm:px-8 h-14 flex items-center justify-between">
+          <span className="ren-spec-label">REN · alpha</span>
+          <span className="ren-spec-label hidden sm:inline">Asistente de razonamiento clínico</span>
+          <span className="ren-spec-label text-[var(--accent-color)]">◆</span>
+        </div>
+      </footer>
     </div>
   );
 }
