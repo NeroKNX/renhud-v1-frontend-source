@@ -3,8 +3,9 @@
 import { motion } from 'motion/react';
 
 const suggestions = [
-  { icon: '🗣️', text: '¿Qué puedes hacer?', action: '¿Qué puedes hacer?' },
-  { icon: '🛠️', text: 'Enséname un Trick nuevo', action: 'Enséname un Trick nuevo' },
+  { idx: '01', text: '¿Qué puedes hacer?', action: '¿Qué puedes hacer?' },
+  { idx: '02', text: 'Enséñame un Trick nuevo', action: 'Enséñame un Trick nuevo' },
+  { idx: '03', text: 'Estructura un problema', action: 'Ayúdame a estructurar un problema complejo' },
 ];
 
 interface EmptyStateProps {
@@ -15,36 +16,34 @@ interface EmptyStateProps {
 export function EmptyState({ isGuest, onSuggestionClick }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] px-4 text-center select-none">
-      {/* Sigil */}
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <span className="text-5xl sm:text-6xl block mb-5" style={{ filter: 'drop-shadow(0 0 12px var(--accent-color))' }}>
-          🜁
-        </span>
-      </motion.div>
-
-      {/* Tagline */}
+      {/* Kicker técnico */}
       <motion.p
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.1 }}
-        className="text-xs sm:text-sm font-mono mb-5"
-        style={{ color: 'var(--accent-color)', letterSpacing: '0.02em' }}
+        transition={{ duration: 0.4 }}
+        className="ren-spec-label mb-5"
       >
-        REN
+        [ MOTOR DE RAZONAMIENTO ]
       </motion.p>
 
-      {/* Core pitch */}
+      {/* Titular dramático */}
+      <motion.h2
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.06 }}
+        className="ren-display text-[clamp(30px,5vw,52px)] text-[var(--ren-text-primary)] mb-6"
+      >
+        Estructura para<br /><span className="thin">cualquier dominio.</span>
+      </motion.h2>
+
+      {/* Core pitch — multidominio */}
       <motion.p
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.16 }}
-        className="text-sm sm:text-base font-mono ren-text-secondary leading-relaxed max-w-md mb-6"
+        className="text-sm sm:text-base ren-text-secondary leading-relaxed max-w-md mb-3"
       >
-        No soy un asistente genérico. Aprendo Tricks a tu medida, investigo en vivo y afino mi criterio con cada interacción.
+        No soy un asistente genérico. Razono sobre código, investigación, datos y decisiones clínicas — aprendo Tricks a tu medida y afino mi criterio con cada interacción.
       </motion.p>
 
       {/* Perfil line */}
@@ -52,44 +51,36 @@ export function EmptyState({ isGuest, onSuggestionClick }: EmptyStateProps) {
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.22 }}
-        className="text-xs sm:text-sm font-mono font-semibold mb-8"
+        className="font-mono text-xs font-semibold mb-8 tracking-wide"
         style={{ color: 'var(--accent-hover)' }}
       >
         Cada mensaje construye tu perfil.
       </motion.p>
 
-      {/* CTA */}
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+      {/* Divisor con marca */}
+      <motion.div
+        initial={{ opacity: 0, scaleX: 0 }}
+        animate={{ opacity: 1, scaleX: 1 }}
         transition={{ duration: 0.4, delay: 0.28 }}
-        className="text-sm font-mono ren-text-secondary mb-8"
-      >
-        💬 <em>Pregúntame lo que sea.</em>
-      </motion.p>
+        className="ren-rule w-40 mb-8"
+      />
 
-      {/* 2 suggestion pills */}
+      {/* Sugerencias afiladas */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.35 }}
-        className="flex flex-wrap gap-2 justify-center max-w-xs"
+        className="flex flex-wrap gap-2 justify-center max-w-md"
       >
-        {suggestions.map((s, i) => (
-          <motion.button
+        {suggestions.map((s) => (
+          <button
             key={s.text}
-            whileHover={{ scale: 1.05, y: -1 }}
-            whileTap={{ scale: 0.95 }}
             onClick={() => onSuggestionClick(s.action)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-mono
-              bg-[var(--ren-bg-tertiary)] border border-[var(--ren-border)]
-              text-[var(--ren-text-secondary)] hover:text-[var(--ren-text-primary)]
-              hover:border-[var(--accent-color)]/40
-              transition-all duration-200"
+            className="ren-spec-chip"
           >
-            <span>{s.icon}</span>
+            <span className="idx">{s.idx}</span>
             {s.text}
-          </motion.button>
+          </button>
         ))}
       </motion.div>
 
@@ -99,9 +90,9 @@ export function EmptyState({ isGuest, onSuggestionClick }: EmptyStateProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.45 }}
-          className="text-[11px] ren-text-tertiary font-mono mt-10"
+          className="text-[11px] ren-text-tertiary font-mono mt-10 tracking-wide"
         >
-          25 mensajes — sin huella
+          25 MENSAJES · SIN HUELLA
         </motion.p>
       )}
     </div>

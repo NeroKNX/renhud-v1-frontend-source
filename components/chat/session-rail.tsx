@@ -1,7 +1,7 @@
 'use client';
 
 import { Plus, Search, Star, MessageSquare } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { ChatSession } from '@/lib/session-manager';
 
 interface SessionRailProps {
@@ -22,6 +22,8 @@ export function SessionRail({
   userName,
 }: SessionRailProps) {
   const [query, setQuery] = useState('');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const filtered = sessions
     .filter((s) => !s.parentId)
@@ -103,7 +105,7 @@ export function SessionRail({
       {/* Footer user */}
       <div className="p-3 border-t border-[var(--ren-border)] shrink-0">
         <div className="ren-spec-label truncate">
-          {isGuest ? 'SESIÓN · INVITADO' : `USUARIO · ${(userName || '').toUpperCase()}`}
+          {!mounted ? '\u00A0' : isGuest ? 'SESIÓN · INVITADO' : `USUARIO · ${(userName || '').toUpperCase()}`}
         </div>
       </div>
     </aside>

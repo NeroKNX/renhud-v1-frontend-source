@@ -158,7 +158,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
               disabled={disabled}
               onClick={() => setIsAdvancedMode(!isAdvancedMode)}
               whileTap={{ scale: 0.92 }}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-full border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 rounded-[2px] border transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
                 isAdvancedMode
                   ? 'bg-[var(--accent-color)]/12 border-[var(--accent-color)]/40 text-[var(--accent-hover)]'
                   : 'border-transparent text-[var(--ren-text-tertiary)] hover:text-[var(--ren-text-secondary)] hover:bg-[var(--ren-bg-tertiary)]'
@@ -196,7 +196,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
                   type="button"
                   whileTap={{ scale: 0.9 }}
                   onClick={() => onToggleTrick?.(trick.id)}
-                  className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-full border text-[10px] sm:text-[11px] font-mono transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-[2px] border text-[10px] sm:text-[11px] font-mono transition-all cursor-pointer ${
                     trick.enabled
                       ? 'bg-[var(--accent-color)]/12 border-[var(--accent-color)]/35 text-[var(--accent-hover)]'
                       : 'border-[var(--ren-border)] text-[var(--ren-text-tertiary)] hover:border-[var(--accent-color)]/30 hover:text-[var(--ren-text-secondary)]'
@@ -209,7 +209,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
           )}
         </div>
 
-        <div className={`flex items-end gap-1.5 sm:gap-2 bg-[var(--ren-bg-secondary)] border rounded-lg px-2.5 sm:px-4 py-2 sm:py-2.5 transition-all ${
+        <div className={`flex items-end gap-1.5 sm:gap-2 bg-[var(--ren-bg-secondary)] border rounded-[2px] px-2.5 sm:px-4 py-2 sm:py-2.5 transition-all ${
           isAdvancedMode
             ? 'border-[var(--accent-color)] shadow-[0_0_20px_rgba(212,168,83,0.25)] ring-2 ring-[var(--accent-color)]/20'
             : isFocused
@@ -249,7 +249,7 @@ export function ChatInput({ onSendMessage, disabled, sessionId, quickTricks, onT
           <button
             type="submit"
             disabled={(!message.trim() && attachedFiles.length === 0) || disabled}
-            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full bg-[var(--accent-color)] text-[var(--ren-bg-primary)] hover:scale-105 hover:shadow-[0_0_12px_rgba(212,168,83,0.3)] disabled:bg-[var(--ren-bg-tertiary)] disabled:text-[var(--ren-text-tertiary)] disabled:border disabled:border-[var(--ren-border)] disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed transition-all"
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-[2px] bg-[var(--accent-color)] text-[var(--ren-bg-primary)] hover:scale-105 hover:shadow-[0_0_12px_rgba(212,168,83,0.3)] disabled:bg-[var(--ren-bg-tertiary)] disabled:text-[var(--ren-text-tertiary)] disabled:border disabled:border-[var(--ren-border)] disabled:scale-100 disabled:shadow-none disabled:cursor-not-allowed transition-all"
             aria-label="Enviar mensaje"
           >
             <Send size={16} />
